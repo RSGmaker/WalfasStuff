@@ -71,11 +71,11 @@ function LoadDNA(dna,sc,oc){
 	var D = dna.split(":");
 	var Back = LoadPart("Wings",dec(D[12]));
 	var Shoes = LoadPart("Shoes",dec(D[7]));
-	var basichead = Openfile("http://rsgmaker.x10host.com/public/createswf/Basichead/0.svg");
+	var basichead = Openfile("https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf/Basichead/0.svg");
 	
 	var Hair = LoadPart("Hair",D[4]);
 	var Hair2 = LoadPart("Hair2",D[4]);
-	var outlinehead = Openfile("http://rsgmaker.x10host.com/public/createswf/Basichead/1.svg");
+	var outlinehead = Openfile("https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf/Basichead/1.svg");
 	var Eyes = LoadPart("Eyes",D[8]);
 	var Mouth = LoadPart("Mouth",dec(D[9]));
 	var Hat = LoadPart("Hats",dec(D[3]));
@@ -167,7 +167,7 @@ function LoadPart(feature,index)
 {
 	if (index >-1)
 	{
-		var U = "http://rsgmaker.x10host.com/public/createswf/"+feature+"/"+index+".svg";
+		var U = "https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf/"+feature+"/"+index+".svg";
 		return Openfile(U);
 	}
 	return null;
