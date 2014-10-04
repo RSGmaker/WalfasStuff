@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: flash2svg, http://dissentgraphics.com/tools/flash2svg -->
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" id="sprite.__201571.__20(Items).__2F134" image-rendering="optimizeSpeed" baseProfile="basic" version="1.1" style="background-color:#ffffff" x="0px" y="0px" width="550px" height="400px" viewBox="0 0 550 400" enable-background="new 0 0 550 400" xmlns="http://www.w3.org/2000/svg">
+  <defs transform="matrix(1 0 0 1 0 0) "/>
+  <g id="sprite.__201571.__20(Items).__2F134">
+    <g id="Layer.__206">
+      <g id="MovieClip.__2Fsprite.__201524_1" overflow="visible">
+        <g id="Layer.__307">
+          <g id="Graphic.__2Fshape.__201540_6" overflow="visible">
+            <g id="Layer.__308">
+              <g id="shape288">
+                <path id="path903" fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1.689" stroke-linecap="round" stroke-linejoin="round" d="M193.395,-171.599 C189.06,-161.972 188.422,-154.423 191.501,-148.896 186.75,-147.551 182.02,-141.524 177.236,-130.754 L58.625,119.18 C55.587,121.15 53.641,120.227 52.751,116.392 L171.362,-133.542 C176.122,-142.687 177.973,-150.034 176.933,-155.622 L176.704,-156.618 C181.605,-156.209 187.206,-161.216 193.395,-171.599z"/>
+                <path id="path904" fill="#C2C2C2" fill-opacity="1" d="M183.619,-151 L191.501,-148.896 C188.422,-154.423 189.06,-161.972 193.395,-171.599 L183.619,-151z"/>
+                <path id="path905" fill="none" stroke="#010101" stroke-opacity="0" stroke-width="1.689" stroke-linecap="round" stroke-linejoin="round" d="M193.395,-171.599 L183.619,-151 L191.501,-148.896"/>
+                <path id="path906" fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1.689" stroke-linecap="round" stroke-linejoin="round" d="M191.501,-148.896 C188.422,-154.423 189.06,-161.972 193.395,-171.599"/>
+                <path id="path907" fill="#7F7B7A" fill-opacity="1" d="M191.501,-148.896 L183.619,-151 173.862,-130.439 C174.793,-130.137 175.906,-130.217 177.236,-130.754 182.02,-141.524 186.75,-147.551 191.501,-148.896z"/>
+                <path id="path908" fill="none" stroke="#010101" stroke-opacity="0" stroke-width="1.689" stroke-linecap="round" stroke-linejoin="round" d="M191.501,-148.896 L183.619,-151 173.862,-130.439"/>
+                <path id="path909" fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1.689" stroke-linecap="round" stroke-linejoin="round" d="M173.862,-130.439 C174.793,-130.137 175.906,-130.217 177.236,-130.754 182.02,-141.524 186.75,-147.551 191.501,-148.896"/>
+                <path id="path910" fill="#FFFFFF" fill-opacity="1" d="M183.619,-151 L193.395,-171.599 C187.206,-161.216 181.605,-156.209 176.704,-156.618 L176.933,-155.622 183.619,-151z"/>
+                <path id="path911" fill="none" stroke="#010101" stroke-opacity="0" stroke-width="1.689" stroke-linecap="round" stroke-linejoin="round" d="M176.933,-155.622 L183.619,-151 L193.395,-171.599"/>
+                <path id="path912" fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1.689" stroke-linecap="round" stroke-linejoin="round" d="M193.395,-171.599 C187.206,-161.216 181.605,-156.209 176.704,-156.618 L176.933,-155.622"/>
+                <path id="path913" fill="#2B2B2B" fill-opacity="1" d="M177.236,-130.754 C175.906,-130.217 174.793,-130.137 173.862,-130.439 172.739,-130.832 171.925,-131.873 171.362,-133.542 L52.751,116.392 C53.641,120.227 55.587,121.15 58.625,119.18 L177.236,-130.754z"/>
+                <path id="path914" fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1.689" stroke-linecap="round" stroke-linejoin="round" d="M177.236,-130.754 C175.906,-130.217 174.793,-130.137 173.862,-130.439 172.739,-130.832 171.925,-131.873 171.362,-133.542 L52.751,116.392 C53.641,120.227 55.587,121.15 58.625,119.18 L177.236,-130.754z"/>
+                <path id="path915" fill="#D2D2D2" fill-opacity="1" d="M173.862,-130.439 L183.619,-151 176.933,-155.622 C177.973,-150.034 176.122,-142.687 171.362,-133.542 171.925,-131.873 172.739,-130.832 173.862,-130.439z"/>
+                <path id="path916" fill="none" stroke="#010101" stroke-opacity="0" stroke-width="1.689" stroke-linecap="round" stroke-linejoin="round" d="M173.862,-130.439 L183.619,-151 176.933,-155.622"/>
+                <path id="path917" fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1.689" stroke-linecap="round" stroke-linejoin="round" d="M176.933,-155.622 C177.973,-150.034 176.122,-142.687 171.362,-133.542 171.925,-131.873 172.739,-130.832 173.862,-130.439"/>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

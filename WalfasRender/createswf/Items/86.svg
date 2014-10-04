@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: flash2svg, http://dissentgraphics.com/tools/flash2svg -->
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" id="sprite.__201571.__20(Items).__2F86" image-rendering="optimizeSpeed" baseProfile="basic" version="1.1" style="background-color:#ffffff" x="0px" y="0px" width="550px" height="400px" viewBox="0 0 550 400" enable-background="new 0 0 550 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="MovieClip.__2Fsprite.__201333" viewBox="-9.25 -36.5 18.5 73">
+      <g id="Layer.__294">
+        <use xlink:href="#Graphic.__2Fshape.__201382" id="Graphic.__2Fshape.__201383" width="18.5" height="73" x="-9.25" y="-36.5" transform="matrix(1 0 0 1 0 0)" overflow="visible"/>
+      </g>
+    </symbol>
+    <symbol id="Graphic.__2Fshape.__201382" viewBox="-9.25 -36.5 18.5 73">
+      <g id="Layer.__332">
+        <g id="shape1692" transform="matrix(1 0 0 1 -9.249 -36.499)">
+          <path id="path1592" transform="matrix(1 0 0 1 9.2 36.45)" fill="#000000" fill-opacity="1" d="M1.55,-36.3 L0.75,-36.5 C-1.4,-36.35 -3.55,-35.75 -5.6,-34.6 -7.35,-33.65 -8.4,-32.7 -8.65,-31.75 L-8.75,-31.75 -8.75,-31.25 -8.75,-31.05 -9.25,-23.25 -7.8,-5.1 C-5.7,22.65 -2.5,36.5 1.85,36.5 6.15,36.5 8.6,33.5 9.25,27.55 L9.25,16.6 C7.4,-6.75 4.8,-24.35 1.55,-36.3z M2.35,-5.25 L-0.25,-5.5 -3.6,-5.15 -3.85,-8.45 -4.6,-18.5 C-2.95,-18.55 -1.2,-18.95 0.7,-19.7 L2.35,-5.25zM-0.5,-29.7 L0,-25.3 -5.1,-24.1 -5.5,-28.5 C-3.7,-28.55 -2.05,-28.95 -0.5,-29.7z"/>
+          <path id="path1596" transform="matrix(1 0 0 1 9.2 36.45)" fill="#D699FF" fill-opacity="1" d="M2.8,-1.1 L2.35,-5.25 -0.25,-5.5 -3.6,-5.15 -3.1,0.45 C-1.9,14.15 -0.35,24.1 1.5,30.25 2.95,29.2 3.8,27 4.15,23.65 L4.25,16.85 C4.25,14.1 3.75,8.15 2.8,-1.1z "/>
+          <path id="path1597" transform="matrix(1 0 0 1 9.2 36.45)" fill="#6F4200" fill-opacity="1" d="M-0.5,-29.7 C-2.05,-28.95 -3.7,-28.55 -5.5,-28.5 L-5.1,-24.1 0,-25.3 -0.5,-29.7z "/>
+        </g>
+      </g>
+    </symbol>
+  </defs>
+  <g id="sprite.__201571.__20(Items).__2F86">
+    <g id="Layer.__238">
+      <use xlink:href="#MovieClip.__2Fsprite.__201333" id="MovieClip.__2Fsprite.__201334" width="18.5" height="73" x="-9.25" y="-36.5" transform="matrix(0.7071075439453125 0.7071075439453125 -0.7071075439453125 0.7071075439453125 88.1 58)" overflow="visible"/>
+    </g>
+    <g id="Layer.__239">
+      <use xlink:href="#MovieClip.__2Fsprite.__201333" id="MovieClip.__2Fsprite.__201335" width="18.5" height="73" x="-9.25" y="-36.5" transform="matrix(0.258819580078125 0.9659271240234375 -0.9659271240234375 0.258819580078125 91.1 63)" overflow="visible"/>
+    </g>
+  </g>
+</svg>

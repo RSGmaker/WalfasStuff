@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: flash2svg, http://dissentgraphics.com/tools/flash2svg -->
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" id="sprite.__20250.__20(Wings).__2F112" image-rendering="optimizeSpeed" baseProfile="basic" version="1.1" style="background-color:#ffffff" x="0px" y="0px" width="550px" height="400px" viewBox="0 0 550 400" enable-background="new 0 0 550 400" xmlns="http://www.w3.org/2000/svg">
+  <defs transform="matrix(1 0 0 1 0 0) ">
+    <linearGradient gradientUnits="userSpaceOnUse" color-interpolation="sRGB" x1="474.196" y1="-25.904" x2="498.938" y2="6.134" id="linearGradient83">
+      <stop stop-color="#7B7B7B" stop-opacity="1" offset="0"/>
+      <stop stop-color="#AAAAAA" stop-opacity="1" offset="0.52157"/>
+      <stop stop-color="#B3B3B3" stop-opacity="1" offset="1"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" color-interpolation="sRGB" x1="474.196" y1="-25.904" x2="498.938" y2="6.134" id="linearGradient84">
+      <stop stop-color="#7B7B7B" stop-opacity="1" offset="0"/>
+      <stop stop-color="#AAAAAA" stop-opacity="1" offset="0.52157"/>
+      <stop stop-color="#B3B3B3" stop-opacity="1" offset="1"/>
+    </linearGradient>
+  </defs>
+  <g id="sprite.__20250.__20(Wings).__2F112">
+    <g id="Layer.__217">
+      <g id="MovieClip.__2Fsprite.__20213_1" overflow="visible">
+        <g id="Layer.__311">
+          <g id="Graphic.__2Fshape.__20249_14" overflow="visible">
+            <g id="Layer.__312">
+              <g id="shape1401">
+                <path id="path2170" fill="none" stroke="#000000" stroke-opacity="1" stroke-width="4.337" stroke-linecap="round" stroke-linejoin="round" d="M268.037,209.289 L256.77,194.701 100.583,315.317 42.271,338.795 76.283,283.851 232.47,163.234 221.204,148.645 236.079,137.158 282.912,197.802 268.037,209.289z"/>
+                <path id="path2171" fill="url(#linearGradient83)" fill-opacity="1" d="M256.77,194.701 L268.037,209.289 282.912,197.802 236.079,137.158 221.204,148.645 232.47,163.234 256.77,194.701z"/>
+                <path id="path2172" fill="none" stroke="#000000" stroke-opacity="1" stroke-width="4.337" stroke-linecap="round" stroke-linejoin="round" d="M256.77,194.701 L268.037,209.289 282.912,197.802 236.079,137.158 221.204,148.645 232.47,163.234 256.77,194.701z"/>
+                <path id="path2173" fill="url(#linearGradient84)" fill-opacity="1" d="M42.271,338.795 C76.007,312.468 95.415,304.604 100.583,315.317 L256.77,194.701 232.47,163.234 76.283,283.851 C87.82,289.92 76.497,308.254 42.271,338.795z"/>
+                <path id="path2174" fill="none" stroke="#000000" stroke-opacity="1" stroke-width="4.337" stroke-linecap="round" stroke-linejoin="round" d="M42.271,338.795 C76.007,312.468 95.415,304.604 100.583,315.317 L256.77,194.701 232.47,163.234 76.283,283.851 C87.82,289.92 76.497,308.254 42.271,338.795z"/>
+                <path id="path2175" fill="#999999" fill-opacity="1" d="M42.271,338.795 L100.583,315.317 C95.415,304.604 76.007,312.468 42.271,338.795"/>
+                <path id="path2176" fill="none" stroke="#000000" stroke-opacity="1" stroke-width="4.337" stroke-linecap="round" stroke-linejoin="round" d="M42.271,338.795 L100.583,315.317 C95.415,304.604 76.007,312.468 42.271,338.795"/>
+                <path id="path2177" fill="#999999" fill-opacity="1" d="M76.283,283.851 L42.271,338.795 C76.497,308.254 87.82,289.92 76.283,283.851"/>
+                <path id="path2178" fill="none" stroke="#000000" stroke-opacity="1" stroke-width="4.337" stroke-linecap="round" stroke-linejoin="round" d="M76.283,283.851 L42.271,338.795 C76.497,308.254 87.82,289.92 76.283,283.851"/>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

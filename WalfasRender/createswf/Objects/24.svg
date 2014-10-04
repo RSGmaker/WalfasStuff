@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" height="720.75px" width="1716.8px" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1, 0, 0, 1, 307.05, 450.35)">
+    <use height="66.8" transform="matrix(1.0, 0.0, 0.0, 1.0, -273.8, -32.35)" width="572.15" xlink:href="#sprite0"/>
+  </g>
+  <defs>
+    <g id="sprite0" transform="matrix(1, 0, 0, 1, 246.2, -37.2)">
+      <use height="62.6" transform="matrix(1.0, 0.0, 0.0, 1.0, -246.2, 41.4)" width="570.2" xlink:href="#shape0"/>
+    </g>
+    <g id="shape0" transform="matrix(1, 0, 0, 1, 246.2, -41.4)">
+      <path d="M238.05 82.7 L209.2 86.8 79.05 104.0 161.9 83.35 -27.0 87.45 57.2 82.5 -58.2 81.7 -211.55 81.55 -234.0 84.4 -246.2 81.7 -128.45 66.25 177.2 65.05 99.4 45.7 132.9 45.9 113.75 41.4 281.55 57.5 324.0 71.65 232.75 83.7 238.05 82.7" fill="#000000" fill-rule="evenodd" stroke="none"/>
+      <path d="M273.0 58.55 L306.95 69.85 233.95 79.5 238.2 78.7 215.1 82.0 111.0 95.75 177.3 79.25 26.15 82.5 93.5 78.55 1.2 77.9 -121.5 77.8 -139.45 80.05 -149.2 77.9 -55.0 65.55 189.5 64.6 127.25 49.1 154.05 49.25 138.75 45.65 273.0 58.55" fill="#ea0404" fill-opacity="0.7529412" fill-rule="evenodd" stroke="none"/>
+    </g>
+  </defs>
+</svg>
