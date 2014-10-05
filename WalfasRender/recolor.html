@@ -425,16 +425,17 @@ function ondatachange()
 		{
 			pst = pst + "&object=" + object;
 		}
+		var URL = location.search.slice(0, location.search.indexOf(".html")+".html".length);
 		if (location.search.indexOf("?dna=") > -1){
 			//var TD = location.search.split('?dna=')[0];
 			//location.search = TD + "?dna="+T;
 			
 			
-			window.history.pushState('Walfas recolor', data["name"], '/RSGmaker/WalfasStuff/master/WalfasRender/recolor.html?dna='+T+pst);
+			window.history.pushState('Walfas recolor', data["name"], URL+'?dna='+T+pst);
 		}else
 		{
 			//location.search = location.search + "?dna=" + T;
-			window.history.pushState('Walfas recolor', data["name"], '/RSGmaker/WalfasStuff/master/WalfasRender/recolor.html?dna='+T+pst);
+			window.history.pushState('Walfas recolor', data["name"], URL+'?dna='+T+pst);
 		}
 		}
 		document.getElementById("dna").value = T;
