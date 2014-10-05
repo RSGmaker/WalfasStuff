@@ -1,0 +1,12 @@
+application: WalfasStuffs
+version: 1
+runtime: php
+api_version: 1
+
+handlers:
+- url: /(.*\.(gif|png|jpg|svg|html))$
+  static_files: static/\1
+  upload: static/.*\.(gif|png|jpg|svg|html)$
+  
+- url: /.*
+  script: helloworld.php
