@@ -1,0 +1,939 @@
+<html>
+<head>
+<title>Touhou Pong! by RSGmaker</title>
+</head>
+<body style="overflow: hidden;margin: 0;padding: 0;">
+<div style="margin-left: auto ;margin-right: auto ;">
+<center>
+<canvas id="canvas" />
+</center>
+</div>
+<script src="http://cdn.webrtc-experiment.com/DataChannel.js"> </script>
+<script src="https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/drawwalfas.js"> </script>
+<div id="chat-output" style="z-index: 1; position: absolute; right: 0px; bottom: 0%; background-color: #ffffff; width: 100%; height: 30%; padding: 0px; color: black; visibility:hidden">textchat:<input type="text" id="chatinput" name="" value=""><br/><div id="textchat"></div></div>
+
+<script>
+	var chat = document.getElementById("chat-output");
+	var textbox = document.getElementById("chatinput");
+	var textchat = document.getElementById("textchat");
+	var name;
+	name = "???";
+	if (typeof localStorage.username == 'undefined')
+	{
+		var A = prompt("enter a username","");
+		if (A != "")
+		{
+			localStorage.username = A;
+		}
+	}
+	else
+	{
+		name = localStorage.username;
+	}
+	var users = [];
+	//the number of users yet to leave the channel
+	var onlineusers = 0;
+	var me = 0;
+	var LeftPlayer = 0;
+	var RightPlayer = 0;
+	var detect = true;
+	//send message(network command) to everyone in the channel
+	function Send(msg){
+		if (msg instanceof Array)
+		{
+			var M = msg;
+			var i = 0;
+			msg = "";
+			while (i < M.length)
+			{
+				if (msg == "")
+				{
+					msg = M[i];
+				}
+				else
+				{
+					msg = msg + "{\\}" + M[i];
+				}
+				i = i+1;
+			}
+		}
+		channel.onmessage(msg, me.id);
+		if (started)
+		{
+			channel.send(msg);
+		}
+	}
+	function CreateUser(userid, role) {
+    var user = {
+		//index of users
+		index:users.length,
+		//the userid of datachannel
+		id:userid,
+		//what the users role in the channel is
+		role:role,
+		//whether or not the user has yet to leave the channel
+		online:true,
+		//the associated character
+		entity:0,
+		//number of points scored
+		points:0,
+		//time of opening app(used to help remove character doubling)
+		utc:99999999999999999999999999999,
+		//displayed nickname
+		name:"???",
+		//walfas dna used in drawwalfas.js
+		DNA:""
+	};
+	users[user.index] = user;
+	return user;
+	}
+	
+	function GetUser(userid){
+		var i = 0;
+		while (i<users.length)
+		{
+			if (users[i].id == userid)
+			{
+				return users[i];
+			}
+			i = i+1;
+		}
+		users[i] = CreateUser(userid,"none");
+	}
+	//room id(aka channel)
+	var rid = "";
+	if (location.search.indexOf("room=") > -1){
+		rid = location.search.split('room=')[1];
+	}
+	else{
+		rid = "general";
+	}
+    var channel = new DataChannel("Walfas Pong_"+rid);
+	
+	var test=0;
+	//which userclients turn it is to pass an update
+	var turn = 1;
+	//the current frame
+	var sync = 0;
+	var started = false;
+	function init(){
+		if (!started){
+			started = true;
+			me = CreateUser(channel.userid,"none");
+			me.name=name;
+			paused=false;
+			//try to force audio to preload
+			GetSound("bonk.wav").volume = 0.15;
+			GetSound("die.wav").volume=0.1;
+			GetSound("powerup.wav").volume = 0.15;
+		}
+	}
+    channel.onopen = function(userid) {
+		onlineusers = onlineusers + 1;
+		init();
+		if (me.role != "none")
+		{
+			announce = 30;
+		}
+    };
+	var sysmsg="";
+	var announce = 0;
+	
+	channel.onclose = function (event) {
+            //sysmsg = "connection lost\nplease restart";
+        };
+
+    channel.onerror = function (event) {
+		sysmsg = "error:"+event;
+	}
+
+    channel.onmessage = function(message, userid,latency) {
+		init();
+				 
+		var command = message;
+		var data;
+		if (message.indexOf("{\\}")){
+			data = message.split("{\\}");
+			command = data[0];
+		}
+		else{
+			data = [message];
+		}
+		var user=GetUser(userid);
+		processcommand(command,data,user,latency);
+    };
+	
+	//this command processes messages sent from other online users
+	function processcommand(command,data,user,latency){
+		if (user == 0 || ""+user == "undefined")
+		{
+			return;
+		}
+		//is user playing
+		var userplayer = (user == LeftPlayer || user == RightPlayer);
+		//am i a player?
+		var implayer = (me == LeftPlayer || me == RightPlayer);
+		var ustr = user.id;
+		if (user == me)
+		{
+			ustr = "you";
+		}
+		switch(command) {
+		case "whoswho":
+			//this command asks the connected clients to announce themselves so they can become visible to them and sync player data if applicable
+			Send(["I'm",me.role,me.points,me.utc,me.name]);
+			if (me.role != "none")
+			{
+				//tell the asker whether the game has been paused or not
+				Send(["Pause",paused])
+			}
+			break;
+		case "I'm":
+			//recieved an announcement via the whoswho command, thus this command populates the information
+			user.name = data[4];
+			if (me.role == data[1] && user != me)
+			{
+				Send(["Double",data[1],new Date().getTime() - me.utc]);
+				return;
+			}
+			if (data[1] == "Left")
+			{
+				user.points = parseInt(data[2]);
+				user.utc = parseInt(data[3]);
+				LeftPlayer = user;
+				user.role = "Left";
+				user.entity = LeftPaddle;
+				LeftPaddle.visible = true;
+				if (user != me)
+				{
+					detect = true;
+				}
+			}
+			if (data[1] == "Right")
+			{
+				user.points = parseInt(data[2]);
+				user.utc = parseInt(data[3]);
+				RightPlayer = user;
+				user.role = "Right";
+				user.entity = RightPaddle;
+				RightPaddle.visible = true;
+			}
+			if (me.role != "none" && (me.DNA != "" && me.DNA != null))
+			{
+				Send(["DNA",me.DNA]);
+			}
+			break;
+		case "JoinGame":
+			//user asks to be set as a player
+			if (data[1] == "Left")
+			{
+				if ((user.role == "none" && (LeftPlayer == 0 || !LeftPlayer.online)) || user.role=="Left")
+				{
+					LeftPlayer = user;
+					user.role = "Left";
+					user.entity = LeftPaddle;
+					LeftPaddle.visible = true;
+				}
+			}
+			if (data[1] == "Right")
+			{
+				if ((user.role == "none" && (RightPlayer == 0 || !RightPlayer.online))  || user.role=="Right")
+				{
+					RightPlayer = user;
+					user.role = "Right";
+					user.entity = RightPaddle;
+					RightPaddle.visible = true;
+				}
+			}
+			if (user == me)
+			{
+				if (me.role != "none" && (me.DNA != "" && me.DNA != null))
+				{
+					Send(["DNA",me.DNA]);
+				}
+			}
+			break;
+		case "ExitGame":
+			if (LeftPlayer == user)
+			{
+				user.entity = 0;
+				user.role = "none";
+				LeftPlayer = 0;
+				LeftPaddle.visible=false;
+				user.points=0;
+			}
+			if (RightPlayer == user)
+			{
+				user.entity = 0;
+				user.role = "none";
+				RightPlayer = 0;
+				RightPaddle.visible=right;
+				user.points=0;
+			}
+			break;
+		case "Repos":
+			//users character has moved
+			if (user.role == me.role && users.utc < me.role)
+			{
+				me.role = "none";
+			}
+			if ((!userplayer) || !playing || user.role == "none")
+			{
+				Send("whoswho");
+			}
+			if (user.entity != 0)
+			{
+				user.entity.x = data[1];
+				user.entity.y = data[2];
+			}
+			break;
+		case "Collision":
+			//users character hit a ball
+			if (!userplayer)
+			{
+				//if a nonplayer(or an unannounced one) hits a ball, ask everyone to reannounce and have it hopefully get resolved in the process
+				Send("whoswho");
+			}
+			{
+			var ball = entities[parseInt(data[5])];
+			ball.x = parseInt(data[1]);
+			ball.y = parseInt(data[2]);
+			ball.spd.x = parseInt(data[3]);
+			ball.spd.y = parseInt(data[4]);
+			ball.bounces=ball.bounces+1;
+			tbounces = tbounces+1;
+			PlaySound("bonk.wav");
+			ltime = Date.now()-latency;
+			}
+			break;
+		case "LostPoint":
+			//user let the ball go off their side of the screen
+			if (userplayer)
+			{
+			var ball = entities[parseInt(data[5])];
+			ball.x = parseInt(data[1]);
+			ball.y = parseInt(data[2]);
+			ball.spd.x = parseInt(data[3]);
+			ball.spd.y = parseInt(data[4]);
+			if (user == LeftPlayer)
+			{
+				RightPlayer.points = RightPlayer.points+1;
+			}
+			if (user == RightPlayer)
+			{
+				LeftPlayer.points = LeftPlayer.points+1;
+			}
+			ball.bounces=0;
+			tbounces = 0;
+			if (ball != Ball)
+			{
+				ball.visible=false;
+			}
+			if (LeftPlayer != 0 && RightPlayer != 0)
+			{
+				PlaySound("die.wav");
+			}
+			ltime = Date.now()-latency;
+			}
+			break;
+		case "Spawnsecond":
+			//ITS RAAAAAAAAAAN! TIME!~
+			if (userplayer)
+			{
+			var ball = entities[parseInt(data[5])];
+			ball.visible = true;
+			ball.x = parseInt(data[1]);
+			ball.y = parseInt(data[2]);
+			ball.spd.x = parseInt(data[3]);
+			ball.spd.y = parseInt(data[4]);
+			ball.bounces=0;
+			PlaySound("powerup.wav");
+			ltime = Date.now()-latency;
+			}
+			break;
+		case "Pause":
+			//user paused the game, this also activates the chat window
+			if (user == LeftPlayer || user == RightPlayer)
+			{
+				sysmsg="";
+				paused = (data[1] == "true");
+				if (paused)
+				{
+					chat.style.visibility="visible";
+				}
+				else
+				{
+					chat.style.visibility="hidden";
+				}
+			}
+			break;
+		case "Chat":
+			//user sent a chat message
+			textchat.innerHTML = user.name+":"+data[1] +"<br/>" + textchat.innerHTML;
+		break;
+		case "Double":
+			//this is sent when 2 users are deciding who is supposed to be controlling a character(when 2 join as same character glitch)
+			if (user != me && me.role == data[1])
+			{
+				var D = (new Date().getTime() - me.utc) - latency;
+				D = "" + D;
+				if (D < data[2])
+				{
+					me.role = "none";
+				}
+				else
+				{
+					Send(["JoinGame",me.role])
+				}
+			}
+		break;
+		case "DNA":
+			//user activated a walfas dna change their character to it.
+			if (user.role != "none" && user.DNA == "")
+			{
+				user.DNA = data[1];
+				user.entity.i = imageFromDNA(user.DNA,0.7);
+			}
+		break;
+		default:
+	}
+	}
+
+    channel.onleave = function(userid) {
+		processcommand("ExitGame",["ExitGame"],GetUser(userid));
+		onlineusers = onlineusers-1;
+		if (onlineusers <= 0)
+		{
+			var oc = channel;
+			channel = new DataChannel("Walfas Pong_"+rid);
+			channel.onopen = oc.onopen;
+			channel.onmessage = oc.onmessage
+			channel.onleave = oc.onleave;
+			channel.onclose = oc.onclose;
+			channel.onerror = oc.onerror;
+			me.id = channel.userid;
+		}
+    };
+	
+	function DrawEntity(E){
+	if (E.angle==0){
+		G.drawImage(E.i,Math.round(E.x),Math.round(E.y));
+	}else{
+	G.save();
+	var x2,y2;
+	// save the current co-ordinate system 
+	// before we screw with it
+	G.save(); 
+ 
+	// move to the middle of where we want to draw our image
+	G.translate(E.x, E.y);
+	G.scale(E.xscale,E.yscale);
+ 
+	// rotate around that point, converting our 
+	// angle from degrees to radians 
+	G.rotate(E.angle);
+ 
+	// draw it up and to the left by half the width
+	// and height of the image 
+	G.drawImage(E.i, -(E.i.width/2), -(E.i.height/2));
+ 
+	// and restore the co-ords to how they were when we began
+	G.restore(); 
+	}
+	
+}
+	function DrawEntities(){
+		var i = 0;
+		while (i < entities.length){
+			if (entities[i].visible)
+			{
+				DrawEntity(entities[i]);
+			}
+			i = i+1;
+		}
+	}
+	function PlaySound(url){
+		var S = GetSound(url);
+		S.play();
+		return S;
+	}
+	function GetSound(url){
+		if (typeof Sounds[url] != 'undefined')
+		{
+			return Sounds[url];
+		}
+		else
+		{
+			var S;
+			S = new Audio();
+			S.src = url;
+			S.volume=0.15;
+			Sounds[url] = S;
+			return S;
+		}
+	}
+	var Sheight,Sh2,C,G,entities,LeftPaddle,RightPaddle,Ball,Ball2,wnd,paused,FPS,mpos,playing,Tutc,tbounces,Sounds,oob;{
+	Sounds = {};
+	GetSound("bonk.wav");
+	GetSound("die.wav").volume=0.1;
+	GetSound("powerup.wav");
+	//vertical resolution
+	Sheight = 720;
+	Sh2 = Sheight / 2;
+	//canvas
+	C = document.getElementById('canvas');
+	G = C.getContext("2d");
+	entities = [];
+	wnd = {};
+	wnd.ratio = 1;
+	wnd.width = 1;
+	wnd.height = 1;
+	paused=true;
+	FPS = 1;
+	mpos = {x:0,y:0};
+	Tutc = 9999999999999999999999999999999999999999999999;
+	tbounces = 0;
+	//out of bounds(used for detecting lost chens)
+	oob = false;
+	}
+
+	
+    window.onmousemove = handleMouseMove;
+	document.addEventListener("touchmove",handleTouchMove);
+	//basicly mouse click, but for tablets
+	function handleTouchMove(event) {
+        event = event || window.event; // IE-ism
+        mpos = {
+            x: event.changedTouches[0].clientX,
+            y: event.changedTouches[0].clientY
+        };
+    }
+	addEventListener("mousedown", function (e) {
+	if (me == 0 && !started)
+	{
+		me = CreateUser(99999999999999999,"none");
+		me.name=name;
+		Tutc = new Date().getTime();
+		me.utc = Tutc;
+		Send("whoswho");
+		detect=true;
+		paused=false;
+		GetSound("bonk.wav").volume=0.05;
+		GetSound("die.wav").volume=0.01;
+		GetSound("powerup.wav").volume=0.05;
+	}
+	if (me != 0 && me.role == "none")
+	{
+		if (detect)
+		{
+			Tutc = new Date().getTime();
+			me.utc = Tutc;
+			JoinGame();
+			GetSound("bonk.wav");
+			GetSound("die.wav").volume=0.1;
+			GetSound("powerup.wav");
+		}
+	}
+}, false);
+	document.onkeydown = function(event) {
+		var e = event.keyCode;
+		//enter
+		if (e == 13 && chat.style.visibility == "visible" )
+		{
+			Send(["Chat",textbox.value]);
+			textbox.value="";
+		}
+		//escape
+		if (e == 27)
+		{
+			if (me.role != "none")
+			{
+				Send(["Pause","" + !paused]);
+			}
+		}
+		//F9
+		if (e == 120)
+		{
+			var A = prompt("enter a walfas dna",localStorage.walfasdna);
+			if (A != "")
+			{
+				localStorage.walfasdna = A;
+				Send(["DNA",A]);
+			}
+		}
+		//F10
+		if (e == 121)
+		{
+			var A = prompt("enter a username",localStorage.username);
+			if (A != "")
+			{
+				localStorage.username = A;
+			}
+			me.name = A;
+			name = A;
+			channel.onmessage("whoswho", me.id);
+		}
+	}
+	function JoinGame(){
+		if (me.role == "none")
+		{
+			if (LeftPlayer == me)
+			{
+				me.role = "Left";
+				me.entity = LeftPaddle;
+			}
+			else if (RightPlayer == me)
+			{
+				me.role = "Right";
+				me.entity = RightPaddle;
+			}
+			else if (LeftPlayer == 0 || RightPlayer == 0)
+			{
+				if (LeftPlayer == 0)
+				{
+					Send("JoinGame{\\}"+"Left");
+				}
+				else if (RightPlayer == 0)
+				{
+					Send("JoinGame{\\}"+"Right");
+				}
+				else
+				{
+					alert("Game is filled,cant join game");
+				}
+			}
+		}
+		else
+		{
+			Send("ExitGame");
+		}
+	}
+
+    function handleMouseMove(event) {
+        event = event || window.event; // IE-ism
+        mpos = {
+            x: event.clientX,
+            y: event.clientY
+        };
+    }
+	var windowupdate = function(){
+		if (wnd.width != window.innerWidth || wnd.height != window.innerHeight){
+			wnd.ratio = window.innerWidth / window.innerHeight;
+			C.height=Sheight;
+			C.width = C.height;
+			C.style.width=(100 / wnd.ratio) + "%";
+			wnd.width = window.innerWidth;
+			wnd.height = window.innerHeight;
+		}
+	}
+	var lmpos = {x:0,y:0};
+	var update = function(T){
+		//get window aspect ratio
+		windowupdate();
+		//draw background
+		G.fillStyle="#000033";
+		G.fillRect(0, 0, C.width, C.height);
+		G.fillStyle="white";
+		G.font="80px Arial";
+		G.strokeStyle="white"
+		//make sure users have announced themselves
+		if (announce>0)
+		{
+			if (announce==1)
+			{
+				channel.onmessage("whoswho",me.id,0);
+			}
+			announce = announce-1;
+		}
+		var scrmsg="";
+		//draw HUD
+		if (LeftPlayer != 0 && LeftPlayer.online)
+		{
+			G.textAlign="left"; 
+			G.strokeText(""+LeftPlayer.points,20,80);
+			G.font="40px Arial";
+			G.strokeText(""+LeftPlayer.name,20,Sheight-40);
+			G.font="80px Arial";
+		}
+		if (RightPlayer != 0 && RightPlayer.online)
+		{
+			G.textAlign="right"; 
+			G.strokeText(""+RightPlayer.points,Sheight-20,80);
+			G.font="40px Arial";
+			G.strokeText(""+RightPlayer.name,Sheight-20,Sheight-40);
+			G.font="80px Arial";
+			G.textAlign="left"; 
+		}
+		if (playing && !paused)
+		{
+			G.textAlign="center"; 
+			G.strokeText(""+tbounces,Sh2,80);
+			G.textAlign="left"; 
+		}
+		if (me == 0)
+		{
+			scrmsg = "Click to join!";
+		}
+		
+		else if (me.role != "none" && !playing)
+		{
+			if (LeftPlayer==0 || !LeftPlayer.online)
+			{
+				scrmsg = "Waiting for Mokou...";
+			}
+			else if (RightPlayer==0 || !RightPlayer.online)
+			{
+				scrmsg = "Waiting for Kaguya...";
+			}
+		}
+		if (me.role == "none" && (LeftPlayer == 0 || RightPlayer == 0))
+		{
+			scrmsg = "Click to join!";
+		}
+		if (playing && paused)
+		{
+			scrmsg = "Paused";
+		}
+		if (sysmsg!="")
+		{
+			scrmsg = sysmsg;
+		}
+		if (scrmsg == "Click to join!" && onlineusers<=0)
+		{
+			scrmsg = "Click to play";
+		}
+		if (scrmsg != "")
+		{
+			G.textAlign="center"; 
+			G.strokeText(scrmsg,Sh2,80);
+			G.textAlign="left"; 
+		}
+		if (!paused){
+			playing = ((LeftPlayer != null && LeftPlayer.online) && (RightPlayer != null && RightPlayer.online));
+			if (me.role != "none")
+			{
+				//if players mouse moved reposition their character
+				if (mpos.x != lmpos.x || mpos.y != lmpos.y)
+				{
+					if (me.entity != 0)
+					{
+						var y = ((mpos.y / window.innerHeight)*Sheight) - 40;
+						if (tgle)
+						{
+							Send(["Repos",me.entity.x,Math.ceil(y)]);
+						}
+					}
+					
+					lmpos.x = mpos.x;
+					lmpos.y = mpos.y;
+				}
+			}
+			if (me.role != "none" && (LeftPlayer != 0 || RightPlayer != 0))
+			{
+				LeftPaddle.visible=true;
+				RightPaddle.visible=true;
+				//keep track of chen and ran
+				updateball(Ball,T,me.entity);
+				updateball(Ball2,T,me.entity);
+				//if not online play(single player)
+				if (!playing)
+				{
+					//this is the AI logic
+					if (me.entity != RightPaddle)
+					{
+						if (tbounces % 4 > 2)
+						{
+							//sometimes strike ball from below
+							RightPaddle.y = Ball.y + 40;
+						}
+						else
+						{
+							//sometimes strike ball from above
+							RightPaddle.y = Ball.y - 40;
+						}
+						
+						//keep track of chen and ran
+						updateball(Ball,T,RightPaddle);
+						updateball(Ball2,T,RightPaddle);
+					}
+					else
+					{
+						if (tbounces % 4 > 2)
+						{
+							//sometimes strike ball from below
+							LeftPaddle.y = Ball.y + 40;
+						}
+						else
+						{
+							//sometimes strike ball from above
+							LeftPaddle.y = Ball.y - 40;
+						}
+						//keep track of chen and ran
+						updateball(Ball,T,LeftPaddle);
+						updateball(Ball2,T,LeftPaddle);
+					}
+				}
+			}
+		}
+		//render all entities
+		DrawEntities();
+	}
+	function updateball(ball,T,e){
+		if (!ball.visible)
+		{
+			return;
+		}
+		var bx,by,bid;
+		//ball id
+		bid = entities.indexOf(ball);
+		bx = ball.spd.x * T;
+		by = ball.spd.y * T;
+		//bounce off ceiling and floor
+		if ((ball.spd.y < 0 && ball.y<ball.y2) || (ball.spd.y > 0 && ball.y>Sheight-Ball.y2))
+		{
+			ball.spd.y = ball.spd.y * -1;
+		}
+		//update position
+		ball.x = ball.x + bx;
+		ball.y = ball.y + by;
+		//spiny spiny spin spin
+		ball.angle = ball.angle + ((Math.abs(bx) + Math.abs(by)) / 50);
+		{
+			var EX,EY,spd;
+			EX = e.x;
+			EY = e.y;
+			//check if touching paddle(player character)
+			if (Math.abs(EX - ball.x) < 50 && Math.abs(EY - ball.y) < 70)
+			{
+				//bounce!
+				spd = (1 + (ball.bounces * 0.05));
+				if (e.x < Sh2 && bx < 0)
+				{
+					Send(["Collision",Math.ceil(ball.x),Math.ceil(ball.y),Math.ceil(500*spd),Math.ceil((ball.y - e.y) * (10*spd)),bid]);
+					if (tbounces > 19 && !Ball2.visible)
+					{
+						//send in the kitsune!
+						Send(["Spawnsecond",Sh2,Sh2,200,0,entities.indexOf(Ball2)]);
+					}
+				}
+				if (e.x > Sh2 && bx > 0)
+				{
+					Send(["Collision",Math.ceil(ball.x),Math.ceil(ball.y),Math.ceil(-500*spd),Math.ceil((ball.y - e.y) * (10*spd)),bid]);;
+					if (tbounces > 19 && !Ball2.visible)
+					{
+						//send in the kitsune!
+						Send(["Spawnsecond",Sh2,Sh2,-200,0,entities.indexOf(Ball2)]);
+					}
+				}
+			}
+			if (Math.abs(ball.x)>2000)
+			{
+				Send(["Collision",Sh2,Sh2,200,0,bid]);;
+			}
+			if (ball.x + ball.i.width < 0 && e.x < Sh2)
+			{
+				if (me.entity != e)
+				{
+					me.points = me.points + 1;
+				}
+					Send(["LostPoint",Sh2,Sh2,200,0,bid]);
+			}
+			if (ball.x > Sheight && e.x > Sh2)
+			{
+				if (me.entity != e)
+				{
+					me.points = me.points + 1;
+				}
+				Send(["LostPoint",Sh2,Sh2,-200,0,bid]);
+			}
+		}
+	}
+	
+	
+	function CreateEntity(X,Y,img){
+		if (typeof img == "string")
+		{
+			var temp = img;
+			img = new Image();
+			img.src = temp;
+		}
+		var E = {
+			x:X,
+			y:Y,
+			i:img,
+			angle:0,
+			visible:true,
+			x2:(img.width / 2),
+			y2:(img.height / 2),
+			xscale:1,
+			yscale:1
+		};
+		entities[entities.length]=E;
+		return E;
+	}
+	{
+		var temp;
+		//load entities
+		LeftPaddle=CreateEntity(40,Sh2,"LeftPaddle.png");
+		RightPaddle=CreateEntity(Sheight-40,Sh2,"RightPaddle.png");
+		RightPaddle.xscale = -1;
+		Ball=CreateEntity(Sh2,Sh2,"Ball.png");
+		Ball.spd = {x:-200,y:10}
+		LeftPaddle.visible = false;
+		RightPaddle.visible = false;
+		LeftPaddle.angle=0.01;
+		RightPaddle.angle=0.01;
+		Ball.angle=0.01;
+		Ball.bounces=0;
+		//RAN
+		Ball2=CreateEntity(-100,-100,"Ball2.png");
+		Ball2.spd = {x:-200,y:10}
+		Ball2.angle=0.01;
+		Ball2.bounces=0;
+		Ball2.visible=false;
+		update();
+	}
+	var tgle = true;
+	var Tloop = function(){
+	var time = Date.now();
+	tgle = !tgle;
+	
+		var T = time - ltime;
+		T = T / 1000.0;
+		if (T>1){
+			//force lagg to not cause crazyiness
+			T=1;
+		}
+		FPS *= 0.95;
+		FPS += (T * 0.05);
+		update(T);
+		ltime = time;
+	
+	
+	}
+
+	var mloop = function(){
+	if (true){
+	if (true){
+		Tloop();
+	}
+	}else{
+		started=true;
+		
+		if (BGL){
+			G.strokeText("Waiting...",cv.width/3,cv.height/3);
+		}else{
+			G.strokeText("Loading...",cv.width/3,cv.height/3);
+		}
+		G.font="20px Arial";
+		G.strokeText("(tap here if using mobile device)",cv.width/3,cv.height/3+30);
+		ltime = Date.now();
+	}
+	requestAnimationFrame(mloop);
+}
+
+var ltime = Date.now();
+requestAnimationFrame(mloop);
+</script>
+</body>
+</html>
