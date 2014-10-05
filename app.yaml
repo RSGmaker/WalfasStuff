@@ -1,12 +1,23 @@
-application: WalfasStuffs
+application: walfasstuffs
 version: 1
 runtime: php
 api_version: 1
+threadsafe: yes
 
 handlers:
-- url: /(.*\.(gif|png|jpg|svg|html))$
-  static_files: static/\1
-  upload: static/.*\.(gif|png|jpg|svg|html)$
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+
+- url: /(.+\.(gif|png|jpg|svg))$
+  static_files: \1
+  upload: .+\.(gif|png|jpg|svg)$
+  application_readable: true
+
+  # Serve html.
+- url: /(.+\.html)$
+  script: \1
   
-- url: /.*
-  script: helloworld.php
+# Serve php scripts.
+- url: /(.+\.php)$
+  script: \1
