@@ -138,6 +138,7 @@ SourceColor:<input type="color" id="srccolor" value="#FFFFFF"/>->NewColor<input 
             }
 	</script>
 <script>
+var repo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/Ocreateswf/"
 var colors = [];
 function handleMouseMove(event) {
         event = event || window.event; // IE-ism
@@ -559,11 +560,11 @@ function LoadDNA(dna)
 	var D = dna.split(":");
 	if (OE[5] == null && D[4]!="240")
 	{
-		OE[5] = Openfile("https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf/Basichead/1.svg","blarg");
+		OE[5] = Openfile(repo+"Basichead/1.svg","blarg");
 	}
 	if (OE[2] == null)
 	{
-		OE[2] = Openfile("https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf/Basichead/0.svg","blarg");
+		OE[2] = Openfile(repo+"Basichead/0.svg","blarg");
 	}
 	if (D[4]=="240")
 	{
@@ -740,7 +741,7 @@ function LoadPart(feature,index)
 {
 	if (index >-1)
 	{
-		var U = "https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf/"+feature+"/"+index+".svg";
+		var U = repo+feature+"/"+index+".svg";
 		return Openfile(U,feature);
 	}
 	entities[entities.length] = null;
