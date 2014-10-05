@@ -7,7 +7,7 @@ var Oskincolor;
 var skincolor;
 var outline;
 var randomcols = false;
-var repo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/Ocreateswf/"
+var repo = "https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/Ocreateswf/"
 var Openfile = function(req) {
 	if (typeof req == "string")
 	{
