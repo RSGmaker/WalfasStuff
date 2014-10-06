@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>Walfas recolor by RSGmaker</title>
 <!--<script type="text/javascript" src="https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/zip/zip.js"></script>-->
 <!--<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script>--> 
 <!--<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/StackBlur.js"></script>-->
@@ -139,7 +140,7 @@ SourceColor:<input type="color" id="srccolor" value="#FFFFFF"/>->NewColor<input 
             }
 	</script>
 <script>
-var repo = "https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/Ocreateswf/"
+var repo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/Ocreateswf/"
 var colors = [];
 function handleMouseMove(event) {
         event = event || window.event; // IE-ism
@@ -1430,6 +1431,7 @@ if (location.search.indexOf("?") > -1){
 			if (TTD[0]=="dna")
 			{
 				data["dna"] = decodeURI(TTD[1]);
+				data["dna"] = TTD[1];
 			}
 			if (TTD[0]=="background")
 			{

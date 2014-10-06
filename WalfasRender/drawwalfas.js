@@ -7,8 +7,9 @@ var Oskincolor;
 var skincolor;
 var outline;
 var randomcols = false;
-var repo = "https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/Ocreateswf/"
-var Openfile = function(req) {
+var colors = [];
+var repo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/Ocreateswf/"
+/*var Openfile = function(req) {
 	if (typeof req == "string")
 	{
 		req = Loadfile(req);
@@ -16,6 +17,33 @@ var Openfile = function(req) {
 	if (req != null)
 	{
 		var svg = req.responseText.replace(Ooutline,outline).replace(Oskincolor,skincolor);;
+		var E = {};
+		E.svg = svg;
+		E.x = 0;
+		E.y = 0;
+		entities[entities.length] = E;
+		return E;
+	}
+	return null;
+}*/
+var Openfile = function(req,type) {
+	if (typeof req == "string")
+	{
+		req = Loadfile(req);
+	}
+	if (req != null)
+	{
+		var svg = req.responseText;
+		var i = 0;
+		while (i<colors.length)
+		{
+			var nc = colors[i];
+			if (nc.active && ((nc.filter == "All" || type == "All") || (type.toLowerCase().indexOf( nc.filter.toLowerCase())>-1)))
+			{
+				svg = svg.replace(nc.src,nc.dst);
+			}
+			i = i+1;
+		}
 		var E = {};
 		E.svg = svg;
 		E.x = 0;
@@ -49,7 +77,7 @@ function Loadfile(url,type){
 		req.responseType = filetype;
 		req.send();
 		req.onload = function(e) {
-			Openfile(req);
+			Openfile(req,type);
 		}
 	}
 }
@@ -58,6 +86,28 @@ function LoadDNA(dna,sc,oc){
 	if (dna==null){
 		dna = "3.39:Meiling:100:1:0:1:1:1:0:0:0:0:0:EB585A";
 	}
+	entities = [];
+	var D = dna.split(":");
+	colors = [];
+	if (D.length>=15)
+		{
+			//colors = [];
+			var TT = D[14].split("/");
+			i = 0;
+			while (i< TT.length)
+			{
+				var TTT = TT[i].split(">");
+				//addColorchange("#"+TTT[0],"#"+TTT[1],TTT[2]);
+				var nc = {};
+				nc.src = "#"+TTT[0];
+				nc.dst = "#"+TTT[1];
+				nc.filter = TTT[2];
+				nc.active = true;
+				colors[i] = nc;
+				i = i+1;
+			}
+			
+		}
 	skincolor = sc;
 	outline = oc;
 	Oskincolor = "#fff1dd";
@@ -69,14 +119,14 @@ function LoadDNA(dna,sc,oc){
 		outline = Ooutline;
 	}
 	//?.??:Name:Scale:Hat:Hair:Body:Arm:Shoes:Eyes:Mouth:Item:Accessory:Back:HairColor
-	var D = dna.split(":");
+	
 	var Back = LoadPart("Wings",dec(D[12]));
 	var Shoes = LoadPart("Shoes",dec(D[7]));
-	var basichead = Openfile(repo+"Basichead/0.svg");
+	var basichead = Openfile(repo+"Basichead/0.svg","blarg");
 	
 	var Hair = LoadPart("Hair",D[4]);
 	var Hair2 = LoadPart("Hair2",D[4]);
-	var outlinehead = Openfile(repo+"Basichead/1.svg");
+	var outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
 	var Eyes = LoadPart("Eyes",D[8]);
 	var Mouth = LoadPart("Mouth",dec(D[9]));
 	var Hat = LoadPart("Hats",dec(D[3]));
@@ -169,7 +219,7 @@ function LoadPart(feature,index)
 	if (index >-1)
 	{
 		var U = repo+feature+"/"+index+".svg";
-		return Openfile(U);
+		return Openfile(U,feature);
 	}
 	return null;
 }
@@ -525,7 +575,14 @@ var drawsvg = function(context,svg,x,y){
 		i = i + 1;
 	}
 }
-function imageFromDNA(dna,scale){
+//create an image object with a walfas dna render preset as its source
+function imageFromDNA(dna,scale,cropped){
+	var ret = new Image();
+	ret.src = imageSrcFromDNA(dna,scale,cropped);
+	return ret;
+}
+//render walfas dna and get the render as a dataurl
+function imageSrcFromDNA(dna,scale,cropped){
 	LoadDNA(dna);
 	var canvas = document.createElement('canvas');
 	if (scale == null)
@@ -538,7 +595,7 @@ function imageFromDNA(dna,scale){
 	G.save(); 
  
 	// move to the middle of where we want to draw our image
-	G.translate(190*scale, 190*scale);
+	G.translate(140*scale, 190*scale);
  
 	// rotate around that point, converting our 
 	// angle from degrees to radians 
@@ -555,8 +612,63 @@ function imageFromDNA(dna,scale){
 		i = i + 1;
 	}
 	// and restore the co-ords to how they were when we began
-	G.restore(); 
-	var ret = new Image();
-	ret.src = canvas.toDataURL();
+	G.restore();
+	var ret = canvas.toDataURL();
+	if (cropped)
+	{
+		var imageData = G.getImageData(0, 0, canvas.width, canvas.height);
+		var data = imageData.data;
+		var tx = 0;
+		var ty = 0;
+		//start texture index at opacity data
+		var tindex = 3;
+		//var tindex = 0;
+		//range of crop
+		var mnx = null;
+		var mny = null;
+		var mxx = null;
+		var mxy = null;
+		while (ty < canvas.height)
+		{
+			while (tx < canvas.width)
+			{
+				//detect if pixel has any opacity
+				if (data[tindex]>0/* || data[tindex+1]>0 || data[tindex+2]>0 || data[tindex+3]>0*/)
+				{
+					//adjust range to fit the pixel
+					if (mnx != null)
+					{
+					mxx = Math.max(mxx,tx);
+					mxy = Math.max(mxy,ty);
+					
+					mnx = Math.min(mnx,tx);
+					mny = Math.min(mny,ty);
+					}else{
+						mxx = tx;
+						mxy = ty;
+						mnx = tx;
+						mny = ty;
+					}
+				}
+				tindex = tindex +4;
+				tx = tx + 1;
+			}
+			ty = ty + 1;
+			tx = 0;
+		}
+		//make a canvas for the new cropped image
+		var cropped = document.createElement('canvas');
+		//set its size to the crop ranges size
+		cropped.width = (mxx - mnx)+1;
+		cropped.height = (mxy - mny)+1;
+		alert("mnx:"+mnx+" mny:"+mny+" mxx:"+mxx+" mxy:"+mxy);
+		var G2 = cropped.getContext("2d");
+		var TI = new Image();
+		TI.src = ret;
+		//draw the image from the starting point of crop range
+		G2.drawImage(TI,-mnx,-mny);
+		//set return value to the newly cropped version
+		ret = cropped.toDataURL();
+	}
 	return ret;
 }
