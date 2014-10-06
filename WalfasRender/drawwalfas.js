@@ -1,7 +1,7 @@
 var filetext,filedata,filetype;
 filetext = "";
 filetype = "";
-var entities = [];
+var DWentities = [];
 var Ooutline;
 var Oskincolor;
 var skincolor;
@@ -21,7 +21,7 @@ var repo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/Ocre
 		E.svg = svg;
 		E.x = 0;
 		E.y = 0;
-		entities[entities.length] = E;
+		DWentities[DWentities.length] = E;
 		return E;
 	}
 	return null;
@@ -48,7 +48,7 @@ var Openfile = function(req,type) {
 		E.svg = svg;
 		E.x = 0;
 		E.y = 0;
-		entities[entities.length] = E;
+		DWentities[DWentities.length] = E;
 		return E;
 	}
 	return null;
@@ -86,7 +86,7 @@ function LoadDNA(dna,sc,oc){
 	if (dna==null){
 		dna = "3.39:Meiling:100:1:0:1:1:1:0:0:0:0:0:EB585A";
 	}
-	entities = [];
+	DWentities = [];
 	var D = dna.split(":");
 	colors = [];
 	if (D.length>=15)
@@ -601,9 +601,9 @@ function imageSrcFromDNA(dna,scale,cropped){
 	// angle from degrees to radians 
 	G.scale(0.7*scale,0.7*scale);
 	var i = 0;
-	while (i < entities.length)
+	while (i < DWentities.length)
 	{
-		var E = entities[i];
+		var E = DWentities[i];
 		if (typeof E.svg != 'undefined')
 		{
 			drawsvg(G,E.svg,E.x,E.y);
