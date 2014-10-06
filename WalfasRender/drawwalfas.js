@@ -661,7 +661,7 @@ function imageSrcFromDNA(dna,scale,cropped){
 		//set its size to the crop ranges size
 		cropped.width = (mxx - mnx)+1;
 		cropped.height = (mxy - mny)+1;
-		alert("mnx:"+mnx+" mny:"+mny+" mxx:"+mxx+" mxy:"+mxy);
+		//alert("mnx:"+mnx+" mny:"+mny+" mxx:"+mxx+" mxy:"+mxy);
 		var G2 = cropped.getContext("2d");
 		var TI = new Image();
 		TI.src = ret;
