@@ -9,23 +9,6 @@ var outline;
 var randomcols = false;
 var colors = [];
 var repo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/Ocreateswf/"
-/*var Openfile = function(req) {
-	if (typeof req == "string")
-	{
-		req = Loadfile(req);
-	}
-	if (req != null)
-	{
-		var svg = req.responseText.replace(Ooutline,outline).replace(Oskincolor,skincolor);;
-		var E = {};
-		E.svg = svg;
-		E.x = 0;
-		E.y = 0;
-		DWentities[DWentities.length] = E;
-		return E;
-	}
-	return null;
-}*/
 var Openfile = function(req,type) {
 	if (typeof req == "string")
 	{
@@ -574,6 +557,146 @@ var drawsvg = function(context,svg,x,y){
 		}
 		i = i + 1;
 	}
+}
+//create an image object with a walfas dna render preset as its source
+function imageFromObject(objindex,scale,cropped){
+	var ret = new Image();
+	ret.src = imageSrcFromObject(objindex,scale,cropped);
+	return ret;
+}
+//render walfas dna and get the render as a dataurl
+function imageSrcFromObject(objindex,scale,cropped){
+	//LoadDNA(dna);
+	var BG = LoadPart("Objects",objindex);
+	var canvas = document.createElement('canvas');
+	if (scale == null)
+	{
+		scale = 1;
+	}
+	canvas.width = 280*scale;
+	canvas.height = 280*scale;
+	var G = canvas.getContext("2d");
+	G.save(); 
+ 
+	// move to the middle of where we want to draw our image
+	G.translate(140*scale, 190*scale);
+ 
+	// rotate around that point, converting our 
+	// angle from degrees to radians 
+	G.scale(0.7*scale,0.7*scale);
+	var i = 0;
+	//while (i < DWentities.length)
+	{
+		var E = BG;
+		if (typeof E.svg != 'undefined')
+		{
+			drawsvg(G,E.svg,E.x,E.y);
+		
+		}
+		i = i + 1;
+	}
+	// and restore the co-ords to how they were when we began
+	G.restore();
+	var ret = canvas.toDataURL();
+	if (cropped)
+	{
+		var imageData = G.getImageData(0, 0, canvas.width, canvas.height);
+		var data = imageData.data;
+		var tx = 0;
+		var ty = 0;
+		//start texture index at opacity data
+		var tindex = 3;
+		//var tindex = 0;
+		//range of crop
+		var mnx = null;
+		var mny = null;
+		var mxx = null;
+		var mxy = null;
+		while (ty < canvas.height)
+		{
+			while (tx < canvas.width)
+			{
+				//detect if pixel has any opacity
+				if (data[tindex]>0/* || data[tindex+1]>0 || data[tindex+2]>0 || data[tindex+3]>0*/)
+				{
+					//adjust range to fit the pixel
+					if (mnx != null)
+					{
+					mxx = Math.max(mxx,tx);
+					mxy = Math.max(mxy,ty);
+					
+					mnx = Math.min(mnx,tx);
+					mny = Math.min(mny,ty);
+					}else{
+						mxx = tx;
+						mxy = ty;
+						mnx = tx;
+						mny = ty;
+					}
+				}
+				tindex = tindex +4;
+				tx = tx + 1;
+			}
+			ty = ty + 1;
+			tx = 0;
+		}
+		//make a canvas for the new cropped image
+		var cropped = document.createElement('canvas');
+		//set its size to the crop ranges size
+		cropped.width = (mxx - mnx)+1;
+		cropped.height = (mxy - mny)+1;
+		//alert("mnx:"+mnx+" mny:"+mny+" mxx:"+mxx+" mxy:"+mxy);
+		var G2 = cropped.getContext("2d");
+		var TI = new Image();
+		TI.src = ret;
+		//draw the image from the starting point of crop range
+		G2.drawImage(TI,-mnx,-mny);
+		//set return value to the newly cropped version
+		ret = cropped.toDataURL();
+	}
+	return ret;
+}
+//create an image object with a walfas dna render preset as its source
+function imageFromBackground(bgindex,scale){
+	var ret = new Image();
+	ret.src = imageSrcFromBackground(bgindex,scale);
+	return ret;
+}
+//render walfas dna and get the render as a dataurl
+function imageSrcFromBackground(bgindex,scale){
+	//LoadDNA(dna);
+	var BG = LoadPart("Background",bgindex);
+	var canvas = document.createElement('canvas');
+	if (scale == null)
+	{
+		scale = 1;
+	}
+	canvas.width = 500*scale;
+	canvas.height = 400*scale;
+	var G = canvas.getContext("2d");
+	G.save(); 
+ 
+	// move to the middle of where we want to draw our image
+	G.translate(0*scale, 0*scale);
+ 
+	// rotate around that point, converting our 
+	// angle from degrees to radians 
+	G.scale(1*scale,1*scale);
+	var i = 0;
+	//while (i < DWentities.length)
+	{
+		var E = BG;
+		if (typeof E.svg != 'undefined')
+		{
+			drawsvg(G,E.svg,E.x,E.y);
+		
+		}
+		i = i + 1;
+	}
+	// and restore the co-ords to how they were when we began
+	G.restore();
+	var ret = canvas.toDataURL();
+	return ret;
 }
 //create an image object with a walfas dna render preset as its source
 function imageFromDNA(dna,scale,cropped){
