@@ -18,7 +18,8 @@ eg;
 ```html
 imageFromDNA("3.39:RSGmaker:100:0:192:324:232:24:0:0:0:1:0:321A00",1.0,false)//1.0 is the same as 100 scale in create.swf
 ```
+you can also render backgrounds and object using imageFromBackground(background id,scale) and imageFromObject(object id,scale,cropping) respectively.
 
-and thats all there is to it you can look at this if you want: http://jsfiddle.net/yp4n6m7r/6/ just a single line of code and it adds the image to the html document
+and thats all there is to it you can look at this if you want: http://jsfiddle.net/yp4n6m7r/9/ just a single line of code and it adds the image to the html document
 
 touhou pong uses drawwalfas.js to replace the paddles with any walfas character this way you can try it here: https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasApps/pong/pong.html (press F9 to input walfas dna)
