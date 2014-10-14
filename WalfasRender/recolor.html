@@ -152,8 +152,25 @@ function handleMouseMove(event) {
         // event.clientX and event.clientY contain the mouse position
 		//srccolor pixelData[0] ("0000" + value).slice(-4)Math.floor
 		//var pixelData = ctx.getImageData(event.offsetX, event.offsetY, 1, 1).data;
-		var TX = event.offsetX==undefined?event.layerX:event.offsetX;
-		var TY = event.offsetY==undefined?event.layerY:event.offsetY;
+		//var TX = event.offsetX==undefined?event.layerX:event.offsetX;
+		//var TY = event.offsetY==undefined?event.layerY:event.offsetY;
+		//var BB = document.getElementById('pic').getBoundingClientRect();
+		var totalOffsetX = 0;
+    var totalOffsetY = 0;
+    var canvasX = 0;
+    var canvasY = 0;
+    var currentElement = document.getElementById('pic');
+
+    do{
+        totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+        totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+    }
+    while(currentElement = currentElement.offsetParent)
+
+    canvasX = event.pageX - totalOffsetX;
+    canvasY = event.pageY - totalOffsetY;
+		var TX = canvasX;
+		var TY = canvasY;
 		//var TX = parseInt(""+event.offsetX);
 		//var TY = parseInt(""+event.offsetY);
 		
@@ -343,13 +360,35 @@ function ondatachange()
 		data.hat = parseInt(D[3]);
 		data.hair = parseInt(D[4]);
 		data.body = parseInt(D[5]);
-		data.arm = parseInt(D[6]);
-		data.shoes = parseInt(D[7]);
-		data.eyes = parseInt(D[8]);
+		//data.arm = parseInt(D[6]);
+		if (D[6].indexOf("S">0))
+		{
+			document.getElementById("arm").type = "text";
+		}
+		data.arm = D[6];
+		//data.shoes = parseInt(D[7]);
+		if (D[6].indexOf("S">0))
+		{
+			document.getElementById("shoes").type = "text";
+		}
+		data.shoes = D[7];
+		if (D[8].indexOf("S">0))
+		{
+			document.getElementById("eyes").type = "text";
+		}
+		data.eyes = D[8];
 		data.mouth = parseInt(D[9]);
-		data.item = parseInt(D[10]);
+		if (D[10].indexOf("S">0))
+		{
+			document.getElementById("item").type = "text";
+		}
+		data.item = D[10];
 		data.accessory = parseInt(D[11]);
-		data.back = parseInt(D[12]);
+		if (D[12].indexOf("S">0))
+		{
+			document.getElementById("back").type = "text";
+		}
+		data.back = D[12];
 		data.haircolor = "#"+D[13];
 		var vars = ["name","scale","hat","hair","body","arm","shoes","eyes","mouth","item","accessory","back","haircolor"];
 		var i = 0;
@@ -383,6 +422,22 @@ function ondatachange()
 		var T = "3.39"
 		while (i < vars.length)
 		{
+			//if (isNaN(data[vars[i]]))
+			//deal with Split values changing from integers to text values
+			if ((""+data[vars[i]])=="")
+			{
+				if (vars[i]!="haircolor")
+				{
+					document.getElementById(vars[i]).type = "text";
+				}
+			}
+			else if( isNaN(data[vars[i]]) == false)
+			{
+				if (vars[i]!="haircolor" && vars[i]!="name")
+				{
+					document.getElementById(vars[i]).type = "number";
+				}
+			}
 			T = (T + ":" + data[vars[i]]).replace("#","");
 			i = i+1;
 		}
@@ -581,8 +636,31 @@ function LoadDNA(dna)
 	
 	
 	
-	var Back = LoadPart2("Wings",dec(D[12]),dec(OD[12]),OE[0]);
-	var Shoes = LoadPart2("Shoes",dec(D[7]),dec(OD[7]),OE[1]);
+	var Back = null;
+	var Back2 = null;
+	if (D[12].indexOf("S")>0)
+	{
+		var DS = D[12].split("S");
+		Back = LoadPart2("Wings",dec(DS[0]),dec(OD[12]),OE[0],"left");
+		Back2 = LoadPart("Wings",dec(DS[1]),"right");
+	}
+	else
+	{
+		Back = LoadPart2("Wings",dec(D[12]),dec(OD[12]),OE[0]);
+	}
+	var Shoes = null;
+	var Shoes2 = null;
+	if (D[7].indexOf("S")>0)
+	{
+		var DS = D[7].split("S");
+		Shoes = LoadPart2("Shoes",dec(DS[0]),dec(OD[7]),OE[1],"left");
+		Shoes2 = LoadPart("Shoes",dec(DS[1]),"right");
+	}
+	else
+	{
+		Shoes = LoadPart2("Shoes",dec(D[7]),dec(OD[7]),OE[1]);
+	}
+	//Shoes = LoadPart2("Shoes",dec(D[7]),dec(OD[7]),OE[1]);
 	var basichead = null;
 	basichead = OE[2];
 	entities[entities.length] = basichead;
@@ -591,13 +669,46 @@ function LoadDNA(dna)
 	var outlinehead = null;
 	outlinehead = OE[5];
 	entities[entities.length] = outlinehead;
-	var Eyes = LoadPart2("Eyes",D[8],OD[8],OE[6]);
+	var Eyes = null;
+	var Eyes2 = null;
+	if (D[8].indexOf("S")>0)
+	{
+		var DS = D[8].split("S");
+		Eyes = LoadPart2("Eyes",DS[0],OD[8],OE[6],"left");
+		Eyes2 = LoadPart("Eyes",DS[1],"right");
+	}
+	else
+	{
+		Eyes = LoadPart2("Eyes",D[8],OD[8],OE[6]);
+	}
 	var Mouth = LoadPart2("Mouth",dec(D[9]),dec(OD[9]),OE[7]);
 	var Hat = LoadPart2("Hats",dec(D[3]),dec(OD[3]),OE[8]);
 	
-	
-	var Arms = LoadPart2("Arms",dec(D[6]),dec(OD[6]),OE[9]);
-	var Item = LoadPart2("Items",dec(D[10]),dec(OD[10]),OE[10]);
+	var Arms = null;
+	var Arms2 = null;
+	if (D[6].indexOf("S")>0)
+	{
+		var DS = D[6].split("S");
+		Arms = LoadPart2("Arms",dec(DS[0]),dec(OD[6]),OE[9],"left");
+		Arms2 = LoadPart("Arms",dec(DS[1]),"right");
+	}
+	else
+	{
+		Arms = LoadPart2("Arms",dec(D[6]),dec(OD[6]),OE[9]);
+	}
+	//var Arms = LoadPart2("Arms",dec(D[6]),dec(OD[6]),OE[9]);
+	var Item = null;
+	var Item2 = null;
+	if (D[10].indexOf("S")>0)
+	{
+		var DS = D[10].split("S");
+		Item = LoadPart2("Items",dec(D[10]),dec(OD[10]),OE[10],"left");
+		Item2 = LoadPart("Items",dec(DS[1]),"right");
+	}
+	else
+	{
+		Item = LoadPart2("Items",dec(D[10]),dec(OD[10]),OE[10]);
+	}
 	var Body = LoadPart2("body",dec(D[5]),dec(OD[5]),OE[11]);
 	var Accessory = LoadPart2("Accessories",dec(D[11]),dec(OD[11]),OE[12]);
 	//var OBJ = LoadPart2("Object",""+,dec(OD[11]),OE[12]);
@@ -665,10 +776,20 @@ function LoadDNA(dna)
 		Arms.x = 105+xo;
 		Arms.y = 305+yo;
 	}
+	if (Arms2 != null)
+	{
+		Arms2.x = 105+xo;
+		Arms2.y = 305+yo;
+	}
 	if (Shoes != null)
 	{
 		Shoes.x = 102+xo;
 		Shoes.y = 305+yo;
+	}
+	if (Shoes2 != null)
+	{
+		Shoes2.x = 102+xo;
+		Shoes2.y = 305+yo;
 	}
 	if (Mouth != null)
 	{
@@ -681,6 +802,12 @@ function LoadDNA(dna)
 		Eyes.y = 312+yo;//Ooutline
 		Eyes.svg = Eyes.svg.replace(outline,eyecolor);
 		
+	}
+	if (Eyes2 != null)
+	{
+		Eyes2.x = 100+xo;
+		Eyes2.y = 312+yo;//Ooutline
+		Eyes2.svg = Eyes2.svg.replace(outline,eyecolor);
 	}
 	if (Hair != null)
 	{
@@ -708,10 +835,20 @@ function LoadDNA(dna)
 		Item.x = 68+xo;
 		Item.y = 180+yo;
 	}
+	if (Item2 != null)
+	{
+		Item2.x = 68+xo;
+		Item2.y = 180+yo;
+	}
 	if (Back != null)
 	{
 		Back.x = -45+xo;
 		Back.y = -30+yo;
+	}
+	if (Back2 != null)
+	{
+		Back2.x = -45+xo;
+		Back2.y = -30+yo;
 	}
 	OD = D;
 	ODB = true;
@@ -721,7 +858,7 @@ function dec(strind)
 {
 	return parseInt(strind)-1;
 }
-function LoadPart2(feature,index,oldindex,oldentity)
+function LoadPart2(feature,index,oldindex,oldentity,side)
 {
 	try 
 	{			
@@ -731,7 +868,7 @@ function LoadPart2(feature,index,oldindex,oldentity)
 		entities[entities.length] = oldentity;
 		return oldentity;
 	}
-	return LoadPart(feature,index);
+	return LoadPart(feature,index,side);
 	
 	}
 			catch(err) {
@@ -739,14 +876,67 @@ function LoadPart2(feature,index,oldindex,oldentity)
 			return "";
 	
 }
-function LoadPart(feature,index)
+function LoadPart(feature,index,side)
 {
 	if (index >-1)
 	{
 		var U = repo+feature+"/"+index+".svg";
-		return Openfile(U,feature);
+		var ret = Openfile(U,feature);
+		if (typeof side != "string")
+		{
+			return ret;
+		}
+		side = side.toLowerCase(); 
+		var sd = 0;
+		if (side == "left")
+		{
+			sd = -1;
+		}
+		if (side == "right")
+		{
+			sd = 1;
+		}
+		if (sd==0)
+		{
+			return ret;
+		}
+		//var ret = LoadPart(feature,index);
+	var text = ret.svg.split("\n");
+	var rtext = text[0];
+	var i = 1;
+	var D;
+	while (i < text.length)
+	{
+		var S = text[i];
+		var off = 0;
+		if (feature == "Wings")
+		{
+			off = -140;
+		}
+		if ((S.indexOf("<path"))> -1){
+			D = slice2(S," d=\"","\"");
+			var DM = D.split("M");
+			var DT = DM[0];
+			var im = 1;
+			while (im<DM.length)
+			{
+				var pd = DM[im].split(" ");
+				if ((parseFloat(pd[0])+off)*sd>0)
+				{
+					DT = DT + "M" + DM[im];
+				}
+				im = im+1;
+			}
+			S = S.replace(D,DT);
+		}
+		{
+			rtext = rtext + "\n" + S;
+		}
+		i = i + 1;
 	}
-	entities[entities.length] = null;
+	ret.svg = rtext;
+	return ret;
+	}
 	return null;
 }
 //LoadDNA(A);

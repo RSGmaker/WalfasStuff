@@ -1,4 +1,4 @@
-var filetext,filedata,filetype;
+{var filetext,filedata,filetype;
 filetext = "";
 filetype = "";
 var DWentities = [];
@@ -103,20 +103,75 @@ function LoadDNA(dna,sc,oc){
 	}
 	//?.??:Name:Scale:Hat:Hair:Body:Arm:Shoes:Eyes:Mouth:Item:Accessory:Back:HairColor
 	
-	var Back = LoadPart("Wings",dec(D[12]));
-	var Shoes = LoadPart("Shoes",dec(D[7]));
+	var Back = null;
+	var Back2 = null;
+	if (D[12].indexOf("S")>0)
+	{
+		var DS = D[12].split("S");
+		Back = LoadPart("Wings",dec(DS[0]),"left");
+		Back2 = LoadPart("Wings",dec(DS[1]),"right");
+	}
+	else
+	{
+		Back = LoadPart("Wings",dec(D[12]));
+	}
+	var Shoes = null;
+	var Shoes2 = null;
+	if (D[7].indexOf("S")>0)
+	{
+		var DS = D[7].split("S");
+		Shoes = LoadPart("Shoes",dec(DS[0]),"left");
+		Shoes2 = LoadPart("Shoes",dec(DS[1]),"right");
+	}
+	else
+	{
+		Shoes = LoadPart("Shoes",dec(D[7]));
+	}
+	//var Shoes = LoadPart("Shoes",dec(D[7]));
 	var basichead = Openfile(repo+"Basichead/0.svg","blarg");
 	
 	var Hair = LoadPart("Hair",D[4]);
 	var Hair2 = LoadPart("Hair2",D[4]);
 	var outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
-	var Eyes = LoadPart("Eyes",D[8]);
+	var Eyes = null;
+	var Eyes2 = null;
+	if (D[8].indexOf("S")>0)
+	{
+		var DS = D[8].split("S");
+		Eyes = LoadPart("Eyes",dec(DS[0]),"left");
+		Eyes2 = LoadPart("Eyes",dec(DS[1]),"right");
+	}
+	else
+	{
+		Eyes = LoadPart("Eyes",D[8]);
+	}
+	//var Eyes = LoadPart("Eyes",D[8]);
 	var Mouth = LoadPart("Mouth",dec(D[9]));
 	var Hat = LoadPart("Hats",dec(D[3]));
-	
-	
-	var Arms = LoadPart("Arms",dec(D[6]));
-	var Item = LoadPart("Items",dec(D[10]));
+	var Arms = null;
+	var Arms2 = null;
+	if (D[6].indexOf("S")>0)
+	{
+		var DS = D[6].split("S");
+		Arms = LoadPart("Arms",dec(DS[0]),"left");
+		Arms2 = LoadPart("Arms",dec(DS[1]),"right");
+	}
+	else
+	{
+		Arms = LoadPart("Arms",dec(D[6]));
+	}
+	var Item = null;
+	var Item2 = null;
+	if (D[10].indexOf("S")>0)
+	{
+		var DS = D[10].split("S");
+		Item = LoadPart("Items",dec(DS[0]),"left");
+		Item2 = LoadPart("Items",dec(DS[1]),"right");
+	}
+	else
+	{
+		Item = LoadPart("Items",dec(D[10]));
+	}
 	var Body = LoadPart("body",dec(D[5]));
 	var Accessory = LoadPart("Accessories",dec(D[11]));
 	var xo = -100;
@@ -147,10 +202,20 @@ function LoadDNA(dna,sc,oc){
 		Arms.x = 105+xo;
 		Arms.y = 305+yo;
 	}
+	if (Arms2 != null)
+	{
+		Arms2.x = 105+xo;
+		Arms2.y = 305+yo;
+	}
 	if (Shoes != null)
 	{
 		Shoes.x = 102+xo;
 		Shoes.y = 305+yo;
+	}
+	if (Shoes2 != null)
+	{
+		Shoes2.x = 102+xo;
+		Shoes2.y = 305+yo;
 	}
 	if (Mouth != null)
 	{
@@ -161,6 +226,11 @@ function LoadDNA(dna,sc,oc){
 	{
 		Eyes.x = 100+xo;
 		Eyes.y = 312+yo;
+	}
+	if (Eyes2 != null)
+	{
+		Eyes2.x = 100+xo;
+		Eyes2.y = 312+yo;
 	}
 	if (Hair != null)
 	{
@@ -187,22 +257,124 @@ function LoadDNA(dna,sc,oc){
 		Item.x = 68+xo;
 		Item.y = 180+yo;
 	}
+	if (Item2 != null)
+	{
+		Item2.x = 68+xo;
+		Item2.y = 180+yo;
+	}
 	if (Back != null)
 	{
 		Back.x = -45+xo;
 		Back.y = -30+yo;
+	}
+	if (Back2 != null)
+	{
+		Back2.x = -45+xo;
+		Back2.y = -30+yo;
 	}
 }
 function dec(strind)
 {
 	return parseInt(strind)-1;
 }
-function LoadPart(feature,index)
+function LoadLeftPart(feature,index)
+{
+	var ret = LoadPart(feature,index);
+	if (ret==null)
+	{
+		return null;
+	}
+	var text = ret.svg.split("\n");
+	var rtext = text[0];
+	var i = 1;
+	var D;
+	while (i < text.length)
+	{
+		var S = text[i];
+		if ((S.indexOf("<path"))> -1){
+			D = slice2(S," d=\"","\"");
+			var DM = D.split("M");
+			var DT = DM[0];
+			var im = 1;
+			while (im<DM.length)
+			{
+				var pd = DM[im].split(" ");
+				if (parseFloat(pd[0])<0)
+				{
+					DT = DT + "M" + DM[im];
+				}
+				im = im+1;
+			}
+			S = S.replace(D,DT);
+		}
+		{
+			rtext = rtext + "\n" + S;
+		}
+		i = i + 1;
+	}
+	ret.svg = rtext;
+	return ret;
+}
+function LoadPart(feature,index,side)
 {
 	if (index >-1)
 	{
 		var U = repo+feature+"/"+index+".svg";
-		return Openfile(U,feature);
+		var ret = Openfile(U,feature);
+		if (typeof side != "string")
+		{
+			return ret;
+		}
+		side = side.toLowerCase(); 
+		var sd = 0;
+		if (side == "left")
+		{
+			sd = -1;
+		}
+		if (side == "right")
+		{
+			sd = 1;
+		}
+		if (sd==0)
+		{
+			return ret;
+		}
+		//var ret = LoadPart(feature,index);
+	var text = ret.svg.split("\n");
+	var rtext = text[0];
+	var i = 1;
+	var D;
+	while (i < text.length)
+	{
+		var S = text[i];
+		var off = 0;
+		if (feature == "Wings")
+		{
+			off = -140;
+		}
+		if ((S.indexOf("<path"))> -1){
+			D = slice2(S," d=\"","\"");
+			var DM = D.split("M");
+			var DT = DM[0];
+			var im = 1;
+			while (im<DM.length)
+			{
+				var pd = DM[im].split(" ");
+				if ((parseFloat(pd[0])+off)*sd>0)
+				{
+					DT = DT + "M" + DM[im];
+				}
+				im = im+1;
+			}
+			S = S.replace(D,DT);
+		}
+		{
+			rtext = rtext + "\n" + S;
+		}
+		i = i + 1;
+	}
+	ret.svg = rtext;
+	return ret;
 	}
 	return null;
 }
@@ -502,6 +674,7 @@ var drawsvg = function(context,svg,x,y){
 			{
 				//context.transform(trans[0],0,0,trans[3],0,0);
 			}
+			
 			if (fcolor != null && (fcolor.charAt(0) == "#" || fcolor.indexOf("url(#")==0))
 			{
 				
@@ -573,13 +746,15 @@ function imageSrcFromObject(objindex,scale,cropped){
 	{
 		scale = 1;
 	}
-	canvas.width = 280*scale;
-	canvas.height = 280*scale;
+	//canvas.width = 280*scale;
+	canvas.width = 320*scale;
+	//canvas.height = 280*scale;
+	canvas.height = 320*scale;
 	var G = canvas.getContext("2d");
 	G.save(); 
  
 	// move to the middle of where we want to draw our image
-	G.translate(140*scale, 190*scale);
+	G.translate(160*scale, 210*scale);
  
 	// rotate around that point, converting our 
 	// angle from degrees to radians 
@@ -712,13 +887,13 @@ function imageSrcFromDNA(dna,scale,cropped){
 	{
 		scale = 1;
 	}
-	canvas.width = 280*scale;
-	canvas.height = 280*scale;
+	canvas.width = 400*scale;
+	canvas.height = 400*scale;
 	var G = canvas.getContext("2d");
 	G.save(); 
  
 	// move to the middle of where we want to draw our image
-	G.translate(140*scale, 190*scale);
+	G.translate(200*scale, 210*scale);
  
 	// rotate around that point, converting our 
 	// angle from degrees to radians 
@@ -794,4 +969,5 @@ function imageSrcFromDNA(dna,scale,cropped){
 		ret = cropped.toDataURL();
 	}
 	return ret;
+}
 }
