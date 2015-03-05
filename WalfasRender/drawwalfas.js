@@ -128,11 +128,12 @@ function LoadDNA(dna,sc,oc){
 		Shoes = LoadPart("Shoes",dec(D[7]));
 	}
 	//var Shoes = LoadPart("Shoes",dec(D[7]));
+	var outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
 	var basichead = Openfile(repo+"Basichead/0.svg","blarg");
 	
 	var Hair = LoadPart("Hair",D[4]);
 	var Hair2 = LoadPart("Hair2",D[4]);
-	var outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
+	
 	var Eyes = null;
 	var Eyes2 = null;
 	if (D[8].indexOf("S")>0)
@@ -177,7 +178,112 @@ function LoadDNA(dna,sc,oc){
 	var xo = -100;
 	var yo = -220;
 	
+	
+	var NX = -6;
+	var NY = 2;
 	if (Body != null)
+	{
+		Body.x = 105+xo+NX;
+		Body.y = 305+yo+NY;
+	}
+	if (basichead != null)
+	{
+		basichead.x = 37+xo;
+		basichead.y = 55+yo+3;
+	}
+	if (outlinehead != null)
+	{
+		outlinehead.x = 100+xo;
+		outlinehead.y = 305+yo+5+3;
+		//outline head isnt that useful it looks like, so lets just move it off screen....
+		outlinehead.y = -10000;
+	}
+	
+	if (Hat != null)
+	{
+		Hat.x = 100+xo;
+		Hat.y = 310+yo-4;
+	}
+	if (Arms != null)
+	{
+		Arms.x = 105+xo+NX;
+		Arms.y = 305+yo+NY;
+	}
+	if (Arms2 != null)
+	{
+		Arms2.x = 105+xo+NX;
+		Arms2.y = 305+yo+NY;
+	}
+	if (Shoes != null)
+	{
+		Shoes.x = 102+xo+NX+2;
+		Shoes.y = 305+yo+NY-1;
+	}
+	if (Shoes2 != null)
+	{
+		Shoes2.x = 102+xo+NX;
+		Shoes2.y = 305+yo+NY;
+	}
+	if (Mouth != null)
+	{
+		Mouth.x = 105+xo;
+		Mouth.y = 305+yo;
+	}
+	if (Eyes != null)
+	{
+		Eyes.x = 100+xo;
+		Eyes.y = 312+yo;//Ooutline
+		//Eyes.svg = Eyes.svg.replace(outline,eyecolor);
+		
+	}
+	if (Eyes2 != null)
+	{
+		Eyes2.x = 100+xo;
+		Eyes2.y = 312+yo;//Ooutline
+		//Eyes2.svg = Eyes2.svg.replace(outline,eyecolor);
+	}
+	if (Hair != null)
+	{
+		Hair.x = 100+xo;
+		Hair.y = 310+yo-3;
+		Hair.svg = Hair.svg.replace(Hair.svg.substr(Hair.svg.indexOf("#"),7),"#"+D[13])
+	}
+	if (Hair2 != null)
+	{
+		Hair2.x = 100+xo;
+		Hair2.y = 310+yo-3;
+		//Hair2.svg = Hair2.svg.replace(Hair2.svg.substr(Hair2.svg.indexOf("#"),7),"#"+D[13])
+		//Hair2.svg = Hair2.svg.replace(Hair2.svg.substr(Hair2.svg.indexOf("fill=\"#")+6,7),"#"+D[13])
+	}
+	if (Accessory != null)
+	{
+		Accessory.x = 47+xo;
+		Accessory.y = 63+yo;
+		//Accessory.y = 200;
+	}
+	if (Item != null)
+	{
+		//3.39:Aya:100:31:30:31:31:31:0:0:47:36:15:332B1A
+		//3.39:Reimu (2 Blue):100:112:112:113:111:2:0:0:0:0:0:283960
+		Item.x = 68+xo+NX;
+		Item.y = 180+yo+NY;
+	}
+	if (Item2 != null)
+	{
+		Item2.x = 68+xo+NX;
+		Item2.y = 180+yo+NY;
+	}
+	if (Back != null)
+	{
+		Back.x = -45+xo+NX;
+		Back.y = -30+yo+NY;
+	}
+	if (Back2 != null)
+	{
+		Back2.x = -45+xo+NX;
+		Back2.y = -30+yo+NY;
+	}
+	/*if (Body != null)
 	{
 		Body.x = 105+xo;
 		Body.y = 305+yo;
@@ -191,6 +297,7 @@ function LoadDNA(dna,sc,oc){
 	{
 		outlinehead.x = 100+xo;
 		outlinehead.y = 305+yo;
+		outlinehead.y = -10000;
 	}
 	if (Hat != null)
 	{
@@ -271,7 +378,7 @@ function LoadDNA(dna,sc,oc){
 	{
 		Back2.x = -45+xo;
 		Back2.y = -30+yo;
-	}
+	}*/
 }
 function dec(strind)
 {
@@ -887,17 +994,17 @@ function imageSrcFromDNA(dna,scale,cropped){
 	{
 		scale = 1;
 	}
-	canvas.width = 400*scale;
-	canvas.height = 400*scale;
+	canvas.width = 500*scale;
+	canvas.height = 500*scale;
 	var G = canvas.getContext("2d");
 	G.save(); 
  
 	// move to the middle of where we want to draw our image
-	G.translate(200*scale, 210*scale);
+	G.translate(250*scale, 260*scale);
  
 	// rotate around that point, converting our 
 	// angle from degrees to radians 
-	G.scale(0.7*scale,0.7*scale);
+	G.scale(0.85*scale,0.85*scale);
 	var i = 0;
 	while (i < DWentities.length)
 	{
