@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" height="720.75px" width="1716.8px" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1, 0, 0, 1, 307.05, 450.35)">
+    <use height="53.65" transform="matrix(1.0, 0.0, 0.0, 1.0, -28.15, -26.85)" width="56.3" xlink:href="#sprite0"/>
+  </g>
+  <defs>
+    <g id="sprite0" transform="matrix(1, 0, 0, 1, 28.15, 26.85)">
+      <use height="53.65" transform="matrix(1.0, 0.0, 0.0, 1.0, -28.15, -26.85)" width="56.3" xlink:href="#shape0"/>
+    </g>
+    <g id="shape0" transform="matrix(1, 0, 0, 1, 28.15, 26.85)">
+      <path d="M-23.1 11.9 Q-26.45 6.25 -26.6 -0.5 L-26.55 -4.4 Q-26.0 -12.05 -21.7 -16.4 -16.55 -21.85 -8.25 -23.7 0.1 -25.55 2.2 -25.3 -5.55 -21.95 -9.05 -15.6 6.3 -13.35 21.75 -18.15 26.9 -13.8 26.65 -4.3 L26.05 1.6 Q5.25 25.0 -23.1 11.9 M-12.0 -4.75 Q-11.65 -11.05 -9.05 -15.6 -11.65 -11.05 -12.0 -4.75" fill="#f9c397" fill-rule="evenodd" stroke="none"/>
+      <path d="M26.05 1.6 Q24.4 11.6 18.4 17.6 10.65 25.3 -0.2 25.3 -11.0 25.3 -18.65 17.6 -21.35 14.95 -23.1 11.9 5.25 25.0 26.05 1.6" fill="#f3af83" fill-rule="evenodd" stroke="none"/>
+      <path d="M2.2 -25.3 Q3.15 -23.6 15.15 -21.15 19.05 -20.3 21.75 -18.15 6.3 -13.35 -9.05 -15.6 -5.55 -21.95 2.2 -25.3" fill="#fbd7bf" fill-rule="evenodd" stroke="none"/>
+      <path d="M-23.1 11.9 Q-26.45 6.25 -26.6 -0.5 L-26.55 -4.4 Q-26.0 -12.05 -21.7 -16.4 -16.55 -21.85 -8.25 -23.7 0.1 -25.55 2.2 -25.3 3.15 -23.6 15.15 -21.15 19.05 -20.3 21.75 -18.15 26.9 -13.8 26.65 -4.3 L26.05 1.6 Q24.4 11.6 18.4 17.6 10.65 25.3 -0.2 25.3 -11.0 25.3 -18.65 17.6 -21.35 14.95 -23.1 11.9" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.0"/>
+      <path d="M-23.1 11.9 Q5.25 25.0 26.05 1.6 M-9.05 -15.6 Q6.3 -13.35 21.75 -18.15" fill="none" stroke="#010101" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.0" stroke-width="3.0"/>
+      <path d="M2.2 -25.3 Q-5.55 -21.95 -9.05 -15.6 -11.65 -11.05 -12.0 -4.75" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.0"/>
+    </g>
+  </defs>
+</svg>
