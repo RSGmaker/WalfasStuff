@@ -232,8 +232,8 @@ function LoadDNA(dna,sc,oc){
 	}
 	if (Eyes != null)
 	{
-		Eyes.x = 100+xo;
-		Eyes.y = 312+yo;//Ooutline
+		Eyes.x = 100+xo-1;
+		Eyes.y = 312+yo-5;//Ooutline
 		//Eyes.svg = Eyes.svg.replace(outline,eyecolor);
 		
 	}
