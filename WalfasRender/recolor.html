@@ -1037,6 +1037,7 @@ function drawSVG(context,SVG,x,y){
 		if (obj.strokeStyle != null)
 		{
 			//alert("stroke");
+			context.globalAlpha = obj.globalAlpha
 			context.strokeStyle = obj.strokeStyle
 			context.stroke(path);
 		}
@@ -1463,7 +1464,7 @@ var drawsvg = function(context,svg,x,y){
 				context.fill(path);
 				if (OP != -1)
 				{
-					context.globalAlpha=1;
+					//context.globalAlpha=1;
 				}
 			}
 			if (scolor != null && (scolor.charAt(0) == "#"))

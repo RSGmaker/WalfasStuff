@@ -806,7 +806,7 @@ var drawsvg = function(context,svg,x,y){
 				context.fill(path);
 				if (OP != -1)
 				{
-					context.globalAlpha=1;
+					//context.globalAlpha=1;
 				}
 			}
 			if (scolor != null && (scolor.charAt(0) == "#"))
