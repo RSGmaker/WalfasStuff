@@ -66,7 +66,7 @@ function Loadfile(url,type){
 	}
 }
 
-function LoadDNA(dna,sc,oc){
+function LoadDNA(dna,sc,oc,isbacksprite){
 	if (dna==null){
 		dna = "3.39:Meiling:100:1:0:1:1:1:0:0:0:0:0:EB585A";
 	}
@@ -129,11 +129,23 @@ function LoadDNA(dna,sc,oc){
 		Shoes = LoadPart("Shoes",dec(D[7]));
 	}
 	//var Shoes = LoadPart("Shoes",dec(D[7]));
-	var outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
-	var basichead = Openfile(repo+"Basichead/0.svg","blarg");
+	var outlinehead;
+	//outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
+	var basichead;
+	var Accessory;
+	if (isbacksprite!=true)
+	{
+		basichead = Openfile(repo+"Basichead/0.svg","blarg");
+	}
 	
-	var Hair = LoadPart("Hair",D[4]);
-	var Hair2 = LoadPart("Hair2",D[4]);
+	
+	var Hair;
+	var Hair2;
+	if (isbacksprite!=true)
+	{
+		Hair = LoadPart("Hair",D[4]);
+		Hair2 = LoadPart("Hair2",D[4]);
+	}
 	
 	var Eyes = null;
 	var Eyes2 = null;
@@ -149,7 +161,12 @@ function LoadDNA(dna,sc,oc){
 	}
 	//var Eyes = LoadPart("Eyes",D[8]);
 	var Mouth = LoadPart("Mouth",dec(D[9]));
-	var Hat = LoadPart("Hats",dec(D[3]));
+	
+	var Hat;
+	if (isbacksprite!=true)
+	{
+		Hat	= LoadPart("Hats",dec(D[3]));
+	}
 	var Arms = null;
 	var Arms2 = null;
 	if (D[6].indexOf("S")>0)
@@ -175,7 +192,21 @@ function LoadDNA(dna,sc,oc){
 		Item = LoadPart("Items",dec(D[10]));
 	}
 	var Body = LoadPart("body",dec(D[5]));
-	var Accessory = LoadPart("Accessories",dec(D[11]));
+	if (isbacksprite!=true)
+	{
+		Accessory = LoadPart("Accessories",dec(D[11]));
+	}
+	var H2;
+	if (isbacksprite==true)
+	{
+		Hair2 = LoadPart("Hair2",D[4]);
+		Hair = LoadPart("Hair",D[4]);
+		
+		//Accessory = LoadPart("Accessories",dec(D[11]));
+		basichead = Openfile(repo+"Basichead/0.svg","blarg");
+		H2 = Openfile(repo+"Basichead/0.svg","blarg"); 
+		Hat	= LoadPart("Hats",dec(D[3]));
+	}
 	var xo = -100;
 	var yo = -220;
 	
@@ -189,8 +220,20 @@ function LoadDNA(dna,sc,oc){
 	}
 	if (basichead != null)
 	{
-		basichead.x = 37+xo;
+		basichead.x = 38+xo;
 		basichead.y = 55+yo+3;
+		if (isbacksprite==true)
+		{
+			//basichead.x += 6;
+			basichead.y +=1;
+			//#fff1dd
+			//basichead.svg = basichead.svg.replace(basichead.svg.substr(basichead.svg.indexOf("#"),7),"#"+D[13]);
+			H2.x = basichead.x+6;
+			H2.y = basichead.y;
+			basichead.svg = basichead.svg.replace("#fff1dd","#"+D[13]);
+			
+			H2.svg = H2.svg.replace("#fff1dd","#"+D[13]);
+		}
 	}
 	if (outlinehead != null)
 	{
@@ -982,14 +1025,14 @@ function imageSrcFromBackground(bgindex,scale){
 	return ret;
 }
 //create an image object with a walfas dna render preset as its source
-function imageFromDNA(dna,scale,cropped){
+function imageFromDNA(dna,scale,cropped,isbacksprite){
 	var ret = new Image();
-	ret.src = imageSrcFromDNA(dna,scale,cropped);
+	ret.src = imageSrcFromDNA(dna,scale,cropped,isbacksprite);
 	return ret;
 }
 //render walfas dna and get the render as a dataurl
-function imageSrcFromDNA(dna,scale,cropped){
-	LoadDNA(dna);
+function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
+	LoadDNA(dna,null,null,isbacksprite);
 	var canvas = document.createElement('canvas');
 	if (scale == null)
 	{
