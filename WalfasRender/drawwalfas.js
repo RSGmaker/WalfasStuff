@@ -106,6 +106,8 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	
 	var Back = null;
 	var Back2 = null;
+	if (isbacksprite!=true)
+	{
 	if (D[12].indexOf("S")>0)
 	{
 		var DS = D[12].split("S");
@@ -115,6 +117,7 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	else
 	{
 		Back = LoadPart("Wings",dec(D[12]));
+	}
 	}
 	var Shoes = null;
 	var Shoes2 = null;
@@ -206,6 +209,18 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 		basichead = Openfile(repo+"Basichead/0.svg","blarg");
 		H2 = Openfile(repo+"Basichead/0.svg","blarg"); 
 		Hat	= LoadPart("Hats",dec(D[3]));
+		
+		
+	if (D[12].indexOf("S")>0)
+	{
+		var DS = D[12].split("S");
+		Back = LoadPart("Wings",dec(DS[0]),"left");
+		Back2 = LoadPart("Wings",dec(DS[1]),"right");
+	}
+	else
+	{
+		Back = LoadPart("Wings",dec(D[12]));
+	}
 	}
 	var xo = -100;
 	var yo = -220;
