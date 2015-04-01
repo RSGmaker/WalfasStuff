@@ -1036,7 +1036,9 @@ function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
 	var canvas = document.createElement('canvas');
 	if (scale == null)
 	{
-		scale = 1;
+		//scale = 1;
+		var D = dna.split(":");
+		scale = parseFloat(D[2])*0.01;
 	}
 	canvas.width = 500*scale;
 	canvas.height = 500*scale;
