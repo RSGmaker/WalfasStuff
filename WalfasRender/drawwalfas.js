@@ -202,6 +202,7 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	var H2;
 	if (isbacksprite==true)
 	{
+		outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
 		Hair2 = LoadPart("Hair2",D[4]);
 		Hair = LoadPart("Hair",D[4]);
 		
@@ -255,7 +256,7 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 		outlinehead.x = 100+xo;
 		outlinehead.y = 305+yo+5+3;
 		//outline head isnt that useful it looks like, so lets just move it off screen....
-		outlinehead.y = -10000;
+		//outlinehead.y = -10000;
 	}
 	
 	if (Hat != null)
