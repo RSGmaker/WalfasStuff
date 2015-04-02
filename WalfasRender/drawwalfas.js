@@ -894,6 +894,7 @@ var drawsvg = function(context,svg,x,y){
 			}
 			context.translate(-x,-y);
 		}
+		context.globalAlpha=1;
 		i = i + 1;
 	}
 }
