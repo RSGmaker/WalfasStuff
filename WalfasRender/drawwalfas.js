@@ -163,6 +163,10 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 		Eyes = LoadPart("Eyes",D[8]);
 	}
 	//var Eyes = LoadPart("Eyes",D[8]);
+	if (D[11] == 110)
+	{
+		Accessory = LoadPart("Accessories",dec(D[11]));
+	}
 	var Mouth = LoadPart("Mouth",dec(D[9]));
 	
 	var Hat;
@@ -195,7 +199,7 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 		Item = LoadPart("Items",dec(D[10]));
 	}
 	var Body = LoadPart("body",dec(D[5]));
-	if (isbacksprite!=true)
+	if (isbacksprite!=true && D[11] != 110) 
 	{
 		Accessory = LoadPart("Accessories",dec(D[11]));
 	}
@@ -318,7 +322,7 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	if (Accessory != null)
 	{
 		Accessory.x = 47+xo;
-		Accessory.y = 63+yo;
+		Accessory.y = 63+yo+5;
 		//Accessory.y = 200;
 	}
 	if (Item != null)
