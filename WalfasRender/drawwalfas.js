@@ -240,7 +240,7 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	}
 	if (basichead != null)
 	{
-		basichead.x = 38+xo;
+		basichead.x = 38+xo+1;
 		basichead.y = 55+yo+3;
 		if (isbacksprite==true)
 		{
