@@ -17,7 +17,8 @@ var Openfile = function(req,type) {
 	}
 	if (req != null)
 	{
-		var svg = req.responseText;
+		//var svg = req.responseText;
+		var svg = req;
 		var i = 0;
 		while (i<colors.length)
 		{
@@ -38,6 +39,9 @@ var Openfile = function(req,type) {
 	return null;
 }
 function Loadfile(url,type){
+	if (sessionStorage["walfas_"+url]) {
+            return sessionStorage["walfas_"+url];
+        } else {
 	if (type == "" || type == null)
 	{
 		try {
@@ -46,11 +50,13 @@ function Loadfile(url,type){
 			req.send();
 			if (req.status === 200 || req.status === 304)
 			{
-				return req;
+				sessionStorage["walfas_"+url] = req.responseText;
+				return req.responseText;
 			}
 		}
 		catch(err) {
 			//document.getElementById("demo").innerHTML = err.message;
+			sessionStorage["walfas_"+url] = "";
 			return null;
 		}
 	}
@@ -61,9 +67,11 @@ function Loadfile(url,type){
 		req.responseType = filetype;
 		req.send();
 		req.onload = function(e) {
+			sessionStorage["walfas_"+url]=req;
 			Openfile(req,type);
 		}
 	}
+		}
 }
 
 function LoadDNA(dna,sc,oc,isbacksprite){
@@ -206,7 +214,7 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	var H2;
 	if (isbacksprite==true)
 	{
-		outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
+		//outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
 		Hair2 = LoadPart("Hair2",D[4]);
 		Hair = LoadPart("Hair",D[4]);
 		
@@ -577,6 +585,374 @@ function PFslice2(str,start,end){
 	SI = SI + start.length;
 	return parseFloat(str.slice(SI,str.indexOf(end,SI+1)));
 }
+function fillarray(array,element)
+{
+	var i = 0;
+	while (i < element.children.length)
+	{
+		array[array.length] = element.children[i];
+		fillarray(array,element.children[i]);
+		i++;
+	}
+}
+
+var drawxml = function(context,xml,x,y){
+	////var text = svg.split("\n");
+	var i = 0;
+	var trans = false;
+	var data = {};
+	var def = false;
+	var Transforms = {};
+	var trans = null;
+	var Gradients = {};
+	var G;
+	grd = null;
+	//var svg=xml.getElementsByTagName("svg")[0].children;
+	var svg = [];
+	fillarray(svg,xml.getElementsByTagName("svg")[0]);
+	//var st = [];
+	/*while (i < svg.length)
+	{
+		i++;
+	}
+	i = 0;*/
+	while (i < svg.length)
+	{
+		//var S = text[i];
+		var S = svg[i];
+		/*if (S.indexOf("<")>0 && S.indexOf(">")<0)
+		{
+			i = i+1;
+			var ST = text[i];
+			S = S + " " + ST;
+			while (ST.indexOf(">")<0)
+			{
+				i = i+1;
+				ST = text[i];
+				S = S + " " + ST;
+			}
+			//alert(S);
+			//combine multiline into a single line command
+		}*/
+		var D = -1;//.tagName
+		//if ((D = S.indexOf("<radialGradient"))> -1){
+		if (S.tagName == "radialGradient"){
+		grd = {};
+		//grd.id = slice2(S,"id=\"","\"");
+		grd.id = S.getAttribute("id");
+		grd.r = parseInt(S.getAttribute("r"));
+		
+		grd.cx = parseFloat(S.getAttribute("cx"));
+		grd.cy = parseFloat(S.getAttribute("cx"));
+		grd.fx = parseFloat(S.getAttribute("fx"));
+		grd.fy = parseFloat(S.getAttribute("fx"));
+		if (grd.fx == null)
+		{
+			grd.fx = grd.cx;
+		}
+		if (grd.fy == null)
+		{
+			grd.fy = grd.cy;
+		}
+		grd.stops = [];
+		var gradient = context.createRadialGradient(grd.fx,grd.fy,0,grd.cx,grd.cy,grd.r);
+				var j = 0;
+				//just implement the first as global since idk how to actually use it.
+				//context.globalAlpha = grd.stops[0].opacity;
+				/*while (j < grd.stops.length)
+				{
+					gradient.addColorStop(grd.stops[j].offset,grd.stops[j].color);
+					j = j+1;
+				}*/
+				//grd.grad = gradient
+				G = gradient;
+		Gradients[grd.id] = gradient;
+		}
+		//if ((D = S.indexOf("<linearGradient"))> -1){
+		if (S.tagName == "linearGradient")
+		{
+		grd = {};
+		//grd.id = slice2(S,"id=\"","\"");
+		grd.id = S.getAttribute("id");
+		grd.x1 = parseFloat(S.getAttribute("x1"));
+		grd.y1 = parseFloat(S.getAttribute("y1"));
+		grd.x2 = parseFloat(S.getAttribute("x2"));
+		grd.y2 = parseFloat(S.getAttribute("y2"));
+		if (grd.x1 == null)
+		{
+			grd.x1 = 0;
+		}
+		if (grd.x2 == null)
+		{
+			grd.x2 = 0;
+		}
+		if (grd.y1 == null)
+		{
+			grd.y1 = 0;
+		}
+		if (grd.y2 == null)
+		{
+			grd.y2 = 0;
+		}
+		grd.stops = [];
+		var gradient = context.createLinearGradient(grd.x1,grd.y1,grd.x2,grd.y2);
+				var j = 0;
+				//just implement the first as global since idk how to actually use it.
+				//context.globalAlpha = grd.stops[0].opacity;
+				/*while (j < grd.stops.length)
+				{
+					gradient.addColorStop(grd.stops[j].offset,grd.stops[j].color);
+					j = j+1;
+				}*/
+				//grd.grad = gradient
+				G = gradient;
+		Gradients[grd.id] = gradient;
+		}
+		//<stop <stop offset=\"
+		//if ((D = S.indexOf("<stop"))> -1 && grd != null){
+		if (S.tagName == "stop" && grd != null){
+		//grd.stops[grd.stops.length] = {offset:PFslice2(S,"offset=\"","\""),color:slice2(S,"stop-color=\"","\""),opacity:PFslice2(S,"stop-opacity=\"","\"")};//stop-color="
+		var stop = {offset:parseFloat(S.getAttribute("offset")),color:S.getAttribute("stop-color"),opacity:parseFloat(S.getAttribute("stop-opacity"))};//stop-color="
+		G.addColorStop(stop.offset,stop.color);
+	}
+	i = i+1;
+	}
+	i = 0;
+	while (i < svg.length)
+	{
+		//var S = text[i];
+		var S = svg[i];
+		
+		/*if (S.indexOf("<")>0 && S.indexOf(">")<0)
+		{
+			i = i+1;
+			var ST = text[i];
+			S = S + " " + ST;
+			while (ST.indexOf(">")<0)
+			{
+				i = i+1;
+				ST = text[i];
+				S = S + " " + ST;
+			}
+			//alert(S);
+			//combine multiline into a single line command
+		}*/
+		var D = -1;
+		/*if (S.indexOf("<defs>") > -1)
+		{
+			def = true;
+		}
+		if (S.indexOf("matrix(") > -1)
+		{
+			//<g
+			var D = S.slice(S.indexOf("matrix(")+7,S.indexOf(")"));
+			D = D.split(",");
+			if (!def)
+			{
+			if (S.indexOf("<g "))
+			{
+				data.maintransform = [parseInt(D[0]),parseInt(D[1]),parseInt(D[2]),parseInt(D[3]),parseInt(D[4]),parseInt(D[5])];
+			}
+			else if (S.indexOf("<use "))
+			{
+				var J = S.indexOf("href=\"#")+7;
+				J = S.slice(J,S.indexOf(J+1));
+				data["Trn"+J] = [parseInt(D[0]),parseInt(D[1]),parseInt(D[2]),parseInt(D[3]),parseInt(D[4]),parseInt(D[5])];
+				//data[]
+			}
+			}
+		}
+		else if (S.indexOf("<path") > -1)*/
+		//if (S.indexOf("matrix(") > -1)
+		if (S.getAttribute("transform"))
+		{
+			//maybe xmlized
+			//<g
+			D = S.getAttribute("transform");
+			D = D.slice(D.indexOf("matrix(")+7,D.indexOf(")"));
+			D = D.split(",");
+			var T = [parseFloat(D[0]),parseFloat(D[1]),parseFloat(D[2]),parseFloat(D[3]),parseFloat(D[4]),parseFloat(D[5])];
+			D = S.getAttribute("xlink:href");//slice2(S,"xlink:href=\"#","\"");
+			if (D != null)
+			{
+				//alert("transformation "+D + " set as " + T);
+				T[6] = 1 / T[0];
+				T[7] = 1 / T[3];
+				Transforms[D] = T;
+			}
+		}
+		//if (S.indexOf("<g id=\"") > -1)
+		if (S.tagName == "g")
+		{
+			//trans = slice2(S,"<g id=\"","\"");
+			trans = S.getAttribute("id");
+			if (trans != null)
+			{
+				//alert("loading transformation"+trans);
+				trans = Transforms[trans];
+			}
+		}
+		//if ((S.indexOf("<path"))> -1){
+		if (S.tagName == "path"){
+			//var D = S.slice(S.indexOf("<path d=\"")+9,S.indexOf("\" "));
+			//D = S.slice(D+9,S.indexOf("\" "));
+			////D = slice2(S," d=\"","\"");
+			D = S.getAttribute("d");
+			//alert("path:"+D);
+			//var lj = S.indexOf("linejoin=\"");
+			var lj = S.getAttribute("linejoin");
+			if (lj)
+			{
+				//lj = S.substr(lj+10,5);
+				context.lineJoin = lj;
+			}
+			else
+			{
+				context.lineJoin = "miter";
+			}
+			//lj = S.indexOf("linecap=\"");
+			lj = S.getAttribute("linecap");
+			if (lj)
+			{
+				//lj = S.substr(lj+9,5);
+				context.lineCap = lj;
+			}
+			else
+			{
+				context.lineCap = "miter";
+			}
+			//lj = S.indexOf("stroke-width=\"");
+			lj = S.getAttribute("stroke-width");
+			if (lj)
+			{
+				//lj = S.slice(lj+14,S.indexOf("\"",lj+15));
+				context.lineWidth = parseInt(lj);
+			}
+			else
+			{
+				context.lineWidth = 1;
+			}
+			
+			var path = new Path2D(D);
+			//var fcolor = S.substr(S.indexOf("fill=\"")+6,7);
+			
+			//var scolor = S.substr(S.indexOf("stroke=\"")+8,7);
+			//var fcolor = slice2(S,"fill=\"","\"");
+			var fcolor = S.getAttribute("fill");
+			//var scolor = slice2(S,"stroke=\"","\"");
+			var scolor = S.getAttribute("stroke");
+			//lj = S.indexOf("style=\"");
+			lj = S.getAttribute("style");
+			if (lj)
+			{
+				//alert("styl'in");
+				//var Sty = slice2(S,"style=\"","\"");
+				//var STYLE = Sty.split(";");
+				var STYLE = lj.split(";");
+				var II = 0;
+				while (II<STYLE.length)
+				{
+					var SS = STYLE[II].split(":");
+					if (SS[0]=="id")
+					{
+					}
+					if (SS[0]=="fill")
+					{
+						fcolor = SS[1];
+					}
+					else if (SS[0]=="stroke")
+					{
+						scolor = SS[1];
+					}
+					else if (isNaN(SS[1]))
+					{
+						context[SS[0]] = SS[1];
+						//alert(SS[0] + "=(string)" +SS[1]);
+					}
+					else
+					{
+						context[SS[0]] = parseFloat(SS[1]);
+						//alert(SS[0] + "=(number)" +parseFloat(SS[1]));
+					}
+					II = II + 1;
+				}
+				/*if (Sty.indexOf("fill:")>-1)
+				{
+					fcolor = context.fill;
+				}
+				if (Sty.indexOf("stroke:")>-1)
+				{
+					scolor = context.stroke;
+				}*/
+			}
+
+			context.translate(x,y);
+			if (trans != null)
+			{
+				//context.transform(trans[0],0,0,trans[3],0,0);
+			}
+			
+			if (fcolor != null && (fcolor.charAt(0) == "#" || fcolor.indexOf("url(#")==0))
+			{
+				
+				var OP;
+				//OP = S.indexOf("fill-opacity=\"");
+				OP = S.getAttribute("fill-opacity");
+				
+				if (OP)
+				{
+					OP = parseFloat(OP);
+					//OP = OP+14;
+					//OP = parseFloat(S.slice(OP,S.indexOf("\"",OP+1)));
+					context.globalAlpha = OP;
+				}
+				if (fcolor.indexOf("url(#")==0)
+				{
+					fcolor = Gradients[slice2(fcolor,"url(#",")")];
+				}
+				context.fillStyle=fcolor;
+				if (randomcols)
+				{
+					context.fillStyle=randomcolor2();
+				}
+				context.fill(path);
+				if (OP != -1)
+				{
+					//context.globalAlpha=1;
+				}
+			}
+			if (scolor != null && (scolor.charAt(0) == "#"))
+			{
+				context.strokeStyle=scolor;
+				if (randomcols)
+				{
+					context.strokeStyle=randomcolor2();
+				}
+				//var sw = (data[scale] * 0.01) * context.lineWidth;
+				//if (sw < 1.1)
+				{
+					context.stroke(path);
+				}
+			}
+			else
+			{
+				context.strokeStyle = context.fillStyle;
+				//scolor = fcolor;
+				context.lineWidth = 1;
+				
+				context.stroke(path);
+			}
+			if (trans != null)
+			{
+				//context.transform(trans[6],0,0,trans[7],0,0);
+			}
+			context.translate(-x,-y);
+				}
+		context.globalAlpha=1;
+		i = i + 1;
+	}
+}
+	
  
 var drawsvg = function(context,svg,x,y){
 	var text = svg.split("\n");
@@ -642,7 +1018,8 @@ var drawsvg = function(context,svg,x,y){
 				G = gradient;
 		Gradients[grd.id] = gradient;
 		}
-		if ((D = S.indexOf("<linearGradient"))> -1){
+		if ((D = S.indexOf("<linearGradient"))> -1)
+		{
 		grd = {};
 		grd.id = slice2(S,"id=\"","\"");
 		grd.x1 = PFslice2(S,"x1=\"","\"");
@@ -680,11 +1057,12 @@ var drawsvg = function(context,svg,x,y){
 		Gradients[grd.id] = gradient;
 		}
 		//<stop <stop offset=\"
-		if ((D = S.indexOf("<stop"))> -1 && grd != null){
+		if ((D = S.indexOf("<stop"))> -1 && grd != null)
+		{
 		//grd.stops[grd.stops.length] = {offset:PFslice2(S,"offset=\"","\""),color:slice2(S,"stop-color=\"","\""),opacity:PFslice2(S,"stop-opacity=\"","\"")};//stop-color="
 		var stop = {offset:PFslice2(S,"offset=\"","\""),color:slice2(S,"stop-color=\"","\""),opacity:PFslice2(S,"stop-opacity=\"","\"")};//stop-color="
 		G.addColorStop(stop.offset,stop.color);
-	}
+		}
 	i = i+1;
 	}
 	i = 0;
@@ -755,7 +1133,8 @@ var drawsvg = function(context,svg,x,y){
 				trans = Transforms[trans];
 			}
 		}
-		if ((S.indexOf("<path"))> -1){
+		if ((S.indexOf("<path"))> -1)
+		{
 			//var D = S.slice(S.indexOf("<path d=\"")+9,S.indexOf("\" "));
 			//D = S.slice(D+9,S.indexOf("\" "));
 			D = slice2(S," d=\"","\"");
@@ -937,7 +1316,13 @@ function imageSrcFromObject(objindex,scale,cropped){
 		var E = BG;
 		if (typeof E.svg != 'undefined')
 		{
-			drawsvg(G,E.svg,E.x,E.y);
+			if (typeof E.xml == 'undefined')
+			{
+				parser=new DOMParser();
+				E.xml=parser.parseFromString(E.svg,"text/xml");
+			}
+			//drawsvg(G,E.svg,E.x,E.y);
+			drawxml(G,E.xml,E.x,E.y);
 		
 		}
 		i = i + 1;
@@ -1035,7 +1420,13 @@ function imageSrcFromBackground(bgindex,scale){
 		var E = BG;
 		if (typeof E.svg != 'undefined')
 		{
-			drawsvg(G,E.svg,E.x,E.y);
+			if (typeof E.xml == 'undefined')
+			{
+				parser=new DOMParser();
+				E.xml=parser.parseFromString(E.svg,"text/xml");
+			}
+			//drawsvg(G,E.svg,E.x,E.y);
+			drawxml(G,E.xml,E.x,E.y);
 		
 		}
 		i = i + 1;
@@ -1078,7 +1469,13 @@ function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
 		var E = DWentities[i];
 		if (typeof E.svg != 'undefined')
 		{
-			drawsvg(G,E.svg,E.x,E.y);
+			if (typeof E.xml == 'undefined')
+			{
+				parser=new DOMParser();
+				E.xml=parser.parseFromString(E.svg,"text/xml");
+			}
+			//drawsvg(G,E.svg,E.x,E.y);
+			drawxml(G,E.xml,E.x,E.y);
 		
 		}
 		i = i + 1;
