@@ -10,24 +10,19 @@ Create.html pre-alpha 0.01
 	* {
 		margin: 0;
 		padding: 0;
-		-moz-user-select: -moz-none;
-   -khtml-user-select: none;
-   -webkit-user-select: none;
-
-   /*
-     Introduced in IE 10.
-     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
-   */
-   -ms-user-select: none;
-   user-select: none;
-	}
-	
-	body {
-		font: 300 18px/1.5 WildWords, WildWords, arial, sans-serif;
 		
 	}
 	
+	body {
+		font-family: WildWords;
+	}
 	
+	img {
+		<!--keep users from being able to do the default select feature on props, it would be very annoying-->
+		-moz-user-select: -moz-none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+	}
 
 	@font-face {
     font-family: WildWords;
@@ -35,15 +30,19 @@ Create.html pre-alpha 0.01
 }
 
 	scenemenu {
-		font: 300 24px/1.5 WildWords, WildWords, arial, sans-serif;
+		font-size: 28px;
 		position: absolute;
 		top: 2%;
 		left: 0%;
 		color: #000;
+		zIndex: 100;
+		-moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
 	}
 	
-	objectmenu {
-
+	stagemenu {
+		font-size: 20px;
 		margin: 0 auto;
 		background: #000;
 		color: #fff;
@@ -53,9 +52,12 @@ Create.html pre-alpha 0.01
 		left: 1%;
 		box-shadow: 0 0 15px 2px #666;
 		color: #000;
+		-moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
 	}
 	
-	#objectmenustyle >ul>li:hover>ul { 
+	#stagemenustyle >ul>li:hover>ul { 
     bottom:100%;
     border-bottom: 1px solid transparent
 	}
@@ -69,8 +71,8 @@ Create.html pre-alpha 0.01
 	#scenemenu_nav ul {
 		
 		float: left;
-		-webkit-transition: .25s;
-		transition: .25s;
+		-webkit-transition: 0.0s;
+		transition: 0.0s;
 	}
 	
 	#scenemenu_nav li {
@@ -78,8 +80,8 @@ Create.html pre-alpha 0.01
 		position: relative;
 		width: 300px;
 		list-style: none;
-		-webkit-transition: .25s;
-		transition: .25s;
+		-webkit-transition: 0.0s;
+		transition: 0.0s;
 	}
 	
 	#scenemenu_nav > ul > li > a, h1 {
@@ -112,7 +114,7 @@ Create.html pre-alpha 0.01
 	
 	#scenemenu_nav ul ul ul {
 		left: 200%;
-		bottom: 00;
+		top: 00;
 	}
 	
 	#scenemenu_nav li:hover, #scenemenu_nav li:hover li {
@@ -131,7 +133,7 @@ Create.html pre-alpha 0.01
 		pointer-events:auto;
 		opacity: 1;
 		left: 0%;
-		top:100%;
+		bottom:00%;
 		border-bottom: 1px solid transparent
 	}
 	#scenemenu_nav li>ul>li:hover>ul>li {
@@ -142,38 +144,38 @@ Create.html pre-alpha 0.01
 		visibility: visible;
 		opacity: 1;
 		left: 0%;
-		top:100%;
+		bottom:100%;
 		border-bottom: 1px solid transparent
 	}
 
 	
-	#objmenu_nav ul {
+	#stgmenu_nav ul {
 		background: white;
 		float: left;
-		-webkit-transition: .25s;
-		transition: .25s;
+		-webkit-transition: 0.0s;
+		transition: 0.0s;
 	}
 	
-	#objmenu_nav li {
+	#stgmenu_nav li {
 		float: left;
 		position: relative;
 		width: 200px;
 		list-style: none;
-		-webkit-transition: .25s;
-		transition: .25s;
+		-webkit-transition: 0.0s;
+		transition: 0.0s;
 	}
 	
-	#objmenu_nav > ul > li > a, h1 {
+	#stgmenu_nav > ul > li > a, h1 {
 		text-transform: uppercase;
 	}
 	
-	#objmenu_nav a {
+	#stgmenu_nav a {
 		display: block;
 		text-decoration: none;
 		padding: 5px 15px;
 		color: #000;
 	}
-	#objmenu_nav p {
+	#stgmenu_nav p {
 		display: block;
 		text-decoration: none;
 		padding: 5px 15px;
@@ -181,7 +183,7 @@ Create.html pre-alpha 0.01
 		cursor: pointer;
 	}
 
-	#objmenu_nav ul ul {
+	#stgmenu_nav ul ul {
 		position: absolute;
 		left: 1000%;
 		bottom:100%;
@@ -191,23 +193,23 @@ Create.html pre-alpha 0.01
 		pointer-events:none;
 	}
 	
-	#objmenu_nav ul ul ul {
+	#stgmenu_nav ul ul ul {
 		left: 200%;
 		top: 0;
 	}
 	
-	#objmenu_nav li:hover, #objmenu_nav li:hover li {
+	#stgmenu_nav li:hover, #stgmenu_nav li:hover li {
 		background: #ddd;
 	}
 	
-	#objmenu_nav li li:hover, #objmenu_nav li li:hover li {
+	#stgmenu_nav li li:hover, #stgmenu_nav li li:hover li {
 		background: #bbb;
 	}
 	
-	#objmenu_nav li li li:hover {
+	#stgmenu_nav li li li:hover {
 		background: #999;
 	}
-	#objmenu_nav li:hover > ul>li {
+	#stgmenu_nav li:hover > ul>li {
 		visibility: visible;
 		pointer-events:auto;
 		opacity: 1;
@@ -215,11 +217,11 @@ Create.html pre-alpha 0.01
 		bottom:100%;
 		border-bottom: 1px solid transparent
 	}
-	#objmenu_nav li>ul>li:hover>ul>li {
+	#stgmenu_nav li>ul>li:hover>ul>li {
 		left: 100%;
 	}
 	
-	#objmenu_nav li:hover > ul {
+	#stgmenu_nav li:hover > ul {
 		visibility: visible;
 		opacity: 1;
 		left: 0%;
@@ -230,12 +232,13 @@ Create.html pre-alpha 0.01
 	</style>
 </head>
 <body id="body" onclick="" onmousedown="return mousedown(event);" onmouseup="mouseup(event)" onmousemove="mousemove(event)" style="overflow: hidden;margin: 0;padding: 0;" onkeydown="keydown(event)" ondblclick="doubleclick(event)" >
-<div id="stage" width="100%" height="100%" onmousedown="return mousedown(event);" onmouseup="mouseup(event)" onmousemove="mousemove(event)" onkeydown="keydown(event)">
+<div id="stage" width="100%" height="100%" onmousedown="return mousedown(event);" onmouseup="mouseup(event)" onmousemove="mousemove(event)" onkeydown="return keydown(event);" style="position:static;left:0;top:0;zIndex:1;">
 </div>
 <!--<div id="dme" contenteditable="false">Drag your images from your desktop into this page to get started.</div>-->
-<img id="BGimage" style="pointer-events:none;position: absolute;top:0%;left:18%zIndex:9999;" height="100%"/>
-<objectmenu>
-		<nav id="objmenu_nav">
+<!--<img id="BGimage" style="pointer-events:none;position: absolute;top:0%;left:18%;zIndex:9999;" height="100%"/>-->
+<div id="interface" style="position:static;left:0;top:0;zIndex:100;">
+<stagemenu>
+		<nav id="stgmenu_nav">
 			<ul>
 			<li>
 					<center><p>Menu</p></center>
@@ -895,7 +898,7 @@ Create.html pre-alpha 0.01
 								<li><p>Speech</p></li>
 								<li><p>Thought</p></li>
 								<li><p>Box</p></li>
-								<li><p onclick="var NT = document.createElement('DIV');NT.innerHTML='Double-click to edit Me!';NT.setAttribute('contenteditable','true');stg.appendChild(NT);">Floating</p></li>
+								<li><p onclick="var NT = document.createElement('DIV');NT.innerHTML='Double-click to edit Me!';NT.setAttribute('contenteditable','false');stg.appendChild(NT);">Floating</p></li>
 								<li><p>Action</p></li>
 							</ul>
 								</li>
@@ -1167,7 +1170,7 @@ Create.html pre-alpha 0.01
 						<li>
 							<p>Load Preset</p>
 							<ul>
-								<li> <select id="presetchoice" onchange="LoadPreset();" width="100%" height="100%">
+								<li> <select id="presetchoice" onchange="if (this.style.visibility != 'hidden'){LoadPreset();}" width="100%" height="100%">
 									<option value="Akyu (2):100:208:179:194:176:54:0:0:0:0:0:984499">Akyu (2)</option>
 <option value="Akyu:100:54:53:54:54:54:0:0:69:0:0:C073C0">Akyu</option>
 <option value="Alice (2A):100:125:124:124:119:13:0:0:0:0:0:FFFF80">Alice (2A)</option>
@@ -1462,7 +1465,7 @@ Create.html pre-alpha 0.01
 				
 			</ul>
 		</nav>
-	</objectmenu>
+	</stagemenu>
 	<scenemenu>
 	<nav id="scenemenu_nav">
 			<ul>
@@ -1496,6 +1499,7 @@ Create.html pre-alpha 0.01
 			</ul>
 		</nav>
 	</scenemenu>
+	</div>
 </body>
 <script src="drawwalfas.js"></script>
 <script>
@@ -1527,6 +1531,7 @@ var imgs = new Array();
 var bdy = document.getElementById('body');
 document.body.style.backgroundColor = "white";
 var stg = document.getElementById('stage');
+var gui = document.getElementById('interface');
 function ImportImage()
 {
 	var temp = prompt("enter a url of image to import","");
@@ -1579,6 +1584,7 @@ function LoadBackground()
 	var elt = document.getElementById("backgroundchoice");
 	var d = parseInt(elt.options[elt.selectedIndex].value)-1;
 	var I;
+	var H = Math.floor(window.innerHeight*1.25);
 	if (d==-1)
 	{
 		I = null;
@@ -1590,18 +1596,12 @@ function LoadBackground()
 	}
 	if (d > -1)
 	{
-		I = imageSrcFromBackground(d,2.0);
+		I = imageSrcFromBackground(d,H / 400);
 	}
-	//var img = document.getElementById("BGimage"); 
-		//img.src = I;
 		bdy.style.backgroundImage = "url("+I+")";
 		bdy.style.backgroundPosition = "top";
 		bdy.style.backgroundRepeat = "no-repeat";
-		//var A = Math.round((document.documentElement.clientWidth / document.documentElement.clientHeight) * 100);
-		//alert(""+A);
-		//bdy.style.backgroundSize = screen.height+"px";
-		bdy.style.backgroundSize = Math.floor(window.innerHeight*1.33)+"px";
-	//alert("loaded:" + d);
+		bdy.style.backgroundSize = H+"px";
 }
 function rnd(I)
 {
@@ -1659,29 +1659,39 @@ function doubleclick(e)
 
 	if (isstageobject(lobj) && lobj.tagName=="DIV")
 	{
-	//alert(""+lobj.getAttribute("contenteditable"))
 		if (lobj.getAttribute("contenteditable")=="true")
 		{
 			lobj.setAttribute("contenteditable","false");
+			lobj.style.border = "";
 		}
 		else
 		{
 			lobj.setAttribute("contenteditable","true");
+			//let the user know the text box can now be editted
+			lobj.style.border = "solid #000000";
 		}
 	}
 }
 
 function keydown(e)
 {
+	var ar=new Array(33,34,35,36,37,38,39,40);
+	var ret = false;
+	if (ar.indexOf(e.keyCode))
+	{
+	ret = true;
+	}
 	if (!isstageobject(lobj))
 	{
-		return;
+		return ret;
 	}
 	if (lobj.tagName=="DIV")
 	{
 		if (lobj.getAttribute("contenteditable")=="true")
 		{
-			return true;
+			//return true seems to messup firefox from editting these
+			//return true;
+			return;
 		}
 	}
 	//delete key
@@ -1712,6 +1722,7 @@ function keydown(e)
 				lobj.style.zIndex=1;
 			}
 		}
+		gui.style.zIndex++;
 	}
 	//down key
 	if (e.keyCode == 40)
@@ -1727,6 +1738,7 @@ function keydown(e)
 				lobj.style.zIndex=0;
 			}
 		}
+		gui.style.zIndex++;
 	}
 	//A key
 	if (e.keyCode == 65)
@@ -1776,7 +1788,7 @@ function keydown(e)
 	{
 		var NT = document.createElement("DIV");
 		NT.innerHTML="Double-click to edit Me!";
-		NT.setAttribute("contenteditable","true");
+		NT.setAttribute("contenteditable","false");
 		stg.appendChild(NT);
 	}
 	//+ key
@@ -1805,12 +1817,13 @@ function keydown(e)
 			lobj.style.opacity = 0.04;
 		}
 	}
-	return false;
+	return ret;
 }
 function mousedown(e)
 {
 if (!isstageobject(e.target))
 	{
+		lobj=null;
 		return;
 	}
 x=e.clientX;
@@ -1861,6 +1874,13 @@ if (e.shiftKey==1)
 	ox = x;
 	oy = y;
 }
+if (e.ctrlKey==1 && e.shiftKey==1)
+{
+	mode = 4;
+	//OV = tobj.scale;
+	ox = x;
+	oy = y;
+}
 
 //e.target.style.left = x-(e.target.width / 2 );
 //e.target.style.top = y-(e.target.height / 2);
@@ -1889,6 +1909,19 @@ if (mode==3)
 		tobj.scale=0.01;
 	}
 }
+if (mode==4)
+{
+	//tobj.scale = OV+(((x-ox) / 100));
+	var nx = 1+((x-ox) / 100);
+	var ny = 1+((y-oy) / 100);
+	tobj.style.WebkitTransform = "rotate("+tobj.rot+"deg) scaleX("+(nx*tobj.direction)+") scaleY("+ny+")";
+	tobj.style.transform = tobj.style.WebkitTransform;
+	tobj.style.MozTransform = tobj.style.WebkitTransform;
+	//tobj.width = tobj.naturalWidth * nx;
+	//tobj.height = tobj.naturalHeight * ny;
+	//tobj.style.scaleX = nx;
+	//tobj.style.scaleY = ny;
+}
 if (mode==1)
 {
 //clientWidth
@@ -1900,7 +1933,7 @@ tobj.style.top = y + oy;
 }
 else
 {
-	if (mode != 0)
+	if (mode != 0 && mode!=4)
 	{
 		tobj.style.WebkitTransform = "rotate("+tobj.rot+"deg) scaleX("+(tobj.scale*tobj.direction)+") scaleY("+tobj.scale+")";
 		tobj.style.transform = tobj.style.WebkitTransform;
