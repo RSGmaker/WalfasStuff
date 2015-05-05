@@ -523,9 +523,92 @@ filetype = "";
 var scriptLoaded;
 var entities = [];
 var Openfile = function(req,type) {
-	/*var div = document.createElement('div');
-	div.innerHTML = req.responseText;
-	document.body.appendChild(div);*/
+	if (typeof req == "string")
+	{
+		req = Loadfile(req);
+	}
+	if (req != null)
+	{
+		//var svg = req.responseText.replace(Ooutline,outline).replace(Oskincolor,skincolor); getsel()
+		var svg = req;
+		var i = 0;
+		while (i<colors.length)
+		{
+			var nc = colors[i];
+			//if (nc.active && ((nc.filter="All" || type == "All") || (type.toLowerCase().contains( nc.filter.toLowerCase()))))
+			if (nc.active && ((nc.filter == "All" || type == "All") || (type.toLowerCase().indexOf( nc.filter.toLowerCase())>-1)))
+			{
+				svg = svg.replace(nc.src,nc.dst);
+			}
+			i = i+1;
+		}
+		var E = {};
+		E.svg = svg;
+		E.x = 0;
+		E.y = 0;
+		entities[entities.length] = E;
+		return E;
+	}
+	return null;
+	if (req != null)
+	{
+		//var svg = req.responseText;
+		var svg = req;
+		var i = 0;
+		while (i<colors.length)
+		{
+			var nc = colors[i];
+			if (nc.active && ((nc.filter == "All" || type == "All") || (type.toLowerCase().indexOf( nc.filter.toLowerCase())>-1)))
+			{
+				svg = svg.replace(nc.src,nc.dst);
+			}
+			i = i+1;
+		}
+		var E = {};
+		E.svg = svg;
+		E.x = 0;
+		E.y = 0;
+		DWentities[DWentities.length] = E;
+		return E;
+	}
+	return null;
+}
+function Loadfile(url,type){
+	if (sessionStorage["walfas_"+url]) {
+            return sessionStorage["walfas_"+url];
+        } else {
+	if (type == "" || type == null)
+	{
+		try {
+			var req = new XMLHttpRequest();
+			req.open('GET', url, false);
+			req.send();
+			if (req.status === 200 || req.status === 304)
+			{
+				sessionStorage["walfas_"+url] = req.responseText;
+				return req.responseText;
+			}
+		}
+		catch(err) {
+			//document.getElementById("demo").innerHTML = err.message;
+			sessionStorage["walfas_"+url] = "";
+			return null;
+		}
+	}
+	else
+	{
+		var req = new XMLHttpRequest();
+		req.open('GET', url, true);
+		req.responseType = filetype;
+		req.send();
+		req.onload = function(e) {
+			sessionStorage["walfas_"+url]=req;
+			Openfile(req,type);
+		}
+	}
+		}
+}
+/*var Openfile = function(req,type) {
 	if (typeof req == "string")
 	{
 		req = Loadfile(req);
@@ -540,10 +623,6 @@ var Openfile = function(req,type) {
 		{
 			var nc = colors[i];
 			//if (nc.active && ((nc.filter="All" || type == "All") || (type.toLowerCase().contains( nc.filter.toLowerCase()))))
-			/*alert(""+nc.filter+" "+type);
-			var T = type.toLowerCase();
-			var NT = nc.filter.toLowerCase();
-			if (nc.active && (T.indexOf(NT)>-1))*/
 			if (nc.active && ((nc.filter == "All" || type == "All") || (type.toLowerCase().indexOf( nc.filter.toLowerCase())>-1)))
 			{
 				svg = svg.replace(nc.src,nc.dst);
@@ -586,7 +665,7 @@ function Loadfile(url,type){
 			Openfile(req,type);
 		}
 	}
-}
+}*/
 //var A = prompt("enter DNA","3.39:Meiling:100:1:0:1:1:1:0:0:0:0:0:EB585A");
 //var skincolor = "fff1dd";
 var Oskincolor = "#fff1dd"
@@ -619,10 +698,12 @@ function LoadDNA(dna)
 	var D = dna.split(":");
 	if (OE[5] == null && D[4]!="240")
 	{
-		OE[5] = Openfile(repo+"Basichead/1.svg","blarg");
+		OE[5] = null;
+		//OE[5] = Openfile(repo+"Basichead/1.svg","blarg");
 	}
 	if (OE[2] == null)
 	{
+		
 		OE[2] = Openfile(repo+"Basichead/0.svg","blarg");
 	}
 	if (D[4]=="240")
