@@ -1501,6 +1501,9 @@ Create.html pre-alpha 0.01
 	</scenemenu>
 	</div>
 </body>
+<script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script> 
+<script type="text/javascript" src="http://gabelerner.github.io/canvg/StackBlur.js"></script>
+<script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script> 
 <script src="drawwalfas.js"></script>
 <script>
 //switch to div tag to allow mouse events to work in the whole window
@@ -1552,8 +1555,8 @@ function ImportDna()
 {
 	var d = prompt("enter a walfas or recolored walfas dna","3.39:Meiling:100:1:0:1:1:1:0:0:0:0:0:EB585A");
 	//var d= "3.39:Meiling:100:1:0:1:1:1:0:0:0:0:0:EB585A";
-	
-	var I = imageSrcFromDNA(d,null,false,false);
+	AddCharacter(d);
+	/*var I = imageSrcFromDNA(d,null,false,false);
 	var img = document.createElement("img"); 
 		img.src = I;
     
@@ -1561,7 +1564,35 @@ function ImportDna()
 		imgs[count].src = I;
 	
 		stg.appendChild(img);
-	count = count+1;
+	count = count+1;*/
+}
+function AddCharacter(dna)
+{
+	var I = imageSrcFromDNA(dna,null,false,false);
+	if (false)
+	{
+	window.setTimeout(function(){I = imageSrcFromDNA(dna,null,false,false);
+	var img = document.createElement("img"); 
+		img.src = I;
+    
+		imgs[count]=new Image;
+		imgs[count].src = I;
+	
+		stg.appendChild(img);
+	count = count+1;}, 100);
+	}
+	else
+	{
+		var img = document.createElement("img"); 
+		img.src = I;
+    
+		imgs[count]=new Image;
+		imgs[count].src = I;
+	
+		stg.appendChild(img);
+		count = count+1;
+	}
+	
 }
 
 function LoadObject()
@@ -1569,6 +1600,20 @@ function LoadObject()
 	var elt = document.getElementById("objectchoice");
 	var d = parseInt(elt.options[elt.selectedIndex].value)-1;
 	var I = imageSrcFromObject(d,1.0,false);
+	if (false)
+	{
+	window.setTimeout(function(){I = imageSrcFromObject(d,1.0,false);
+	var img = document.createElement("img"); 
+		img.src = I;
+    
+		imgs[count]=new Image;
+		imgs[count].src = I;
+	
+		stg.appendChild(img);
+	count = count+1;}, 100);
+	}
+	else
+	{
 	var img = document.createElement("img"); 
 		img.src = I;
     
@@ -1577,6 +1622,7 @@ function LoadObject()
 	
 		stg.appendChild(img);
 	count = count+1;
+	}
 	//alert("loaded:" + d);
 }
 function LoadBackground()
@@ -1596,12 +1642,30 @@ function LoadBackground()
 	}
 	if (d > -1)
 	{
-		I = imageSrcFromBackground(d,H / 400);
+	//the correct math is /400 but increasing the resolution will help reduce the "gray lines" issue
+		//I = imageSrcFromBackground(d,H / 400);
+		I = imageSrcFromBackground(d,H / 200);
 	}
+	if (true)
+	{
+	//timeout is required for new render style as it has an asnyc function, the new style only applies to backgrounds currently
+	window.setTimeout(function(){
+	if (d > -1)
+	{
+	I = imageSrcFromBackground(d,H / 200);
+	}
+	bdy.style.backgroundImage = "url("+I+")";
+		bdy.style.backgroundPosition = "top";
+		bdy.style.backgroundRepeat = "no-repeat";
+		bdy.style.backgroundSize = H+"px";}, 100);
+		}
+		else
+		{
 		bdy.style.backgroundImage = "url("+I+")";
 		bdy.style.backgroundPosition = "top";
 		bdy.style.backgroundRepeat = "no-repeat";
 		bdy.style.backgroundSize = H+"px";
+		}
 }
 function rnd(I)
 {
@@ -1610,7 +1674,8 @@ function rnd(I)
 function newcharacter()
 {
 	var d = "Null:Char"+count+":100:"+rnd(351)+":"+rnd(281)+":"+rnd(363)+":"+rnd(277)+":"+rnd(127)+":"+rnd(133)+":"+rnd(85)+":"+rnd(157)+":"+rnd(156)+":"+rnd(136)+":"+rnd(16777215).toString(16);
-	var I = imageSrcFromDNA(d,null,false,false);
+	AddCharacter(d);
+	/*var I = imageSrcFromDNA(d,null,false,false);
 	var img = document.createElement("img"); 
 		img.src = I;
     
@@ -1618,14 +1683,14 @@ function newcharacter()
 		imgs[count].src = I;
 	
 		stg.appendChild(img);
-	count = count+1;
+	count = count+1;*/
 }
 function LoadPreset()
 {
 	var elt = document.getElementById("presetchoice");
 	var d = "NULL:"+elt.options[elt.selectedIndex].value;
-	
-	var I = imageSrcFromDNA(d,null,false,false);
+	AddCharacter(d);
+	/*var I = imageSrcFromDNA(d,null,false,false);
 	var img = document.createElement("img"); 
 		img.src = I;
     
@@ -1633,7 +1698,7 @@ function LoadPreset()
 		imgs[count].src = I;
 	
 		stg.appendChild(img);
-	count = count+1;
+	count = count+1;*/
 	//alert("loaded:" + d);
 }
 //determines if the element is a valid object owned by the stage.
