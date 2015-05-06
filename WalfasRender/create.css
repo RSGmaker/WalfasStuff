@@ -1,0 +1,225 @@
+html {
+        overflow: hidden;
+}
+	* {
+		margin: 0;
+		padding: 0;
+		
+	}
+	
+	body {
+		font-family: WildWords;
+	}
+	
+	img {
+		<!--keep users from being able to do the default select feature on props, it would be very annoying-->
+		-moz-user-select: -moz-none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		cursor: pointer;
+	}
+
+	@font-face {
+    font-family: WildWords;
+    src: url(https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/font_ww.ttf);
+}
+
+	scenemenu {
+		font-size: 28px;
+		position: absolute;
+		top: 2%;
+		left: 0%;
+		color: #000;
+		zIndex: 100;
+		-moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+	}
+	
+	stagemenu {
+		font-size: 20px;
+		margin: 0 auto;
+		background: #000;
+		color: #fff;
+		border-radius: 5px;
+		position: absolute;
+		bottom: 4%;
+		left: 1%;
+		box-shadow: 0 0 15px 2px #666;
+		color: #000;
+		-moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+	}
+	
+	#stagemenustyle >ul>li:hover>ul { 
+    bottom:100%;
+    
+	}
+	
+	
+	
+	 {
+		color: black;
+	}
+	
+	#scenemenu_nav ul {
+		
+		float: left;
+		-webkit-transition: 0.2s;
+		transition: 0.2s;
+	}
+	
+	#scenemenu_nav li {
+		float: left;
+		position: relative;
+		width: 300px;
+		list-style: none;
+		-webkit-transition: 0.2s;
+		transition: 0.2s;
+	}
+	
+	#scenemenu_nav > ul > li > a, h1 {
+		text-transform: uppercase;
+	}
+	
+	#scenemenu_nav a {
+		display: block;
+		text-decoration: none;
+		padding: 5px 15px;
+		color: #000;
+	}
+	#scenemenu_nav p {
+		display: block;
+		text-decoration: none;
+		padding: 5px 15px;
+		color: #000;
+		cursor: pointer;
+	}
+
+	#scenemenu_nav ul ul {
+		position: absolute;
+		left: 1000%;
+		top:100%;
+    
+		visibility: hidden;
+		opacity: 0;
+		pointer-events:none;
+	}
+	
+	#scenemenu_nav ul ul ul {
+		left: 200%;
+		top: 00;
+	}
+	
+	#scenemenu_nav li:hover, #scenemenu_nav li:hover li {
+
+	}
+	
+	#scenemenu_nav li li:hover, #scenemenu_nav li li:hover li {
+		background: #bbb;
+	}
+	
+	#scenemenu_nav li li li:hover {
+		background: #999;
+	}
+	#scenemenu_nav li:hover > ul>li {
+		visibility: visible;
+		pointer-events:auto;
+		opacity: 1;
+		left: 0%;
+		bottom:00%;
+		
+	}
+	#scenemenu_nav li>ul>li:hover>ul>li {
+		left: 100%;
+	}
+	
+	#scenemenu_nav li:hover > ul {
+		visibility: visible;
+		opacity: 1;
+		left: 0%;
+		bottom:100%;
+		
+	}
+
+	
+	#stgmenu_nav ul {
+		background: white;
+		float: left;
+		-webkit-transition: 0.2s;
+		transition: 0.2s;
+	}
+	
+	#stgmenu_nav li {
+		float: left;
+		position: relative;
+		width: 200px;
+		list-style: none;
+		-webkit-transition: 0.2s;
+		transition: 0.2s;
+	}
+	
+	#stgmenu_nav > ul > li > a, h1 {
+		text-transform: uppercase;
+	}
+	
+	#stgmenu_nav a {
+		display: block;
+		text-decoration: none;
+		padding: 5px 15px;
+		color: #000;
+	}
+	#stgmenu_nav p {
+		display: block;
+		text-decoration: none;
+		padding: 5px 15px;
+		color: #000;
+		cursor: pointer;
+	}
+
+	#stgmenu_nav ul ul {
+		position: absolute;
+		left: 1000%;
+		bottom:100%;
+    
+		visibility: hidden;
+		opacity: 0;
+		pointer-events:none;
+	}
+	
+	#stgmenu_nav ul ul ul {
+		left: 200%;
+		top: 0;
+	}
+	
+	#stgmenu_nav li:hover, #stgmenu_nav li:hover li {
+		background: #ddd;
+	}
+	
+	#stgmenu_nav li li:hover, #stgmenu_nav li li:hover li {
+		background: #bbb;
+	}
+	
+	#stgmenu_nav li li li:hover {
+		background: #999;
+	}
+	#stgmenu_nav li:hover > ul>li {
+		visibility: visible;
+		pointer-events:auto;
+		opacity: 1;
+		left: 0%;
+		bottom:100%;
+		
+	}
+	#stgmenu_nav li>ul>li:hover>ul>li {
+		left: 100%;
+	}
+	
+	#stgmenu_nav li:hover > ul {
+		visibility: visible;
+		opacity: 1;
+		left: 0%;
+		bottom:100%;
+		
+	}
