@@ -1,14 +1,22 @@
-{var filetext,filedata,filetype;
-filetext = "";
-filetype = "";
+{
+//drawable entities
 var DWentities = [];
+//original outline color
 var Ooutline;
+//original skin color
 var Oskincolor;
 var skincolor;
 var outline;
+//whether to use drawsvg or the feature that comes with the browser.(disabling only effects backgrounds)
+var customrenderer = false;
+//whether or not to randomize all colors, used in RSGmaker's seizure time animations
 var randomcols = false;
+//list of colorchanges
 var colors = [];
+//the repository of the create.swf vector files(in svg format).
 var repo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf2/"
+
+var allowtransforms = false;
 //var repo = "https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/Ocreateswf/"
 var Openfile = function(req,type) {
 	if (typeof req == "string")
@@ -33,6 +41,7 @@ var Openfile = function(req,type) {
 		E.svg = svg;
 		E.x = 0;
 		E.y = 0;
+		E.type=type;
 		DWentities[DWentities.length] = E;
 		return E;
 	}
@@ -40,6 +49,7 @@ var Openfile = function(req,type) {
 }
 function Loadfile(url,type){
 	if (sessionStorage["walfas_"+url]) {
+			//if we've loaded this file before just get the info from temp storage.
             return sessionStorage["walfas_"+url];
         } else {
 	if (type == "" || type == null)
@@ -64,7 +74,7 @@ function Loadfile(url,type){
 	{
 		var req = new XMLHttpRequest();
 		req.open('GET', url, true);
-		req.responseType = filetype;
+		req.responseType = "";
 		req.send();
 		req.onload = function(e) {
 			sessionStorage["walfas_"+url]=req;
@@ -83,16 +93,19 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	colors = [];
 	if (D.length>=15)
 		{
-			//colors = [];
+			//process recolor information in dna
 			var TT = D[14].split("/");
 			i = 0;
 			while (i< TT.length)
 			{
+				
 				var TTT = TT[i].split(">");
-				//addColorchange("#"+TTT[0],"#"+TTT[1],TTT[2]);
 				var nc = {};
+				//source color
 				nc.src = "#"+TTT[0];
+				//destination color
 				nc.dst = "#"+TTT[1];
+				//filter(which props this color change applies to)
 				nc.filter = TTT[2];
 				nc.active = true;
 				colors[i] = nc;
@@ -110,10 +123,11 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	if (outline==null){
 		outline = Ooutline;
 	}
-	//?.??:Name:Scale:Hat:Hair:Body:Arm:Shoes:Eyes:Mouth:Item:Accessory:Back:HairColor
+	//Version#:Name:Scale:Hat:Hair:Body:Arm:Shoes:Eyes:Mouth:Item:Accessory:Back:HairColor
 	
 	var Back = null;
 	var Back2 = null;
+	var hasstubble = (D[11] == 110);
 	if (isbacksprite!=true)
 	{
 	if (D[12].indexOf("S")>0)
@@ -139,9 +153,10 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	{
 		Shoes = LoadPart("Shoes",dec(D[7]));
 	}
-	//var Shoes = LoadPart("Shoes",dec(D[7]));
 	var outlinehead;
 	//outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
+	
+	//basichead is the head prop that goes under the hair
 	var basichead;
 	var Accessory;
 	if (isbacksprite!=true)
@@ -170,9 +185,9 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	{
 		Eyes = LoadPart("Eyes",D[8]);
 	}
-	//var Eyes = LoadPart("Eyes",D[8]);
-	if (D[11] == 110)
+	if (hasstubble)
 	{
+		//the accessory is a stubble so let's place it before the mouth.
 		Accessory = LoadPart("Accessories",dec(D[11]));
 	}
 	var Mouth = LoadPart("Mouth",dec(D[9]));
@@ -207,19 +222,18 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 		Item = LoadPart("Items",dec(D[10]));
 	}
 	var Body = LoadPart("body",dec(D[5]));
-	if (isbacksprite!=true && D[11] != 110) 
+	if (isbacksprite!=true && !hasstubble) 
 	{
 		Accessory = LoadPart("Accessories",dec(D[11]));
 	}
 	var H2;
 	if (isbacksprite==true)
 	{
-		//outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
 		Hair2 = LoadPart("Hair2",D[4]);
 		Hair = LoadPart("Hair",D[4]);
 		
-		//Accessory = LoadPart("Accessories",dec(D[11]));
 		basichead = Openfile(repo+"Basichead/0.svg","blarg");
+		//H2 is a duplicate that helps hide parts to try to make the backsprite cleaner
 		H2 = Openfile(repo+"Basichead/0.svg","blarg"); 
 		Hat	= LoadPart("Hats",dec(D[3]));
 		
@@ -235,10 +249,13 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 		Back = LoadPart("Wings",dec(D[12]));
 	}
 	}
+	if (customrenderer)
+	{
+	//general offset value, changing this will change where it centers.
 	var xo = -100;
 	var yo = -220;
 	
-	
+	//a value i used to make the body go into a more correct placement.
 	var NX = -6;
 	var NY = 2;
 	if (Body != null)
@@ -252,10 +269,7 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 		basichead.y = 55+yo+3;
 		if (isbacksprite==true)
 		{
-			//basichead.x += 6;
 			basichead.y +=1;
-			//#fff1dd
-			//basichead.svg = basichead.svg.replace(basichead.svg.substr(basichead.svg.indexOf("#"),7),"#"+D[13]);
 			H2.x = basichead.x+6;
 			H2.y = basichead.y;
 			basichead.svg = basichead.svg.replace("#fff1dd","#"+D[13]);
@@ -263,13 +277,13 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 			H2.svg = H2.svg.replace("#fff1dd","#"+D[13]);
 		}
 	}
-	if (outlinehead != null)
+	/*if (outlinehead != null)
 	{
 		outlinehead.x = 100+xo;
 		outlinehead.y = 305+yo+5+3;
 		//outline head isnt that useful it looks like, so lets just move it off screen....
 		//outlinehead.y = -10000;
-	}
+	}*/
 	
 	if (Hat != null)
 	{
@@ -304,15 +318,13 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	if (Eyes != null)
 	{
 		Eyes.x = 100+xo-1;
-		Eyes.y = 312+yo-5;//Ooutline
-		//Eyes.svg = Eyes.svg.replace(outline,eyecolor);
+		Eyes.y = 312+yo-5;
 		
 	}
 	if (Eyes2 != null)
 	{
 		Eyes2.x = 100+xo;
-		Eyes2.y = 312+yo;//Ooutline
-		//Eyes2.svg = Eyes2.svg.replace(outline,eyecolor);
+		Eyes2.y = 312+yo;
 	}
 	if (Hair != null)
 	{
@@ -324,21 +336,20 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	{
 		Hair2.x = 100+xo;
 		Hair2.y = 310+yo-3;
-		//Hair2.svg = Hair2.svg.replace(Hair2.svg.substr(Hair2.svg.indexOf("#"),7),"#"+D[13])
-		//Hair2.svg = Hair2.svg.replace(Hair2.svg.substr(Hair2.svg.indexOf("fill=\"#")+6,7),"#"+D[13])
 	}
 	if (Accessory != null)
 	{
 		Accessory.x = 47+xo;
 		Accessory.y = 63+yo+5;
-		//Accessory.y = 200;
 	}
 	if (Item != null)
 	{
-		//3.39:Aya:100:31:30:31:31:31:0:0:47:36:15:332B1A
-		//3.39:Reimu (2 Blue):100:112:112:113:111:2:0:0:0:0:0:283960
 		Item.x = 68+xo+NX;
 		Item.y = 180+yo+NY;
+		
+		//non customrenderer
+		//Item.x = 68+xo+NX+300;
+		//Item.y = 180+yo+NY;
 	}
 	if (Item2 != null)
 	{
@@ -355,145 +366,127 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 		Back2.x = -45+xo+NX;
 		Back2.y = -30+yo+NY;
 	}
-	/*if (Body != null)
+	}
+	else
 	{
-		Body.x = 105+xo;
-		Body.y = 305+yo;
+		var xo = 100;
+	var yo = 0;
+	
+	//a value i used to make the body go into a more correct placement.
+	//var NX = -6;
+	//var NY = 2;
+	if (Body != null)
+	{
+		Body.x = 0+xo;
+		Body.y = 50+yo;
 	}
 	if (basichead != null)
 	{
-		basichead.x = 37+xo;
-		basichead.y = 55+yo;
+		basichead.x = 0+xo;
+		basichead.y = 30+yo;
+		if (isbacksprite==true)
+		{
+			basichead.y +=1;
+			H2.x = basichead.x+6;
+			H2.y = basichead.y;
+			basichead.svg = basichead.svg.replace("#fff1dd","#"+D[13]);
+			
+			H2.svg = H2.svg.replace("#fff1dd","#"+D[13]);
+		}
 	}
-	if (outlinehead != null)
+	/*if (outlinehead != null)
 	{
 		outlinehead.x = 100+xo;
-		outlinehead.y = 305+yo;
-		outlinehead.y = -10000;
-	}
+		outlinehead.y = 305+yo+5+3;
+		//outline head isnt that useful it looks like, so lets just move it off screen....
+		//outlinehead.y = -10000;
+	}*/
+	
 	if (Hat != null)
 	{
-		Hat.x = 100+xo;
-		Hat.y = 310+yo;
+		Hat.x = -8+xo;
+		Hat.y = -120+yo;
 	}
 	if (Arms != null)
 	{
-		Arms.x = 105+xo;
-		Arms.y = 305+yo;
+		Arms.x = -4+xo;
+		Arms.y = 110+yo;
 	}
 	if (Arms2 != null)
 	{
-		Arms2.x = 105+xo;
-		Arms2.y = 305+yo;
+		Arms2.x = -5+xo;
+		Arms2.y = 130+yo;
 	}
 	if (Shoes != null)
 	{
-		Shoes.x = 102+xo;
-		Shoes.y = 305+yo;
+		Shoes.x = -40+xo;
+		Shoes.y = 297+yo;
 	}
 	if (Shoes2 != null)
 	{
-		Shoes2.x = 102+xo;
-		Shoes2.y = 305+yo;
+		Shoes2.x = 0+xo;
+		Shoes2.y = 290+yo;
 	}
 	if (Mouth != null)
 	{
-		Mouth.x = 105+xo;
-		Mouth.y = 305+yo;
+		Mouth.x = 55+xo;
+		Mouth.y = 92+yo;
 	}
 	if (Eyes != null)
 	{
-		Eyes.x = 100+xo;
-		Eyes.y = 312+yo;
+		Eyes.x = 20+xo;
+		Eyes.y = 50+yo;
+		
 	}
 	if (Eyes2 != null)
 	{
-		Eyes2.x = 100+xo;
-		Eyes2.y = 312+yo;
+		Eyes2.x = 0+xo;
+		Eyes2.y = 30+yo;
 	}
 	if (Hair != null)
 	{
-		Hair.x = 100+xo;
-		Hair.y = 310+yo;
+		Hair.x = 0+xo;
+		Hair.y = 0+yo;
 		Hair.svg = Hair.svg.replace(Hair.svg.substr(Hair.svg.indexOf("#"),7),"#"+D[13])
 	}
 	if (Hair2 != null)
 	{
-		Hair2.x = 100+xo;
-		Hair2.y = 310+yo;
-		//Hair2.svg = Hair2.svg.replace(Hair2.svg.substr(Hair2.svg.indexOf("fill=\"#")+6,7),"#"+D[13])
+		Hair2.x = 0+xo;
+		Hair2.y = -5+yo;
 	}
 	if (Accessory != null)
 	{
-		Accessory.x = 47+xo;
-		Accessory.y = 63+yo;
-		//Accessory.y = 200;
+		Accessory.x = 0+xo;
+		Accessory.y = 0+yo;
 	}
 	if (Item != null)
 	{
-		//3.39:Aya:100:31:30:31:31:31:0:0:47:36:15:332B1A
-		//3.39:Reimu (2 Blue):100:112:112:113:111:2:0:0:0:0:0:283960
-		Item.x = 68+xo;
-		Item.y = 180+yo;
+		Item.x = 0+xo;
+		Item.y = 0+yo;
 	}
 	if (Item2 != null)
 	{
-		Item2.x = 68+xo;
-		Item2.y = 180+yo;
+		Item2.x = 0+xo;
+		Item2.y = 0+yo;
 	}
 	if (Back != null)
 	{
-		Back.x = -45+xo;
-		Back.y = -30+yo;
+		Back.x = 125+xo;
+		Back.y = 0+yo;
 	}
 	if (Back2 != null)
 	{
-		Back2.x = -45+xo;
-		Back2.y = -30+yo;
-	}*/
+		Back2.x = -10+xo;
+		Back2.y = 0+yo;
+	}
+	}
 }
+//used as a lazy way to fix indexes.
 function dec(strind)
 {
 	return parseInt(strind)-1;
 }
-function LoadLeftPart(feature,index)
-{
-	var ret = LoadPart(feature,index);
-	if (ret==null)
-	{
-		return null;
-	}
-	var text = ret.svg.split("\n");
-	var rtext = text[0];
-	var i = 1;
-	var D;
-	while (i < text.length)
-	{
-		var S = text[i];
-		if ((S.indexOf("<path"))> -1){
-			D = slice2(S," d=\"","\"");
-			var DM = D.split("M");
-			var DT = DM[0];
-			var im = 1;
-			while (im<DM.length)
-			{
-				var pd = DM[im].split(" ");
-				if (parseFloat(pd[0])<0)
-				{
-					DT = DT + "M" + DM[im];
-				}
-				im = im+1;
-			}
-			S = S.replace(D,DT);
-		}
-		{
-			rtext = rtext + "\n" + S;
-		}
-		i = i + 1;
-	}
-	ret.svg = rtext;
-	return ret;
-}
+//this calls openfile but does prop splitting features before returning an svg
 function LoadPart(feature,index,side)
 {
 	if (index >-1)
@@ -518,7 +511,6 @@ function LoadPart(feature,index,side)
 		{
 			return ret;
 		}
-		//var ret = LoadPart(feature,index);
 	var text = ret.svg.split("\n");
 	var rtext = text[0];
 	var i = 1;
@@ -557,7 +549,7 @@ function LoadPart(feature,index,side)
 	}
 	return null;
 }
-
+// gets a value in between 2 strings
 function slice2(str,start,end){
 	var SI = str.indexOf(start);
 	if (SI == -1)
@@ -567,6 +559,7 @@ function slice2(str,start,end){
 	SI = SI + start.length;
 	return str.slice(SI,str.indexOf(end,SI+1));
 }
+// gets a value in between 2 strings and converts it to an integer
 function Pslice2(str,start,end){
 	var SI = str.indexOf(start);
 	if (SI == -1)
@@ -576,6 +569,7 @@ function Pslice2(str,start,end){
 	SI = SI + start.length;
 	return parseInt(str.slice(SI,str.indexOf(end,SI+1)));
 }
+// gets a value in between 2 strings and converts it to a float
 function PFslice2(str,start,end){
 	var SI = str.indexOf(start);
 	if (SI == -1)
@@ -596,8 +590,8 @@ function fillarray(array,element)
 	}
 }
 
+//the xml version of drawsvg which will likely be more compatible
 var drawxml = function(context,xml,x,y){
-	////var text = svg.split("\n");
 	var i = 0;
 	var trans = false;
 	var data = {};
@@ -607,38 +601,16 @@ var drawxml = function(context,xml,x,y){
 	var Gradients = {};
 	var G;
 	grd = null;
-	//var svg=xml.getElementsByTagName("svg")[0].children;
 	var svg = [];
+	//flatten elements into 1 single array so it processes in the same order as the text parser
 	fillarray(svg,xml.getElementsByTagName("svg")[0]);
-	//var st = [];
-	/*while (i < svg.length)
-	{
-		i++;
-	}
-	i = 0;*/
 	while (i < svg.length)
 	{
-		//var S = text[i];
+		//this while loop loads all the gradients found in the svg.
 		var S = svg[i];
-		/*if (S.indexOf("<")>0 && S.indexOf(">")<0)
-		{
-			i = i+1;
-			var ST = text[i];
-			S = S + " " + ST;
-			while (ST.indexOf(">")<0)
-			{
-				i = i+1;
-				ST = text[i];
-				S = S + " " + ST;
-			}
-			//alert(S);
-			//combine multiline into a single line command
-		}*/
-		var D = -1;//.tagName
-		//if ((D = S.indexOf("<radialGradient"))> -1){
+		var D = -1;
 		if (S.tagName == "radialGradient"){
 		grd = {};
-		//grd.id = slice2(S,"id=\"","\"");
 		grd.id = S.getAttribute("id");
 		grd.r = parseInt(S.getAttribute("r"));
 		
@@ -646,72 +618,51 @@ var drawxml = function(context,xml,x,y){
 		grd.cy = parseFloat(S.getAttribute("cx"));
 		grd.fx = parseFloat(S.getAttribute("fx"));
 		grd.fy = parseFloat(S.getAttribute("fx"));
-		if (grd.fx == null)
+		if (grd.fx == null || isNaN(grd.fx))
 		{
 			grd.fx = grd.cx;
 		}
-		if (grd.fy == null)
+		if (grd.fy == null || isNaN(grd.fy))
 		{
 			grd.fy = grd.cy;
 		}
 		grd.stops = [];
 		var gradient = context.createRadialGradient(grd.fx,grd.fy,0,grd.cx,grd.cy,grd.r);
 				var j = 0;
-				//just implement the first as global since idk how to actually use it.
-				//context.globalAlpha = grd.stops[0].opacity;
-				/*while (j < grd.stops.length)
-				{
-					gradient.addColorStop(grd.stops[j].offset,grd.stops[j].color);
-					j = j+1;
-				}*/
-				//grd.grad = gradient
 				G = gradient;
 		Gradients[grd.id] = gradient;
 		}
-		//if ((D = S.indexOf("<linearGradient"))> -1){
 		if (S.tagName == "linearGradient")
 		{
 		grd = {};
-		//grd.id = slice2(S,"id=\"","\"");
 		grd.id = S.getAttribute("id");
 		grd.x1 = parseFloat(S.getAttribute("x1"));
 		grd.y1 = parseFloat(S.getAttribute("y1"));
 		grd.x2 = parseFloat(S.getAttribute("x2"));
 		grd.y2 = parseFloat(S.getAttribute("y2"));
-		if (grd.x1 == null)
+		if (grd.x1 == null || isNaN(grd.x1))
 		{
 			grd.x1 = 0;
 		}
-		if (grd.x2 == null)
+		if (grd.x2 == null || isNaN(grd.x2))
 		{
 			grd.x2 = 0;
 		}
-		if (grd.y1 == null)
+		if (grd.y1 == null || isNaN(grd.y1))
 		{
 			grd.y1 = 0;
 		}
-		if (grd.y2 == null)
+		if (grd.y2 == null || isNaN(grd.y2))
 		{
 			grd.y2 = 0;
 		}
 		grd.stops = [];
 		var gradient = context.createLinearGradient(grd.x1,grd.y1,grd.x2,grd.y2);
 				var j = 0;
-				//just implement the first as global since idk how to actually use it.
-				//context.globalAlpha = grd.stops[0].opacity;
-				/*while (j < grd.stops.length)
-				{
-					gradient.addColorStop(grd.stops[j].offset,grd.stops[j].color);
-					j = j+1;
-				}*/
-				//grd.grad = gradient
 				G = gradient;
 		Gradients[grd.id] = gradient;
 		}
-		//<stop <stop offset=\"
-		//if ((D = S.indexOf("<stop"))> -1 && grd != null){
 		if (S.tagName == "stop" && grd != null){
-		//grd.stops[grd.stops.length] = {offset:PFslice2(S,"offset=\"","\""),color:slice2(S,"stop-color=\"","\""),opacity:PFslice2(S,"stop-opacity=\"","\"")};//stop-color="
 		var stop = {offset:parseFloat(S.getAttribute("offset")),color:S.getAttribute("stop-color"),opacity:parseFloat(S.getAttribute("stop-opacity"))};//stop-color="
 		G.addColorStop(stop.offset,stop.color);
 	}
@@ -720,112 +671,60 @@ var drawxml = function(context,xml,x,y){
 	i = 0;
 	while (i < svg.length)
 	{
-		//var S = text[i];
+		//this is the main while loop that does the actual draw functions
 		var S = svg[i];
 		
-		/*if (S.indexOf("<")>0 && S.indexOf(">")<0)
-		{
-			i = i+1;
-			var ST = text[i];
-			S = S + " " + ST;
-			while (ST.indexOf(">")<0)
-			{
-				i = i+1;
-				ST = text[i];
-				S = S + " " + ST;
-			}
-			//alert(S);
-			//combine multiline into a single line command
-		}*/
 		var D = -1;
-		/*if (S.indexOf("<defs>") > -1)
-		{
-			def = true;
-		}
-		if (S.indexOf("matrix(") > -1)
-		{
-			//<g
-			var D = S.slice(S.indexOf("matrix(")+7,S.indexOf(")"));
-			D = D.split(",");
-			if (!def)
-			{
-			if (S.indexOf("<g "))
-			{
-				data.maintransform = [parseInt(D[0]),parseInt(D[1]),parseInt(D[2]),parseInt(D[3]),parseInt(D[4]),parseInt(D[5])];
-			}
-			else if (S.indexOf("<use "))
-			{
-				var J = S.indexOf("href=\"#")+7;
-				J = S.slice(J,S.indexOf(J+1));
-				data["Trn"+J] = [parseInt(D[0]),parseInt(D[1]),parseInt(D[2]),parseInt(D[3]),parseInt(D[4]),parseInt(D[5])];
-				//data[]
-			}
-			}
-		}
-		else if (S.indexOf("<path") > -1)*/
-		//if (S.indexOf("matrix(") > -1)
 		if (S.getAttribute("transform"))
 		{
-			//maybe xmlized
-			//<g
 			D = S.getAttribute("transform");
 			D = D.slice(D.indexOf("matrix(")+7,D.indexOf(")"));
 			D = D.split(",");
 			var T = [parseFloat(D[0]),parseFloat(D[1]),parseFloat(D[2]),parseFloat(D[3]),parseFloat(D[4]),parseFloat(D[5])];
-			D = S.getAttribute("xlink:href");//slice2(S,"xlink:href=\"#","\"");
+			D = S.getAttribute("xlink:href");
 			if (D != null)
 			{
+				//although the transforms are loaded they are never used as i never figured out how to get them to behave.
 				//alert("transformation "+D + " set as " + T);
 				T[6] = 1 / T[0];
 				T[7] = 1 / T[3];
 				Transforms[D] = T;
 			}
 		}
-		//if (S.indexOf("<g id=\"") > -1)
 		if (S.tagName == "g")
 		{
-			//trans = slice2(S,"<g id=\"","\"");
 			trans = S.getAttribute("id");
 			if (trans != null)
 			{
+				//set what the current transformation should be
+				
 				//alert("loading transformation"+trans);
 				trans = Transforms[trans];
 			}
 		}
-		//if ((S.indexOf("<path"))> -1){
 		if (S.tagName == "path"){
-			//var D = S.slice(S.indexOf("<path d=\"")+9,S.indexOf("\" "));
-			//D = S.slice(D+9,S.indexOf("\" "));
-			////D = slice2(S," d=\"","\"");
 			D = S.getAttribute("d");
-			//alert("path:"+D);
-			//var lj = S.indexOf("linejoin=\"");
 			var lj = S.getAttribute("linejoin");
 			if (lj)
 			{
-				//lj = S.substr(lj+10,5);
 				context.lineJoin = lj;
 			}
 			else
 			{
 				context.lineJoin = "miter";
 			}
-			//lj = S.indexOf("linecap=\"");
 			lj = S.getAttribute("linecap");
 			if (lj)
 			{
-				//lj = S.substr(lj+9,5);
 				context.lineCap = lj;
 			}
 			else
 			{
 				context.lineCap = "miter";
 			}
-			//lj = S.indexOf("stroke-width=\"");
 			lj = S.getAttribute("stroke-width");
 			if (lj)
 			{
-				//lj = S.slice(lj+14,S.indexOf("\"",lj+15));
 				context.lineWidth = parseInt(lj);
 			}
 			else
@@ -834,20 +733,11 @@ var drawxml = function(context,xml,x,y){
 			}
 			
 			var path = new Path2D(D);
-			//var fcolor = S.substr(S.indexOf("fill=\"")+6,7);
-			
-			//var scolor = S.substr(S.indexOf("stroke=\"")+8,7);
-			//var fcolor = slice2(S,"fill=\"","\"");
 			var fcolor = S.getAttribute("fill");
-			//var scolor = slice2(S,"stroke=\"","\"");
 			var scolor = S.getAttribute("stroke");
-			//lj = S.indexOf("style=\"");
 			lj = S.getAttribute("style");
 			if (lj)
 			{
-				//alert("styl'in");
-				//var Sty = slice2(S,"style=\"","\"");
-				//var STYLE = Sty.split(";");
 				var STYLE = lj.split(";");
 				var II = 0;
 				while (II<STYLE.length)
@@ -867,28 +757,19 @@ var drawxml = function(context,xml,x,y){
 					else if (isNaN(SS[1]))
 					{
 						context[SS[0]] = SS[1];
-						//alert(SS[0] + "=(string)" +SS[1]);
 					}
 					else
 					{
 						context[SS[0]] = parseFloat(SS[1]);
-						//alert(SS[0] + "=(number)" +parseFloat(SS[1]));
 					}
 					II = II + 1;
 				}
-				/*if (Sty.indexOf("fill:")>-1)
-				{
-					fcolor = context.fill;
-				}
-				if (Sty.indexOf("stroke:")>-1)
-				{
-					scolor = context.stroke;
-				}*/
 			}
 
 			context.translate(x,y);
 			if (trans != null)
 			{
+				//an old attempt at figuring out transform
 				//context.transform(trans[0],0,0,trans[3],0,0);
 			}
 			
@@ -896,14 +777,11 @@ var drawxml = function(context,xml,x,y){
 			{
 				
 				var OP;
-				//OP = S.indexOf("fill-opacity=\"");
 				OP = S.getAttribute("fill-opacity");
 				
 				if (OP)
 				{
 					OP = parseFloat(OP);
-					//OP = OP+14;
-					//OP = parseFloat(S.slice(OP,S.indexOf("\"",OP+1)));
 					context.globalAlpha = OP;
 				}
 				if (fcolor.indexOf("url(#")==0)
@@ -944,6 +822,7 @@ var drawxml = function(context,xml,x,y){
 			}
 			if (trans != null)
 			{
+				//undo transform
 				//context.transform(trans[6],0,0,trans[7],0,0);
 			}
 			context.translate(-x,-y);
@@ -953,7 +832,7 @@ var drawxml = function(context,xml,x,y){
 	}
 }
 	
- 
+ //the old text parsing version of the renderer
 var drawsvg = function(context,svg,x,y){
 	var text = svg.split("\n");
 	var i = 0;
@@ -1291,31 +1170,42 @@ function imageFromObject(objindex,scale,cropped){
 //render walfas dna and get the render as a dataurl
 function imageSrcFromObject(objindex,scale,cropped){
 	//LoadDNA(dna);
+	//return repo+"Objects"+"/"+objindex+".svg";
+	var CR = customrenderer;
+	customrenderer = true;
+	allowtransforms = false;
 	var BG = LoadPart("Objects",objindex);
 	var canvas = document.createElement('canvas');
 	if (scale == null)
 	{
 		scale = 1;
 	}
-	//canvas.width = 280*scale;
-	canvas.width = 320*scale;
-	//canvas.height = 280*scale;
-	canvas.height = 320*scale;
+	canvas.width = 500*scale;
+	canvas.height = 500*scale;
 	var G = canvas.getContext("2d");
 	G.save(); 
  
 	// move to the middle of where we want to draw our image
-	G.translate(160*scale, 210*scale);
+	if (customrenderer)
+	{
+		G.translate(250*scale, 260*scale);
+	}
+	else
+	{
+		G.translate(0*scale, -140*scale);
+	}
  
 	// rotate around that point, converting our 
 	// angle from degrees to radians 
-	G.scale(0.7*scale,0.7*scale);
+	G.scale(0.85*scale,0.85*scale);
 	var i = 0;
 	//while (i < DWentities.length)
 	{
 		var E = BG;
 		if (typeof E.svg != 'undefined')
 		{
+			if (customrenderer)
+			{
 			if (typeof E.xml == 'undefined')
 			{
 				parser=new DOMParser();
@@ -1323,7 +1213,15 @@ function imageSrcFromObject(objindex,scale,cropped){
 			}
 			//drawsvg(G,E.svg,E.x,E.y);
 			drawxml(G,E.xml,E.x,E.y);
-		
+			}
+			else
+			{
+			
+			var url = 'data:image/svg+xml;base64,' + btoa(E.svg);
+			img = new Image();
+			img.src = url;
+			G.drawImage(img,0,0);
+			}
 		}
 		i = i + 1;
 	}
@@ -1386,6 +1284,7 @@ function imageSrcFromObject(objindex,scale,cropped){
 		//set return value to the newly cropped version
 		ret = cropped.toDataURL();
 	}
+	customrenderer = CR;
 	return ret;
 }
 //create an image object with a walfas dna render preset as its source
@@ -1394,9 +1293,24 @@ function imageFromBackground(bgindex,scale){
 	ret.src = imageSrcFromBackground(bgindex,scale);
 	return ret;
 }
+//just a dumb idea, it doesn't actually work as async data doesn't update while other data is running it looks like
+function loadimg(img,src)
+{
+	var i = 0;
+	var freeze=true;
+	img.onload = function(e) {
+			freeze = false;
+		}
+		img.src = src;
+		while (!img.complete)
+		{
+			i++;
+		}
+}
 //render walfas dna and get the render as a dataurl
 function imageSrcFromBackground(bgindex,scale){
 	//LoadDNA(dna);
+	allowtransforms = true;
 	var BG = LoadPart("Background",bgindex);
 	var canvas = document.createElement('canvas');
 	if (scale == null)
@@ -1409,7 +1323,7 @@ function imageSrcFromBackground(bgindex,scale){
 	G.save(); 
  
 	// move to the middle of where we want to draw our image
-	G.translate(0*scale, 0*scale);
+	G.translate(-410*scale, -286*scale);
  
 	// rotate around that point, converting our 
 	// angle from degrees to radians 
@@ -1420,14 +1334,25 @@ function imageSrcFromBackground(bgindex,scale){
 		var E = BG;
 		if (typeof E.svg != 'undefined')
 		{
-			if (typeof E.xml == 'undefined')
+			if (customrenderer)
 			{
+				if (typeof E.xml == 'undefined')
+				{
 				parser=new DOMParser();
 				E.xml=parser.parseFromString(E.svg,"text/xml");
+				}
+				drawxml(G,E.xml,E.x,E.y);
 			}
+			else
+			{
+			/**/
 			//drawsvg(G,E.svg,E.x,E.y);
-			drawxml(G,E.xml,E.x,E.y);
-		
+			//
+			var url = 'data:image/svg+xml;base64,' + btoa(E.svg);
+			img = new Image();
+			img.src = url;
+			G.drawImage(img,0,0);
+			}
 		}
 		i = i + 1;
 	}
@@ -1444,6 +1369,9 @@ function imageFromDNA(dna,scale,cropped,isbacksprite){
 }
 //render walfas dna and get the render as a dataurl
 function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
+	var CR = customrenderer;
+	customrenderer = true;
+	allowtransforms = false;
 	LoadDNA(dna,null,null,isbacksprite);
 	var canvas = document.createElement('canvas');
 	if (scale == null)
@@ -1456,19 +1384,30 @@ function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
 	canvas.height = 500*scale;
 	var G = canvas.getContext("2d");
 	G.save(); 
+	
  
 	// move to the middle of where we want to draw our image
-	G.translate(250*scale, 260*scale);
+	if (customrenderer)
+	{
+		G.translate(250*scale, 260*scale);
+	}
+	else
+	{
+		G.translate(125*scale, 125*scale);
+	}
  
 	// rotate around that point, converting our 
 	// angle from degrees to radians 
 	G.scale(0.85*scale,0.85*scale);
+	
 	var i = 0;
 	while (i < DWentities.length)
 	{
 		var E = DWentities[i];
 		if (typeof E.svg != 'undefined')
 		{
+			if (customrenderer/* && E.type != "Items"*/)
+			{
 			if (typeof E.xml == 'undefined')
 			{
 				parser=new DOMParser();
@@ -1476,12 +1415,24 @@ function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
 			}
 			//drawsvg(G,E.svg,E.x,E.y);
 			drawxml(G,E.xml,E.x,E.y);
-		
+			}
+			else
+			{
+			var url = 'data:image/svg+xml;base64,' + btoa(E.svg);
+			img = new Image();
+			img.src = url;
+			//G.drawImage(img,E.x,E.y);
+			if (img.complete)
+			{
+				G.drawImage(img,E.x - (img.width/2),E.y);
+			}
+			}
 		}
 		i = i + 1;
 	}
 	// and restore the co-ords to how they were when we began
 	G.restore();
+	customrenderer = CR;
 	var ret = canvas.toDataURL();
 	if (cropped)
 	{
