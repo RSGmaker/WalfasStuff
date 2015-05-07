@@ -229,6 +229,7 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 	var H2;
 	if (isbacksprite==true)
 	{
+		outlinehead = Openfile(repo+"Basichead/1.svg","blarg");
 		Hair2 = LoadPart("Hair2",D[4]);
 		Hair = LoadPart("Hair",D[4]);
 		
@@ -277,13 +278,13 @@ function LoadDNA(dna,sc,oc,isbacksprite){
 			H2.svg = H2.svg.replace("#fff1dd","#"+D[13]);
 		}
 	}
-	/*if (outlinehead != null)
+	if (outlinehead != null)
 	{
 		outlinehead.x = 100+xo;
 		outlinehead.y = 305+yo+5+3;
 		//outline head isnt that useful it looks like, so lets just move it off screen....
 		//outlinehead.y = -10000;
-	}*/
+	}
 	
 	if (Hat != null)
 	{
@@ -1478,6 +1479,11 @@ function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
 		}
 		//make a canvas for the new cropped image
 		var cropped = document.createElement('canvas');
+		//if (false)
+		//if (cropped)
+			//if (true)
+		if (false)
+		{
 		//set its size to the crop ranges size
 		cropped.width = (mxx - mnx)+1;
 		cropped.height = (mxy - mny)+1;
@@ -1488,6 +1494,22 @@ function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
 		//draw the image from the starting point of crop range
 		G2.drawImage(TI,-mnx,-mny);
 		//set return value to the newly cropped version
+		}
+		else
+		{
+			//attempt at a cropping that retains centering
+			var X = Math.min(mnx,canvas.width-mxx);
+			var Y = Math.min(mny,canvas.height-mxy);
+			
+			cropped.width = canvas.width - (X*2);
+			cropped.height = canvas.height - (Y*2);
+			
+			var G2 = cropped.getContext("2d");
+			var TI = new Image();
+			TI.src = ret;
+			//draw the image from the starting point of crop range
+			G2.drawImage(TI,-X,-Y);
+		}
 		ret = cropped.toDataURL();
 	}
 	return ret;
