@@ -16,8 +16,21 @@ var colors = [];
 //the repository of the create.swf vector files(in svg format).
 var repo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf2/"
 
+var loader = null;
+if  (ZipLoader)
+{
+	var T = document.title;
+	document.title = "Loading assets...";
+	try
+	{
+	loader = new ZipLoader(repo+"createswf2.zip");;
+	}
+	catch(error)
+	{
+	}
+	document.title = T;
+}
 var allowtransforms = false;
-//var repo = "https://rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/Ocreateswf/"
 var Openfile = function(req,type) {
 	if (typeof req == "string")
 	{
@@ -54,6 +67,13 @@ function Loadfile(url,type){
         } else {
 	if (type == "" || type == null)
 	{
+		if (loader != null)
+		{
+			var U = repo + "createswf2.zip://createswf2/" + url.substring(repo.length);
+			var ret = loader.load(U);
+			//sessionStorage["walfas_"+url] = ret;
+			return ret;
+		}
 		try {
 			var req = new XMLHttpRequest();
 			req.open('GET', url, false);
