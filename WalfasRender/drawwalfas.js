@@ -23,7 +23,17 @@ if  (ZipLoader)
 	document.title = "Loading assets...";
 	try
 	{
-	loader = new ZipLoader(repo+"createswf2.zip");;
+		try
+		{
+			loader = new ZipLoader("createswf2.zip");;
+			repo="";
+		}
+		catch(err2)
+		{
+			loader = new ZipLoader(repo+"createswf2.zip");;
+		}
+		
+	
 	}
 	catch(error)
 	{
@@ -70,7 +80,14 @@ function Loadfile(url,type){
 		if (loader != null)
 		{
 			var U = repo + "createswf2.zip://createswf2/" + url.substring(repo.length);
-			var ret = loader.load(U);
+			try
+			{
+				var ret = loader.load(U);
+			}
+			catch(error)
+			{
+				return null;
+			}
 			//sessionStorage["walfas_"+url] = ret;
 			return ret;
 		}
@@ -1223,7 +1240,7 @@ function imageSrcFromObject(objindex,scale,cropped){
 	//while (i < DWentities.length)
 	{
 		var E = BG;
-		if (typeof E.svg != 'undefined')
+		if (E != null && typeof E.svg != 'undefined')
 		{
 			if (customrenderer)
 			{
@@ -1353,7 +1370,7 @@ function imageSrcFromBackground(bgindex,scale){
 	//while (i < DWentities.length)
 	{
 		var E = BG;
-		if (typeof E.svg != 'undefined')
+		if (E != null && typeof E.svg != 'undefined')
 		{
 			if (customrenderer)
 			{
@@ -1425,7 +1442,7 @@ function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
 	while (i < DWentities.length)
 	{
 		var E = DWentities[i];
-		if (typeof E.svg != 'undefined')
+		if (E != null && typeof E.svg != 'undefined')
 		{
 			if (customrenderer/* && E.type != "Items"*/)
 			{
