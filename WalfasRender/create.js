@@ -529,7 +529,7 @@ function mo(e)
 	return true;
 	if (lobj.tagName=="DIV")
 	{
-		lobj.setAttribute("contenteditable","false");
+		lobj.setAttribute("contentEditable","false");
 	}
 }
 var dna="";
@@ -540,14 +540,14 @@ function doubleclick(e)
 	{
 		if (lobj.tagName=="DIV")
 		{
-		if (lobj.getAttribute("contenteditable")=="true")
+		if (lobj.getAttribute("contentEditable")=="true")
 		{
-			lobj.setAttribute("contenteditable","false");
+			lobj.setAttribute("contentEditable","false");
 			lobj.style.border = "";
 		}
 		else
 		{
-			lobj.setAttribute("contenteditable","true");
+			lobj.setAttribute("contentEditable","true");
 			//let the user know the text box can now be editted
 			lobj.style.border = "solid #000000";
 		}
@@ -561,14 +561,20 @@ function doubleclick(e)
 	}
 }
 document.onkeydown = function(evt) {
+	var ret = false;
+	try
+	{
     evt = evt || window.event;
     var keyCode = evt.keyCode;
-	var ret = true;
-	if (!document.activeElement.contenteditable)
-	{
-    if (keyCode >= 33 && keyCode <= 40) {
+	
+	if ((keyCode >= 33 && keyCode <= 40) || keyCode == 32) {
         ret = false;
     }
+	if (document.activeElement.contentEditable && document.activeElement == lobj)
+	{
+		//alert(""+document.activeElement);
+		//ret = true;
+		return true;
 	}
 	if (!(keyCode >= 16 && keyCode <= 18))
 	{
@@ -576,6 +582,10 @@ document.onkeydown = function(evt) {
 	}
 	//make sure the main controls still fire so the zindex commands will still work.
 	keydown(evt);
+	}
+	catch(error)
+	{
+	}
 	return ret;
 };
 /*document.addEventListener("keydown", dockeydown);
@@ -595,11 +605,50 @@ var keyCode = e.keyCode;
 
 function keydown(e)
 {
-	var ar=new Array(33,34,35,36,37,38,39,40);
-	var ret = false;
+	var ar=new Array(32,33,34,35,36,37,38,39,40);
+	var ret = true;
 	if (ar.indexOf(e.keyCode))
 	{
-	ret = true;
+	ret = false;
+	}
+	//space
+	var T = document.getElementById("stgmenu");
+	if (e.keyCode == 32)
+	{
+		//alert("pressed space!");
+		//document.getElementById("stgmenu_nav").style.visibility = !document.getElementById("stgmenu_nav").style.visibility;
+		//document.getElementById("stgmenu_nav").style.visibility = "hidden";
+		
+		if (T.style.visibility != "hidden")
+		{
+			T.style.visibility = "hidden";
+		}
+		else
+		{
+			T.style.visibility = "visible";
+		}
+		
+		document.getElementById("scenemenu").style.visibility = T.style.visibility;
+	}
+	//theater mode
+	if (T.style.visibility == "hidden")
+	{
+		//left key
+		if (e.keyCode==37)
+		{
+			if (currentpart>0)
+			{
+				loadpart(currentpart-1);
+			}
+		}
+		//right key
+		if (e.keyCode==39)
+		{
+			if (currentpart<scene.parts.length-1)
+			{
+				loadpart(currentpart+1);
+			}
+		}
 	}
 	if (!isstageobject(lobj))
 	{
@@ -607,7 +656,7 @@ function keydown(e)
 	}
 	if (lobj.tagName=="DIV")
 	{
-		if (lobj.getAttribute("contenteditable")=="true")
+		if (lobj.getAttribute("contentEditable")=="true")
 		{
 			//return true seems to messup firefox from editing these
 			//return true;
@@ -727,7 +776,7 @@ function keydown(e)
 	{
 		var NT = document.createElement("DIV");
 		NT.innerHTML="Double-click to edit Me!";
-		NT.setAttribute("contenteditable","false");
+		NT.setAttribute("contentEditable","false");
 		stg.appendChild(NT);
 		initobject(NT);
 	}
