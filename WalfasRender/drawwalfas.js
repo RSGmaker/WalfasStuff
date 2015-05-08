@@ -1218,15 +1218,15 @@ function imageSrcFromObject(objindex,scale,cropped){
 	{
 		scale = 1;
 	}
-	canvas.width = 800*scale;
-	canvas.height = 800*scale;
+	canvas.width = 750*scale;
+	canvas.height = 500*scale;
 	var G = canvas.getContext("2d");
 	G.save(); 
  
 	// move to the middle of where we want to draw our image
 	if (customrenderer)
 	{
-		G.translate(400*scale, 410*scale);
+		G.translate(375*scale, 260*scale);
 	}
 	else
 	{
