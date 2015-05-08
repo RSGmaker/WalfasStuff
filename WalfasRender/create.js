@@ -1,5 +1,5 @@
 {
-var scene = {name:"Untitled",next:null,prev:null,parts:[{stage:"",background:null,backgroundsize:"0px"}]};
+var scene = {name:"Untitled",next:null,prev:null,parts:[{stage:"",background:-1,backgroundsize:"0px"}]};
 var currentpart = 0;
 //mouse behavior mode
 var mode = 0;
@@ -23,6 +23,8 @@ var bdy = document.getElementById('body');
 document.body.style.backgroundColor = "white";
 var stg = document.getElementById('stage');
 var gui = document.getElementById('interface');
+var current_background = -1;
+var current_backgroundsize = 0;
 function addEventHandler(obj, evt, handler) {
     if(obj.addEventListener) {
         // W3C method
@@ -34,6 +36,146 @@ function addEventHandler(obj, evt, handler) {
         // Old school method.
         obj['on'+evt] = handler;
     }
+}
+
+function getsize(O)
+{
+	var sz = 0;
+	if (I == undefined || I == null)
+	{
+		for(var x in localStorage)
+		{sz+= x.length;};
+	}
+	else
+	{
+		sz = localStorage[O].length;
+	}
+	if (sz<1024)
+	{
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"B";
+	}
+	else if (sz < 1048576)
+	{
+		sz = sz / 1024;
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"KB";
+	}
+	else
+	{
+		sz = sz / 1048576.0;
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"MB";
+	}
+	return sz;
+}
+function encodestage()
+{
+	//why am i doing this and not just a simple string replace method?
+	//because firefox can't do simple text operations on large strings :( it's pretty stupid.
+	var C = stg.childNodes;
+	var i = 0;
+	var ret = "";
+	//this rebuilds the entire innerHTML of the stage but leaves out the src attributes so images can't bloat up the savefiles.
+	while (i < C.length)
+	{
+		if (!(""+C[i].tagName == "undefined"))
+		{
+		if (ret == "")
+		{
+			ret = "<"+C[i].tagName;
+		}
+		else
+		{
+			ret = ret + "\r<"+C[i].tagName +" ";
+		}
+		var j = 0;
+		if (C[i].attributes != undefined)
+		{
+		while (j < C[i].attributes.length)
+		{
+			var A = C[i].attributes[j];
+			if (A.name!="src")
+			{
+				ret = ret + " "+A.name+'="' + A.value + '"';
+			}
+			j++;
+		}
+		}
+		ret = ret+">\r"+C[i].innerHTML + "\r</"+C[i].tagName+">";
+		}
+		i++;
+	}
+	return ret;
+	/*var ST = ' data:image/png;base64,';
+	var T = S.split('"')
+	var ret = "";
+	var i = 0;
+	while (i< T.length)
+	{
+		var s = T[i];
+		if (s.indexOf(ST)>-1)
+		{
+			ret = ret + '"';
+		}
+		else
+		{
+			if (ret == "")
+			{
+				ret = T[i] + '"';
+			}
+			else
+			{
+				ret = ret + '"' + T[i];
+			}
+		}
+		i++;
+	}*/
+	return ret;
+}
+function loadstage(S)
+{
+	/*while (stg.firstChild) {
+		stg.removeChild(stg.firstChild);
+	}
+	if (S=="")
+	{
+		return;
+	}
+	S = atob(S);
+	var C = JSON.parse(S);
+	var i = 0;
+	
+	while (i < C.length)
+	{
+		if (C[i].tagName == "IMG")
+		{
+			C[i].setAttribute("src",imageSrcFromDNA(C[i].getAttribute("alt"),null,false,false));
+		}
+		stg.appendChild(C[i]);
+		i++;
+	}*/
+	stg.innerHTML = S;
+	window.setTimeout(function(){
+
+	var C = stg.childNodes;
+	var i = 0;
+	while (i < C.length)
+	{
+		if (C[i].tagName == "IMG")
+		{
+			//if (C[i].getAttribute("className" == "Character"))
+			if (C[i].className == "Character")
+			{
+				C[i].setAttribute("src",imageSrcFromDNA(C[i].getAttribute("alt")));
+			}
+			else if (C[i].className == "ObjectProp")
+			{
+				C[i].setAttribute("src",imageSrcFromObject(parseInt(C[i].getAttribute("alt")),1.0,false));
+			}
+		}
+		i++;
+	}}, 50);
 }
 function sceneClear()
 {
@@ -109,7 +251,8 @@ function saveScene()
 
 function savepart()
 {
-	scene.parts[currentpart] = {stage:stg.innerHTML,background:bdy.style.backgroundImage,backgroundsize:bdy.style.backgroundSize};
+	//scene.parts[currentpart] = {stage:stg.innerHTML,background:bdy.style.backgroundImage,backgroundsize:bdy.style.backgroundSize};
+	scene.parts[currentpart] = {stage:encodestage(),background:current_background,backgroundsize:bdy.style.backgroundSize};
 }
 
 function loadpart(index)
@@ -119,12 +262,31 @@ function loadpart(index)
 		return;
 	}
 	var part = scene.parts[index];
-	stg.innerHTML = part.stage;
-	
+	//stg.innerHTML = part.stage;
+	loadstage(part.stage);
+	var I = null;
+	try
+	{
+	var I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	window.setTimeout(function(){
+	if (part.background > -1)
+	{
+	I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	}
+	bdy.style.backgroundImage = "url("+I+")";
+		bdy.style.backgroundPosition = "top";
+		bdy.style.backgroundRepeat = "no-repeat";
+		bdy.style.backgroundSize = part.backgroundsize+"px";}, 100);
+	}
+	catch(error)
+	{
+		bdy.style.backgroundImage = "";
+	}
+		/*
 	bdy.style.backgroundImage = part.background;
 	bdy.style.backgroundPosition = "top";
 	bdy.style.backgroundRepeat = "no-repeat";
-	bdy.style.backgroundSize = part.backgroundsize;
+	bdy.style.backgroundSize = part.backgroundsize;*/
 	currentpart = index;
 	refreshSceneData();
 }
@@ -175,6 +337,97 @@ function refreshSceneData()
 		i++;
 	}
 }
+function ChangeBackground(index,position,size)
+{
+	var I = null;
+	if (index > -1)
+	{
+	 I = imageSrcFromBackground(index,size / 200);
+	}
+	window.setTimeout(function(){
+	if (index > -1)
+	{
+	I = imageSrcFromBackground(index,size/200);
+	}
+		bdy.style.backgroundPosition = position;
+		bdy.style.backgroundRepeat = "no-repeat";
+		bdy.style.backgroundImage = "url("+I+")";
+		bdy.style.backgroundSize = (size)+"px";}, 50
+		
+		);
+		
+}
+function DisplayBackgroundMenu()
+{
+	document.getElementById("Background Menu").style.visibility = "visible";
+	document.getElementById("dimmer").style.visibility = "visible";
+}
+function SetBGOptions()
+{
+	var SC = parseFloat(document.getElementById("BGscale").value);
+	var X = document.getElementById("BGxpos").value;
+	if (X.indexOf("%")<0 && X.indexOf("px")<0)
+	{
+		X = X+"px";
+	}
+	var Y = document.getElementById("BGypos").value;
+	if (Y.indexOf("%")<0 && Y.indexOf("px")<0)
+	{
+		Y = Y+"px";
+	}
+	var pos = X+" "+Y;
+	ChangeBackground(BG_menuSelection,pos,SC * 400);
+	/*var SC = parseFloat(document.getElementById("BGscale").value);
+	var I = null;
+	if (BG_menuSelection > -1)
+	{
+	 I = imageSrcFromBackground(BG_menuSelection,SC*2);
+	}
+	window.setTimeout(function(){
+	if (BG_menuSelection > -1)
+	{
+	I = imageSrcFromBackground(BG_menuSelection,SC*2);
+	}
+	var X = document.getElementById("BGxpos").value;
+	if (X.indexOf("%")<0 && X.indexOf("px")<0)
+	{
+		X = X+"px";
+	}
+	var Y = document.getElementById("BGypos").value;
+	if (Y.indexOf("%")<0 && Y.indexOf("px")<0)
+	{
+		Y = Y+"px";
+	}
+		bdy.style.backgroundPosition = X+" "+Y;
+		bdy.style.backgroundRepeat = "no-repeat";
+		bdy.style.backgroundImage = "url("+I+")";
+		bdy.style.backgroundSize = (SC * 400)+"px";}, 50);*/
+		
+}
+function HideBGOptions()
+{
+	document.getElementById("Background Menu").style.visibility = "hidden";
+	document.getElementById("dimmer").style.visibility = "hidden";
+}
+var BG_menuSelection=-1;
+function BGChangeBG(index,scale)
+{
+	var B = document.getElementById("Background Preview");
+	var I=null;
+	BG_menuSelection = index;
+	if (index > -1)
+	{
+	index--;
+	BG_menuSelection--;
+	I = imageSrcFromBackground(index,scale);
+	}
+	window.setTimeout(function(){
+	if (index > 0)
+	{
+		I = imageSrcFromBackground(index,scale);
+	}
+	B.src = I;}, 50);
+}
 function SceneMenuUpdate()
 {
 	var L = document.getElementById("Scene Menu List");
@@ -186,11 +439,22 @@ function SceneMenuUpdate()
 	var part = S.parts[0];
 	//D.innerHTML = part.stage;
 	
-	D.style.backgroundImage = part.background;
+	var I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	window.setTimeout(function(){
+	if (part.background > -1)
+	{
+	I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	}
+	D.style.backgroundImage = "url("+I+")";
+		D.style.backgroundPosition = "top";
+		D.style.backgroundRepeat = "no-repeat";
+		D.style.backgroundSize = part.backgroundsize+"px";}, 50);
+		
+	/*D.style.backgroundImage = part.background;
 	D.style.backgroundPosition = "top";
 	D.style.backgroundRepeat = "no-repeat";
 	//D.style.backgroundSize = part.backgroundsize;
-	D.style.backgroundSize = part.backgroundsize;
+	D.style.backgroundSize = part.backgroundsize;*/
 }
 function SceneMenuDelete()
 {
@@ -408,7 +672,8 @@ function LoadObject()
 	var img = document.createElement("img"); 
 		img.src = I;
     
-		img.alt = d+":"+elt.options[elt.selectedIndex].text;
+		//img.alt = d+":"+elt.options[elt.selectedIndex].text;
+		img.alt = ""+d;
 		img.className = "ObjectProp";
 	
 		imgs[count]=new Image;
@@ -423,7 +688,7 @@ function LoadObject()
 	var img = document.createElement("img"); 
 		img.src = I;
     
-		img.alt = d+":"+elt.options[elt.selectedIndex].text;
+		img.alt = d;
 		img.className = "ObjectProp";
 	
 		imgs[count]=new Image;
@@ -440,8 +705,11 @@ function LoadBackground()
 {
 	var elt = document.getElementById("backgroundchoice");
 	var d = parseInt(elt.options[elt.selectedIndex].value)-1;
+	
 	var I;
 	var H = Math.floor(window.innerHeight*1.25);
+	current_background = d;
+	current_backgroundsize = H;
 	if (d==-1)
 	{
 		I = null;
@@ -479,6 +747,7 @@ function LoadBackground()
 		}
 		//make sure to call document.activeElement.blur(); after using a text sensitive control to prevent accidental interaction after its use.
 		document.activeElement.blur();
+		pushstate();
 }
 function rnd(I)
 {
@@ -570,7 +839,7 @@ document.onkeydown = function(evt) {
 	if ((keyCode >= 33 && keyCode <= 40) || keyCode == 32) {
         ret = false;
     }
-	if (document.activeElement.contentEditable && document.activeElement == lobj)
+	if ((document.activeElement.contentEditable && document.activeElement == lobj) || document.activeElement.tagName == "INPUT")
 	{
 		//alert(""+document.activeElement);
 		//ret = true;
@@ -670,11 +939,13 @@ function keydown(e)
 		{
 			stg.removeChild(lobj.parentNode);
 			count--;
+			pushstate();
 		}
 		else
 		{
 			stg.removeChild(lobj);
 			count--;
+			pushstate();
 		}
 	}
 	if (e.shiftKey==1)
@@ -716,6 +987,7 @@ function keydown(e)
 	if (e.keyCode == 65)
 	{
 		ImportImage();
+		pushstate();
 	}
 	//B key
 	if (e.keyCode == 66)
@@ -726,11 +998,13 @@ function keydown(e)
 			{
 				lobj.src = imageSrcFromDNA(lobj.alt,null,false,true);
 				lobj.backsprite=true
+				pushstate();
 			}
 			else
 			{
 				lobj.src = imageSrcFromDNA(lobj.alt,null,false,false);
 				lobj.backsprite=false;
+				pushstate();
 			}
 		}
 		else
@@ -744,15 +1018,15 @@ function keydown(e)
 	if (e.keyCode == 67 && lobj.tagName=="DIV")
 	{
 		var temp = prompt("enter a color",""+lobj.style.color);
-		
 		lobj.style.color = temp;
+		pushstate();
 	}
 	//V key
 	if (e.keyCode == 86 && lobj.tagName=="DIV")
 	{
 		var temp = prompt("enter a font name",""+lobj.style.fontFamily);
-		
 		lobj.style.fontFamily = temp;
+		pushstate();
 	}
 	//F key
 	if (e.keyCode == 70)
@@ -770,6 +1044,7 @@ function keydown(e)
 		lobj.style.WebkitTransform = "rotate("+lobj.rot+"deg) scaleX("+(lobj.scale*lobj.direction)+") scaleY("+lobj.scale+")";
 		lobj.style.transform = lobj.style.WebkitTransform;
 		lobj.style.MozTransform = lobj.style.WebkitTransform;
+		pushstate();
 	}
 	//T key
 	if (e.keyCode == 84)
@@ -819,6 +1094,7 @@ function initobject(obj)
 	obj.direction = 1;
 	obj.id = "stgObj:"+Math.random();
 	obj.zIndex = -1000+count;
+	pushstate();
 }
 function mousedown(e)
 {
@@ -978,6 +1254,44 @@ function compiledna(dna)
 	}
 	return ret;
 }
+
+function pushstate()
+{
+	var state = {scene:scene,currentpart:currentpart,BGsize:current_backgroundsize,current:encodestage(),BGImage:current_background};
+	state = JSON.stringify(state);
+	var id = "state:"+window.history.length;
+	var str = ""+state;
+	var size = state.length;
+	//sessionStorage[id] = state;
+	history.pushState(state,"Create.html","");
+}
+window.onpopstate = function(event) {
+	//var state = JSON.parse(sessionStorage[event.state]);
+	var state = JSON.parse(event.state);
+	if (state.scene != undefined)
+	{
+		scene = state.scene;
+		currentpart = -1;
+		loadpart(state.currentpart);
+		//bdy.style.backgroundImage = state.BGImage;
+		
+		var I = imageSrcFromBackground(state.BGImage,state.BGsize / 200);
+	window.setTimeout(function(){
+	if (state.BGImage > -1)
+	{
+	I = imageSrcFromBackground(state.BGImage,state.BGsize / 200);
+	}
+	bdy.style.backgroundImage = "url("+I+")";
+		bdy.style.backgroundPosition = "top";
+		bdy.style.backgroundRepeat = "no-repeat";
+		bdy.style.backgroundSize = state.BGsize+"px";}, 50);
+		
+		//bdy.style = state.bodystyle;
+		loadstage(state.current);
+		//stg.innerHTML = state.current;
+	}
+  //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+};
 function mouseup(e)
 {
 	if (mode==3)
@@ -1014,6 +1328,10 @@ function mouseup(e)
 			//alert(""+dist);
 			tobj.alt = D;*/
 		}
+	}
+	if (mode != 0 && lobj != null && isstageobject(lobj))
+	{
+		pushstate();
 	}
 	mode=0;
 	tobj=-1;
@@ -1113,6 +1431,34 @@ Function.prototype.bindToEventHandler = function bindToEventHandler() {
 }
 //scenelist = [];
 //scenelist = {};
+if (localStorage.maxstorage == undefined)
+{
+	localStorage.clear();
+	var i = 0;
+	var s = "0000000000000000000000000";
+	s = s + s + s + s + s;
+	s = s+s;
+	s = s+s;
+	s = s+s;
+	s = s+s;
+	s = s+s;
+	var ok = true;
+	try
+	{
+	while (ok)
+	{
+		localStorage["memtest:"+i] =s;
+		i++;
+	}
+	}
+	catch(error)
+	{
+	}
+	localStorage.clear();
+	localStorage.maxstorage = i * 1000;
+	alert("maxstorage:"+localStorage.maxstorage);
+	//scenelist = {};
+}
 if (localStorage.scenes == undefined)
 {
 	//localStorage.scenes = new Array();
@@ -1122,7 +1468,10 @@ else
 {
 	scenelist = JSON.parse(localStorage.scenes);
 }
+document.getElementById("BGscale").value = "" +((window.innerHeight*1.25) / 400);
 //scenelist = {};
-//scenelist = [];
+//scenelist = []
+//for(var x in localStorage)console.log(x+"="+((localStorage[x].length * 2)/1024/1024).toFixed(2)+" MB");;
+
 refreshSceneList();
 }
