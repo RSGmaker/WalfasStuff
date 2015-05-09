@@ -1,5 +1,5 @@
 {
-var scene = {name:"Untitled",next:null,prev:null,parts:[{stage:"",background:-1,backgroundsize:"0px"}]};
+var scene = {name:"Untitled",next:null,prev:null,parts:[{stage:"",background:-1,backgroundsize:0,backgroundPosition:"50% 0px"}]};
 var currentpart = 0;
 //mouse behavior mode
 var mode = 0;
@@ -25,6 +25,8 @@ var stg = document.getElementById('stage');
 var gui = document.getElementById('interface');
 var current_background = -1;
 var current_backgroundsize = 0;
+var current_backgroundPosition = "50% 0px";
+var offlinemode = false;
 function addEventHandler(obj, evt, handler) {
     if(obj.addEventListener) {
         // W3C method
@@ -37,19 +39,8 @@ function addEventHandler(obj, evt, handler) {
         obj['on'+evt] = handler;
     }
 }
-
-function getsize(O)
+function formatsize(sz)
 {
-	var sz = 0;
-	if (I == undefined || I == null)
-	{
-		for(var x in localStorage)
-		{sz+= x.length;};
-	}
-	else
-	{
-		sz = localStorage[O].length;
-	}
 	if (sz<1024)
 	{
 		sz = ""+sz;
@@ -67,6 +58,44 @@ function getsize(O)
 		sz = ""+sz;
 		sz = sz.substring(0,sz.indexOf('.')+3)+"MB";
 	}
+	return sz;
+}
+function getsize(O)
+{
+	var sz = 0;
+	if (isNaN(O))
+	{
+	if (O == undefined || O == null)
+	{
+		for(var x in localStorage)
+		{sz+= x.length;};
+	}
+	else
+	{
+		sz = localStorage[O].length;
+	}
+	}
+	else
+	{
+		sz = O;
+	}
+	/*if (sz<1024)
+	{
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"B";
+	}
+	else if (sz < 1048576)
+	{
+		sz = sz / 1024;
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"KB";
+	}
+	else
+	{
+		sz = sz / 1048576.0;
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"MB";
+	}*/
 	return sz;
 }
 function encodestage()
@@ -165,13 +194,18 @@ function loadstage(S)
 		if (C[i].tagName == "IMG")
 		{
 			//if (C[i].getAttribute("className" == "Character"))
-			if (C[i].className == "Character")
+			var CN = C[i].className;
+			if (CN == "Character")
 			{
 				C[i].setAttribute("src",imageSrcFromDNA(C[i].getAttribute("alt")));
 			}
-			else if (C[i].className == "ObjectProp")
+			else if (CN == "ObjectProp")
 			{
 				C[i].setAttribute("src",imageSrcFromObject(parseInt(C[i].getAttribute("alt")),1.0,false));
+			}
+			else if (CN == "ImportedAsset")
+			{
+				C[i].setAttribute("src",C[i].getAttribute("alt"));
 			}
 		}
 		i++;
@@ -252,7 +286,7 @@ function saveScene()
 function savepart()
 {
 	//scene.parts[currentpart] = {stage:stg.innerHTML,background:bdy.style.backgroundImage,backgroundsize:bdy.style.backgroundSize};
-	scene.parts[currentpart] = {stage:encodestage(),background:current_background,backgroundsize:bdy.style.backgroundSize};
+	scene.parts[currentpart] = {stage:encodestage(),background:current_background,backgroundsize:current_backgroundsize,backgroundPosition:current_backgroundPosition};
 }
 
 function loadpart(index)
@@ -262,11 +296,17 @@ function loadpart(index)
 		return;
 	}
 	var part = scene.parts[index];
+	current_background = index;
+	current_backgroundsize = part.backgroundsize;
+	current_backgroundPosition = part.backgroundPosition;
+	
+	
 	//stg.innerHTML = part.stage;
 	loadstage(part.stage);
 	var I = null;
 	try
 	{
+		
 	var I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
 	window.setTimeout(function(){
 	if (part.background > -1)
@@ -274,7 +314,7 @@ function loadpart(index)
 	I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
 	}
 	bdy.style.backgroundImage = "url("+I+")";
-		bdy.style.backgroundPosition = "top";
+		bdy.style.backgroundPosition = part.backgroundPosition;
 		bdy.style.backgroundRepeat = "no-repeat";
 		bdy.style.backgroundSize = part.backgroundsize+"px";}, 100);
 	}
@@ -339,6 +379,9 @@ function refreshSceneData()
 }
 function ChangeBackground(index,position,size)
 {
+	current_background = index;
+	current_backgroundsize = size;
+	current_backgroundPosition = position;
 	var I = null;
 	if (index > -1)
 	{
@@ -352,7 +395,9 @@ function ChangeBackground(index,position,size)
 		bdy.style.backgroundPosition = position;
 		bdy.style.backgroundRepeat = "no-repeat";
 		bdy.style.backgroundImage = "url("+I+")";
-		bdy.style.backgroundSize = (size)+"px";}, 50
+		bdy.style.backgroundSize = (size)+"px";
+		pushstate();
+		}, 50
 		);
 		
 }
@@ -376,31 +421,6 @@ function SetBGOptions()
 	}
 	var pos = X+" "+Y;
 	ChangeBackground(BG_menuSelection,pos,SC * 400);
-	/*var SC = parseFloat(document.getElementById("BGscale").value);
-	var I = null;
-	if (BG_menuSelection > -1)
-	{
-	 I = imageSrcFromBackground(BG_menuSelection,SC*2);
-	}
-	window.setTimeout(function(){
-	if (BG_menuSelection > -1)
-	{
-	I = imageSrcFromBackground(BG_menuSelection,SC*2);
-	}
-	var X = document.getElementById("BGxpos").value;
-	if (X.indexOf("%")<0 && X.indexOf("px")<0)
-	{
-		X = X+"px";
-	}
-	var Y = document.getElementById("BGypos").value;
-	if (Y.indexOf("%")<0 && Y.indexOf("px")<0)
-	{
-		Y = Y+"px";
-	}
-		bdy.style.backgroundPosition = X+" "+Y;
-		bdy.style.backgroundRepeat = "no-repeat";
-		bdy.style.backgroundImage = "url("+I+")";
-		bdy.style.backgroundSize = (SC * 400)+"px";}, 50);*/
 		
 }
 function HideBGOptions()
@@ -433,7 +453,8 @@ function SceneMenuUpdate()
 	var name=L.options[L.selectedIndex].value;
 	var S = scenelist[name];
 	var P = document.getElementById("Scene Menu Parts");
-	P.innerHTML = "Parts: " + S.parts.length;
+	//P.innerHTML = "Parts: " + S.parts.length +"<br/>" + "Total usage:"+getsize("scenes")+" of " + getsize(localStorage.maxstorage);
+	P.innerHTML = "Parts: " + S.parts.length +"<br/>" + "Remaining space:"+formatsize(localStorage.maxstorage-getsize());
 	var D = document.getElementById("Scene Menu Preview");
 	var part = S.parts[0];
 	//D.innerHTML = part.stage;
@@ -574,6 +595,18 @@ function DisplaySceneInfo()
 function ImportImage()
 {
 	var temp = prompt("enter a url of image to import","");
+	if (temp[1] == ':' && temp[2] == '/' && temp[3] != '/')
+	{
+		//if (offlinemode)
+		{
+			temp = "file://"+temp;
+		}
+	}
+	if (!offlinemode && temp.indexOf("file://")==0)
+	{
+		alert("You cannot import files saved onto your computer when using this program online.\nTry uploading the file to a site that allows hotlinking and import it from there.\n\nor download create.html to your computer.")
+		return;
+	}
 		if (temp!="")
 		{
 			var img = document.createElement("img"); 
@@ -588,7 +621,7 @@ function ImportImage()
 		count = count+1;
 		stg.appendChild(img);
 		initobject(img);
-		stg.removeChild(document.getElementById('dme'));
+		//stg.removeChild(document.getElementById('dme'));
 		}
 }
 function ImportDna()
@@ -700,7 +733,7 @@ function LoadObject()
 	document.activeElement.blur();
 	//alert("loaded:" + d);
 }
-function LoadBackground()
+/*function LoadBackground()
 {
 	var elt = document.getElementById("backgroundchoice");
 	var d = parseInt(elt.options[elt.selectedIndex].value)-1;
@@ -747,7 +780,7 @@ function LoadBackground()
 		//make sure to call document.activeElement.blur(); after using a text sensitive control to prevent accidental interaction after its use.
 		document.activeElement.blur();
 		pushstate();
-}
+}*/
 function rnd(I)
 {
 	return Math.floor(Math.random()*I);
@@ -1266,7 +1299,7 @@ function compiledna(dna)
 
 function pushstate()
 {
-	var state = {scene:scene,currentpart:currentpart,BGsize:current_backgroundsize,current:encodestage(),BGImage:current_background};
+	var state = {scene:scene,currentpart:currentpart,BGsize:current_backgroundsize,current:encodestage(),BGImage:current_background,BGpos:current_backgroundPosition};
 	state = JSON.stringify(state);
 	var id = "state:"+window.history.length;
 	var str = ""+state;
@@ -1291,7 +1324,7 @@ window.onpopstate = function(event) {
 	I = imageSrcFromBackground(state.BGImage,state.BGsize / 200);
 	}
 	bdy.style.backgroundImage = "url("+I+")";
-		bdy.style.backgroundPosition = "top";
+		bdy.style.backgroundPosition = state.BGpos;
 		bdy.style.backgroundRepeat = "no-repeat";
 		bdy.style.backgroundSize = state.BGsize+"px";}, 50);
 		
@@ -1356,7 +1389,8 @@ S.style.left = x-(S.width / 2 );
 S.style.top = y-(S.height / 2);
 }
 
-if(window.FileReader) { 
+//html drag and drop feature
+/*if(window.FileReader) { 
  var body;
  addEventHandler(window, 'load', function() {
     body   = document.getElementById('body');
@@ -1437,7 +1471,7 @@ Function.prototype.bindToEventHandler = function bindToEventHandler() {
   });
 } else { 
   document.getElementById('status').innerHTML = 'Your browser does not support the HTML5 FileReader.';
-}
+}*/
 //scenelist = [];
 //scenelist = {};
 if (localStorage.maxstorage == undefined)
@@ -1478,6 +1512,10 @@ else
 	scenelist = JSON.parse(localStorage.scenes);
 }
 document.getElementById("BGscale").value = "" +((window.innerHeight*1.25) / 400);
+if (window.location.href.indexOf("file://")==0)
+{
+	offlinemode = true;
+}
 //scenelist = {};
 //scenelist = []
 //for(var x in localStorage)console.log(x+"="+((localStorage[x].length * 2)/1024/1024).toFixed(2)+" MB");;
