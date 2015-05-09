@@ -1037,6 +1037,55 @@ function keydown(e)
 	{
 		return ret;
 	}
+	if (T.style.visibility != "hidden")
+	{
+		//var X = parseFloat(lobj.style.left);
+		//var Y = parseFloat(lobj.style.top);
+		var X = 0;
+		var Y = 0;
+		//left
+		if (e.keyCode == 37)
+		{
+			X=-1;
+		}
+		//up
+		if (e.keyCode == 38)
+		{
+			Y=-1;
+		}
+		//right
+		if (e.keyCode == 39)
+		{
+			X=1;
+		}
+		if (e.keyCode == 40)
+		{
+			Y=1;
+		}
+		if (X != 0 || Y != 0)
+		{
+		if (e.shiftKey && !e.ctrlKey)
+		{
+			lobj.scale = lobj.scale * (1 + (X*0.1));
+			lobj.style.WebkitTransform = "rotate("+lobj.rot+"deg) scaleX("+(lobj.scale*lobj.direction)+") scaleY("+lobj.scale+")";
+			lobj.style.transform = lobj.style.WebkitTransform;
+			lobj.style.MozTransform = lobj.style.WebkitTransform;
+		}
+		else if (!e.shiftKey && e.ctrlKey)
+		{
+			lobj.rot += X;
+			lobj.style.WebkitTransform = "rotate("+lobj.rot+"deg) scaleX("+(lobj.scale*lobj.direction)+") scaleY("+lobj.scale+")";
+			lobj.style.transform = lobj.style.WebkitTransform;
+			lobj.style.MozTransform = lobj.style.WebkitTransform;
+		}
+		else
+		{
+			lobj.style.left = ""+(parseFloat(lobj.style.left)+X);
+			lobj.style.top = ""+(parseFloat(lobj.style.top)+Y);
+		}
+		}
+		//lobj.style.left = 
+	}
 	if (lobj.tagName=="DIV")
 	{
 		if (lobj.getAttribute("contentEditable")=="true")
