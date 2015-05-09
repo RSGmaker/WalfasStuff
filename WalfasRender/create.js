@@ -29,6 +29,7 @@ var current_backgroundsize = 0;
 var current_backgroundPosition = "50% 0px";
 var offlinemode = false;
 var currentDNA = -1;
+var laststate="";
 function addEventHandler(obj, evt, handler) {
     if(obj.addEventListener) {
         // W3C method
@@ -1402,20 +1403,29 @@ function compiledna(dna)
 	}
 	return ret;
 }
-
-function pushstate()
+function getstate()
 {
 	var state = {scene:scene,currentpart:currentpart,BGsize:current_backgroundsize,current:encodestage(),BGImage:current_background,BGpos:current_backgroundPosition};
 	state = JSON.stringify(state);
-	var id = "state:"+window.history.length;
-	var str = ""+state;
-	var size = state.length;
-	//sessionStorage[id] = state;
-	history.pushState(state,"Create.html","");
+	return state;
 }
-window.onpopstate = function(event) {
-	//var state = JSON.parse(sessionStorage[event.state]);
-	var state = JSON.parse(event.state);
+function pushstate()
+{
+	/*var state = {scene:scene,currentpart:currentpart,BGsize:current_backgroundsize,current:encodestage(),BGImage:current_background,BGpos:current_backgroundPosition};
+	state = JSON.stringify(state);*/
+	var state = getstate();
+	/*var id = "state:"+window.history.length;
+	var str = ""+state;
+	var size = state.length;*/
+	//sessionStorage[id] = state;
+	if (state != laststate)
+	{
+		history.pushState(state,"Create.html","");
+		collabpush(state);
+	}
+}
+function setstate(state)
+{
 	if (state.scene != undefined)
 	{
 		scene = state.scene;
@@ -1438,7 +1448,10 @@ window.onpopstate = function(event) {
 		loadstage(state.current);
 		//stg.innerHTML = state.current;
 	}
-  //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+}
+window.onpopstate = function(event) {
+	var state = JSON.parse(event.state);
+	setstate(state);
 };
 function mouseup(e)
 {
@@ -1630,6 +1643,7 @@ if (window.location.href.indexOf("file://")==0)
 {
 	offlinemode = true;
 }
+
 //scenelist = {};
 //scenelist = []
 //for(var x in localStorage)console.log(x+"="+((localStorage[x].length * 2)/1024/1024).toFixed(2)+" MB");;
