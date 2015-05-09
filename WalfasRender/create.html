@@ -97,10 +97,7 @@ Create.html pre-alpha 0.03
 						<li>
 							<p>File</p>
 							<ul>
-								<li><p>Characters</p>
-									<ul>
-										<li><p>Not Implemented</p></li>
-									</ul>
+								<li><p onclick="DisplayDNAMenu();">Characters</p>
 								</li>
 								<li><p onclick="DisplaySceneInfo();">Scene info</p></li>
 								<li><p onclick="saveScene();">Save scene</p></li>
@@ -231,7 +228,8 @@ Create.html pre-alpha 0.03
 	</h1>
 	<br/>
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="HideCharacterOptions();" >&nbsp;&nbsp;Close&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="SetCharacterOptions();" >&nbsp;&nbsp;&nbsp;&nbsp;Set&nbsp;&nbsp;&nbsp;&nbsp;</a>
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="SetCharacterOptions();" >&nbsp;&nbsp;&nbsp;&nbsp;Set&nbsp;&nbsp;&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="SaveCharacterOptions();" >&nbsp;&nbsp;&nbsp;Save&nbsp;&nbsp;&nbsp;</a>
 	</div>
 	</div>
 	
@@ -250,6 +248,28 @@ Create.html pre-alpha 0.03
 	<div id="Background List" style="position:absolute; bottom:10;right:45; pointer;overflow:auto;">
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="HideBGOptions();" >&nbsp;&nbsp;Close&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="SetBGOptions();" >&nbsp;&nbsp;&nbsp;&nbsp;Set&nbsp;&nbsp;&nbsp;&nbsp;</a>
+	</div>	
+	</div>
+	
+	<div id="DNA Menu" style="position:fixed;top:20%;left:30%;width:25em;background-color:rgba(255,255,255,0.8);box-shadow: 0 0 15px 2px #666;transform:scale(1.5);visibility:hidden;">
+	<div style="margin:10px;opacity:1;">
+	<h1 style="border-bottom:solid;">
+	<center>DNA List</center>
+	</h1>
+	
+	<div style="width:180px;height:240px;float: left;cursor: pointer;">
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="AddNewDNA();" >&nbsp;Add new DNA&nbsp;</a>
+	<div id="DNA List" style="width:120px;height:200px;float: left;cursor: pointer;overflow:auto;border-style: solid;">
+	</div>
+	</div>
+	<div style="float:right;">
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="DeleteDNA();" >&nbsp;&nbsp;Delete&nbsp;&nbsp;</a>
+	<img id="DNA Preview" style="width:140px;"></img>
+	</div>
+	<div id="DNA Strand" style="border-style: solid;width:15em;overflow: hidden;" onclick="SetBGOptions();" ><center>[DNA strand]</center></div>
+	
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="HideDNAMenu();" >&nbsp;&nbsp;Close&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="DNAMenuImport();" >&nbsp;&nbsp;Import&nbsp;&nbsp;</a>
 	</div>	
 	</div>
 </body>

@@ -19,6 +19,7 @@ var count = 0;
 var toload = 0;
 var imgs = new Array();
 var scenelist;
+var dnalist;
 var bdy = document.getElementById('body');
 document.body.style.backgroundColor = "white";
 var stg = document.getElementById('stage');
@@ -27,6 +28,7 @@ var current_background = -1;
 var current_backgroundsize = 0;
 var current_backgroundPosition = "50% 0px";
 var offlinemode = false;
+var currentDNA = -1;
 function addEventHandler(obj, evt, handler) {
     if(obj.addEventListener) {
         // W3C method
@@ -512,6 +514,15 @@ function HideCharacterOptions()
 	document.getElementById('dimmer').style.visibility = "hidden";
 	document.getElementById("Character Options").style.visibility = "hidden";
 }
+function SaveCharacterOptions()
+{
+	dna = editdna(dna,2,document.getElementById("charoptionsscale").value);
+	dna = editdna(dna,1,document.getElementById("charoptionsname").value);
+	
+	dnalist[dnalist.length] = dna;
+	localStorage.dnas = JSON.stringify(dnalist);
+}
+
 function SetCharacterOptions()
 {
 	dna = editdna(dna,2,document.getElementById("charoptionsscale").value);
@@ -785,6 +796,94 @@ function rnd(I)
 {
 	return Math.floor(Math.random()*I);
 }
+function DNAMenuImport()
+{
+	if (currentDNA>-1)
+	{
+		var d = dnalist[currentDNA];
+		AddCharacter(d);
+	}
+}
+function DeleteDNA()
+{
+	if (currentDNA>-1)
+	{
+	var d = dnalist[currentDNA];
+	if (confirm("Delete the DNA:"+d+"?"))
+	{
+		dnalist.splice(currentDNA,1);
+		localStorage.dnas = JSON.stringify(dnalist);
+		DisplayDNAMenu();
+	}
+	}
+}
+function DNAChangeDNA(i)
+{
+	//var d = i;
+	var d = dnalist[i];
+	currentDNA = i;
+	//alert("DNA "+d);
+	//var img = document.getElementById("DNA Preview");
+	//img.src = imageSrcFromDNA(d,null,false,false);
+	var I = imageSrcFromDNA(d,null,false,false);
+	var m = document.getElementById("DNA Menu");
+	m.style.backgroundImage = "url("+I+")";
+	m.style.backgroundSize = 250+"px"
+	m.style.backgroundPosition = "80% 100%";
+	m.style.backgroundRepeat = "no-repeat";
+	
+	document.getElementById("DNA Strand").innerHTML = "<center>"+d+"</center>"
+}
+function HideDNAMenu()
+{
+	document.getElementById("DNA Menu").style.visibility = "hidden";
+	document.getElementById("dimmer").style.visibility = "hidden";
+}
+//calling this instead of adding it directly makes the indexes have the correct references stored
+function adddnaclick(e,i)
+{
+	e.addEventListener("click", function(){DNAChangeDNA(i);});
+}
+function DisplayDNAMenu()
+{
+	var m =document.getElementById("DNA Menu");
+	m.style.visibility = "visible";
+	document.getElementById("dimmer").style.visibility = "visible";
+	m.style.backgroundImage = null;
+	currentDNA = -1;
+	var list = document.getElementById("DNA List");
+	while (list.firstChild) {
+		list.removeChild(list.firstChild);
+	}
+	var i = 0;
+	while (i < dnalist.length)
+	{
+		var p = document.createElement("a");
+		var d = dnalist[i];
+		
+		p.innerHTML = getdnavalue(d,1)+"<br/>";
+		//var t = i;
+		//p.addEventListener("click", function(){DNAChangeDNA(t);});
+		adddnaclick(p,i);
+		list.appendChild(p);
+		i++;
+	}
+	document.getElementById("DNA Strand").innerHTML = "<center>[DNA strand]</center>";
+}
+function AddNewDNA()
+{
+	var d = prompt("Input a DNA strand");
+	if (d.split(":").length>12)
+	{
+		dnalist[dnalist.length] = d;
+		localStorage.dnas = JSON.stringify(dnalist);
+		DisplayDNAMenu();
+	}
+	else
+	{
+		alert("Invalid dna");
+	}
+}
 function RandomizeAll()
 {
 	var i = 0;
@@ -814,17 +913,8 @@ function LoadPreset()
 	var elt = document.getElementById("presetchoice");
 	var d = "NULL:"+elt.options[elt.selectedIndex].value;
 	AddCharacter(d,true);
-	/*var I = imageSrcFromDNA(d,null,false,false);
-	var img = document.createElement("img"); 
-		img.src = I;
-    
-		imgs[count]=new Image;
-		imgs[count].src = I;
-	
-		stg.appendChild(img);
-	count = count+1;*/
-	//alert("loaded:" + d);
 }
+
 //determines if the element is a valid object owned by the stage.
 //make sure to check this before manipulating an object otherwise the user will be able to mess up menus and other things.
 function isstageobject(obj)
@@ -899,20 +989,6 @@ document.onkeydown = function(evt) {
 	}
 	return ret;
 };
-/*document.addEventListener("keydown", dockeydown);
-
-function dockeydown(e) {
-var keyCode = e.keyCode;
-  var ar=new Array(33,34,35,36,37,38,39,40);
-	var ret = false;
-	if (ar.indexOf(e.keyCode)>-1)
-	{
-	ret = true;
-	}
-	//alert("blarg"+ret+keyCode);
-	return ret;
-	
-}*/
 
 function keydown(e)
 {
@@ -926,10 +1002,6 @@ function keydown(e)
 	var T = document.getElementById("stgmenu");
 	if (e.keyCode == 32)
 	{
-		//alert("pressed space!");
-		//document.getElementById("stgmenu_nav").style.visibility = !document.getElementById("stgmenu_nav").style.visibility;
-		//document.getElementById("stgmenu_nav").style.visibility = "hidden";
-		
 		if (T.style.visibility != "hidden")
 		{
 			T.style.visibility = "hidden";
@@ -1172,10 +1244,6 @@ if (typeof tobj.scale === "undefined")
 }
 ox = parseInt(tobj.style.left,10) - x;
 oy = parseInt(tobj.style.top,10) - y;
-//alert("left:"+ tobj.style.left + " offset:" + ox);
-//ox = 30;
-//oy = 5;
-//blb = frg;
 }
 
 if (e.ctrlKey==1)
@@ -1202,8 +1270,6 @@ if (e.ctrlKey==1 && e.shiftKey==1)
 	oy = y;
 }
 
-//e.target.style.left = x-(e.target.width / 2 );
-//e.target.style.top = y-(e.target.height / 2);
 return e.target.tagName!='IMG';
 //return false;
 }
@@ -1215,7 +1281,6 @@ if (!isstageobject(e.target))
 	}
 x=e.clientX;
 y=e.clientY;
-//tobj = document.getElementById('dme');
 if (mode==2)
 {
 	//tobj.style.transform = "rotate(" + (x-ox) + "deg)";
@@ -1231,23 +1296,15 @@ if (mode==3)
 }
 if (mode==4)
 {
-	//tobj.scale = OV+(((x-ox) / 100));
 	var nx = 1+((x-ox) / 100);
 	var ny = 1+((y-oy) / 100);
 	tobj.style.WebkitTransform = "rotate("+tobj.rot+"deg) scaleX("+(nx*tobj.direction)+") scaleY("+ny+")";
 	tobj.style.transform = tobj.style.WebkitTransform;
 	tobj.style.MozTransform = tobj.style.WebkitTransform;
-	//tobj.width = tobj.naturalWidth * nx;
-	//tobj.height = tobj.naturalHeight * ny;
-	//tobj.style.scaleX = nx;
-	//tobj.style.scaleY = ny;
 }
 if (mode==1)
 {
-//clientWidth
 tobj.style.position="absolute";
-//tobj.style.left = x-(tobj.clientWidth / 2 );
-//tobj.style.top = y-(tobj.clientHeight / 2);
 tobj.style.left = x + ox;
 tobj.style.top = y + oy;
 }
@@ -1510,6 +1567,14 @@ if (localStorage.scenes == undefined)
 else
 {
 	scenelist = JSON.parse(localStorage.scenes);
+}
+if (localStorage.dnas == undefined)
+{
+	dnalist = [];
+}
+else
+{
+	dnalist = JSON.parse(localStorage.dnas);
 }
 document.getElementById("BGscale").value = "" +((window.innerHeight*1.25) / 400);
 if (window.location.href.indexOf("file://")==0)
