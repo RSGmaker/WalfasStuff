@@ -353,7 +353,6 @@ function ChangeBackground(index,position,size)
 		bdy.style.backgroundRepeat = "no-repeat";
 		bdy.style.backgroundImage = "url("+I+")";
 		bdy.style.backgroundSize = (size)+"px";}, 50
-		
 		);
 		
 }
@@ -753,19 +752,29 @@ function rnd(I)
 {
 	return Math.floor(Math.random()*I);
 }
+function RandomizeAll()
+{
+	var i = 0;
+	var C = stg.childNodes;
+	while (i < C.length)
+	{
+		if (C[i].className == "Character")
+		{
+			var d = randomDNA();
+			d = editdna(d,2,parseInt(getdnavalue(d,2)) * 2);
+			C[i].alt = d;
+			C[i].src = imageSrcFromDNA(d,null,false,false);
+		}
+		i++;
+	}
+}
+function randomDNA()
+{
+	return "Null:Char"+count+":100:"+rnd(351)+":"+rnd(281)+":"+rnd(363)+":"+rnd(277)+":"+rnd(127)+":"+rnd(133)+":"+rnd(85)+":"+rnd(157)+":"+rnd(156)+":"+rnd(136)+":"+rnd(16777215).toString(16);
+}
 function newcharacter()
 {
-	var d = "Null:Char"+count+":100:"+rnd(351)+":"+rnd(281)+":"+rnd(363)+":"+rnd(277)+":"+rnd(127)+":"+rnd(133)+":"+rnd(85)+":"+rnd(157)+":"+rnd(156)+":"+rnd(136)+":"+rnd(16777215).toString(16);
-	AddCharacter(d);
-	/*var I = imageSrcFromDNA(d,null,false,false);
-	var img = document.createElement("img"); 
-		img.src = I;
-    
-		imgs[count]=new Image;
-		imgs[count].src = I;
-	
-		stg.appendChild(img);
-	count = count+1;*/
+	AddCharacter(randomDNA());
 }
 function LoadPreset()
 {
