@@ -1218,7 +1218,7 @@ function imageSrcFromObject(objindex,scale,cropped){
 	{
 		scale = 1;
 	}
-	canvas.width = 500*scale;
+	canvas.width = 750*scale;
 	canvas.height = 500*scale;
 	var G = canvas.getContext("2d");
 	G.save(); 
@@ -1226,7 +1226,7 @@ function imageSrcFromObject(objindex,scale,cropped){
 	// move to the middle of where we want to draw our image
 	if (customrenderer)
 	{
-		G.translate(250*scale, 260*scale);
+		G.translate(375*scale, 260*scale);
 	}
 	else
 	{

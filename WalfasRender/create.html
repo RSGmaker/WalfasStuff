@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>
-Create.html pre-alpha 0.02
+Create.html pre-alpha 0.03
 </title>
 <link rel="stylesheet" type="text/css" href="create.css">
 </head>
@@ -9,7 +9,7 @@ Create.html pre-alpha 0.02
 <div id="stage" width="100%" height="100%" style="position:static;left:0;top:0;zIndex:1;">
 </div>
 <!--<div id="dme" contenteditable="false">Drag your images from your desktop into this page to get started.</div>-->
-<!--<img id="BGimage" style="pointer-events:none;position: absolute;top:0%;left:18%;zIndex:9999;" height="100%"/>-->
+<!--<div id="BGI" style="pointer-events:none;position: absolute;top:0%;left:0%;zIndex:-9999;width:100%;height:100%;background:white;"></div>-->
 <div id="interface" style="position:static;left:0;top:0;zIndex:100;">
 <stagemenu id="stgmenu">
 		<nav id="stgmenu_nav">
@@ -20,7 +20,7 @@ Create.html pre-alpha 0.02
 						<li>
 							<p>Options</p>
 							<ul>
-								<li><p>(you can load custom dnas by clicking on the clone capsule.)<br/>(you can also load images by dragging them into the window and dropping them on a menu or an object.)</p></li>
+								<li><p>(you can load custom dnas by clicking on the clone capsule.)</p></li>
 							</ul>
 						</li>
 						<li>
@@ -64,16 +64,16 @@ Create.html pre-alpha 0.02
 							<p>Stage</p>
 							<ul>
 								<li><p onclick="ClearStage();">Clear</p></li>
-								<li><p>Randomize All</p></li>
+								<li><p onclick="RandomizeAll();">Randomize All</p></li>
 								<li><p>Scramble!</p></li>
 								<li><p>Shrink</p></li>
 							</ul>
 						</li>
 						<li>
-							<p>Background</p>
-							<ul>
+							<p onclick="DisplayBackgroundMenu();">Background</p>
+							<!--<ul>
 								<li> <select id="backgroundchoice" onchange="LoadBackground();" width="100%" height="100%"></select>
-							</ul>
+							</ul>-->
 						</li>
 						<li>
 							<p>Toys</p>
@@ -97,10 +97,7 @@ Create.html pre-alpha 0.02
 						<li>
 							<p>File</p>
 							<ul>
-								<li><p>Characters</p>
-									<ul>
-										<li><p>Not Implemented</p></li>
-									</ul>
+								<li><p onclick="DisplayDNAMenu();">Characters</p>
 								</li>
 								<li><p onclick="DisplaySceneInfo();">Scene info</p></li>
 								<li><p onclick="saveScene();">Save scene</p></li>
@@ -158,9 +155,9 @@ Create.html pre-alpha 0.02
 	<h1 style="border-bottom:solid;">
 	<center>Scene Info</center>
 	</h1>
-	Scene Name: <input type="text" id="scenename" name="SceneName" value="Untitled" width="200px"><br/>
-	Prev Scene: <input type="text" id="prevscene" name="PrevScene" value="" disabled><br/>
-	Next Scene: <input type="text" id="nextscene" name="NextScene" value="" disabled><br/>
+	Scene Name: <input type="text" id="scenename" name="SceneName" value="Untitled" width="200px"/><br/>
+	Prev Scene: <input type="text" id="prevscene" name="PrevScene" value="" disabled/><br/>
+	Next Scene: <input type="text" id="nextscene" name="NextScene" value="" disabled/><br/>
 	<br/>
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="HideSceneInfo();" >&nbsp;&nbsp;Close&nbsp;&nbsp;</a><br/>
 	</div>
@@ -226,13 +223,55 @@ Create.html pre-alpha 0.02
 	<br/>
 	<br/>
 	<h2>
-	&nbsp;&nbsp;&nbsp;Scale:<input type="text" id="charoptionsscale" value="100" width="200px">X:<input type="text" id="charoptionsX"value="0" width="200px"><br/>
-	Rotation:<input type="text" id="charoptionsRotation" value="0" width="200px">Y:<input type="text" id="charoptionsY" value="0" width="200px"><br/>
+	&nbsp;&nbsp;&nbsp;Scale:<input type="text" id="charoptionsscale" value="100" width="200px"/>X:<input type="text" id="charoptionsX"value="0" width="200px"/><br/>
+	Rotation:<input type="text" id="charoptionsRotation" value="0" width="200px"/>Y:<input type="text" id="charoptionsY" value="0" width="200px"/><br/>
 	</h1>
 	<br/>
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="HideCharacterOptions();" >&nbsp;&nbsp;Close&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="SetCharacterOptions();" >&nbsp;&nbsp;&nbsp;&nbsp;Set&nbsp;&nbsp;&nbsp;&nbsp;</a>
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="SetCharacterOptions();" >&nbsp;&nbsp;&nbsp;&nbsp;Set&nbsp;&nbsp;&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="SaveCharacterOptions();" >&nbsp;&nbsp;&nbsp;Save&nbsp;&nbsp;&nbsp;</a>
 	</div>
+	</div>
+	
+	<div id="Background Menu" style="position:fixed;top:20%;left:30%;width:35em;background-color:rgba(255,255,255,0.8);box-shadow: 0 0 15px 2px #666;transform:scale(1.5);visibility:hidden;">
+	<div style="margin:10px;opacity:1;">
+	<h1 style="border-bottom:solid;">
+	<center>Background Menu</center>
+	</h1>
+	<div id="Background List" style="width:220px;height:390px;float: left;cursor: pointer;overflow:auto;">
+	</div>
+	<center>Location</center>
+	&nbsp;X:<input type="text" id="BGxpos" value="50%"/>Y:<input type="text" id="BGypos" value="0"/><br/>
+	<br/>
+	<center>Scale: <input type="text" id="BGscale" value="1" /></center><br/>
+	<img id="Background Preview" style="width:320px;float: right;"></img>
+	<div id="Background List" style="position:absolute; bottom:10;right:45; pointer;overflow:auto;">
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="HideBGOptions();" >&nbsp;&nbsp;Close&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="SetBGOptions();" >&nbsp;&nbsp;&nbsp;&nbsp;Set&nbsp;&nbsp;&nbsp;&nbsp;</a>
+	</div>	
+	</div>
+	
+	<div id="DNA Menu" style="position:fixed;top:20%;left:30%;width:25em;background-color:rgba(255,255,255,0.8);box-shadow: 0 0 15px 2px #666;transform:scale(1.5);visibility:hidden;">
+	<div style="margin:10px;opacity:1;">
+	<h1 style="border-bottom:solid;">
+	<center>DNA List</center>
+	</h1>
+	
+	<div style="width:180px;height:240px;float: left;cursor: pointer;">
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="AddNewDNA();" >&nbsp;Add new DNA&nbsp;</a>
+	<div id="DNA List" style="width:120px;height:200px;float: left;cursor: pointer;overflow:auto;border-style: solid;">
+	</div>
+	</div>
+	<div style="float:right;">
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="DeleteDNA();" >&nbsp;&nbsp;Delete&nbsp;&nbsp;</a>
+	<img id="DNA Preview" style="width:140px;"></img>
+	</div>
+	<div style="position:absolute; bottom:16;right:15;">
+	<div id="DNA Strand" style="border-style: solid;width:15em;overflow: hidden;" onclick="SetBGOptions();" ><center>[DNA strand]</center></div>
+	
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="HideDNAMenu();" >&nbsp;&nbsp;Close&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="DNAMenuImport();" >&nbsp;&nbsp;Import&nbsp;&nbsp;</a>
+	</div>	
 	</div>
 </body>
 <script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script> 

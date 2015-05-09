@@ -1,5 +1,5 @@
 {
-var scene = {name:"Untitled",next:null,prev:null,parts:[{stage:"",background:null,backgroundsize:"0px"}]};
+var scene = {name:"Untitled",next:null,prev:null,parts:[{stage:"",background:-1,backgroundsize:0,backgroundPosition:"50% 0px"}]};
 var currentpart = 0;
 //mouse behavior mode
 var mode = 0;
@@ -19,10 +19,16 @@ var count = 0;
 var toload = 0;
 var imgs = new Array();
 var scenelist;
+var dnalist;
 var bdy = document.getElementById('body');
 document.body.style.backgroundColor = "white";
 var stg = document.getElementById('stage');
 var gui = document.getElementById('interface');
+var current_background = -1;
+var current_backgroundsize = 0;
+var current_backgroundPosition = "50% 0px";
+var offlinemode = false;
+var currentDNA = -1;
 function addEventHandler(obj, evt, handler) {
     if(obj.addEventListener) {
         // W3C method
@@ -34,6 +40,178 @@ function addEventHandler(obj, evt, handler) {
         // Old school method.
         obj['on'+evt] = handler;
     }
+}
+function formatsize(sz)
+{
+	if (sz<1024)
+	{
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"B";
+	}
+	else if (sz < 1048576)
+	{
+		sz = sz / 1024;
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"KB";
+	}
+	else
+	{
+		sz = sz / 1048576.0;
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"MB";
+	}
+	return sz;
+}
+function getsize(O)
+{
+	var sz = 0;
+	if (isNaN(O))
+	{
+	if (O == undefined || O == null)
+	{
+		for(var x in localStorage)
+		{sz+= x.length;};
+	}
+	else
+	{
+		sz = localStorage[O].length;
+	}
+	}
+	else
+	{
+		sz = O;
+	}
+	/*if (sz<1024)
+	{
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"B";
+	}
+	else if (sz < 1048576)
+	{
+		sz = sz / 1024;
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"KB";
+	}
+	else
+	{
+		sz = sz / 1048576.0;
+		sz = ""+sz;
+		sz = sz.substring(0,sz.indexOf('.')+3)+"MB";
+	}*/
+	return sz;
+}
+function encodestage()
+{
+	//why am i doing this and not just a simple string replace method?
+	//because firefox can't do simple text operations on large strings :( it's pretty stupid.
+	var C = stg.childNodes;
+	var i = 0;
+	var ret = "";
+	//this rebuilds the entire innerHTML of the stage but leaves out the src attributes so images can't bloat up the savefiles.
+	while (i < C.length)
+	{
+		if (!(""+C[i].tagName == "undefined"))
+		{
+		if (ret == "")
+		{
+			ret = "<"+C[i].tagName;
+		}
+		else
+		{
+			ret = ret + "\r<"+C[i].tagName +" ";
+		}
+		var j = 0;
+		if (C[i].attributes != undefined)
+		{
+		while (j < C[i].attributes.length)
+		{
+			var A = C[i].attributes[j];
+			if (A.name!="src")
+			{
+				ret = ret + " "+A.name+'="' + A.value + '"';
+			}
+			j++;
+		}
+		}
+		ret = ret+">\r"+C[i].innerHTML + "\r</"+C[i].tagName+">";
+		}
+		i++;
+	}
+	return ret;
+	/*var ST = ' data:image/png;base64,';
+	var T = S.split('"')
+	var ret = "";
+	var i = 0;
+	while (i< T.length)
+	{
+		var s = T[i];
+		if (s.indexOf(ST)>-1)
+		{
+			ret = ret + '"';
+		}
+		else
+		{
+			if (ret == "")
+			{
+				ret = T[i] + '"';
+			}
+			else
+			{
+				ret = ret + '"' + T[i];
+			}
+		}
+		i++;
+	}*/
+	return ret;
+}
+function loadstage(S)
+{
+	/*while (stg.firstChild) {
+		stg.removeChild(stg.firstChild);
+	}
+	if (S=="")
+	{
+		return;
+	}
+	S = atob(S);
+	var C = JSON.parse(S);
+	var i = 0;
+	
+	while (i < C.length)
+	{
+		if (C[i].tagName == "IMG")
+		{
+			C[i].setAttribute("src",imageSrcFromDNA(C[i].getAttribute("alt"),null,false,false));
+		}
+		stg.appendChild(C[i]);
+		i++;
+	}*/
+	stg.innerHTML = S;
+	window.setTimeout(function(){
+
+	var C = stg.childNodes;
+	var i = 0;
+	while (i < C.length)
+	{
+		if (C[i].tagName == "IMG")
+		{
+			//if (C[i].getAttribute("className" == "Character"))
+			var CN = C[i].className;
+			if (CN == "Character")
+			{
+				C[i].setAttribute("src",imageSrcFromDNA(C[i].getAttribute("alt")));
+			}
+			else if (CN == "ObjectProp")
+			{
+				C[i].setAttribute("src",imageSrcFromObject(parseInt(C[i].getAttribute("alt")),1.0,false));
+			}
+			else if (CN == "ImportedAsset")
+			{
+				C[i].setAttribute("src",C[i].getAttribute("alt"));
+			}
+		}
+		i++;
+	}}, 50);
 }
 function sceneClear()
 {
@@ -109,7 +287,8 @@ function saveScene()
 
 function savepart()
 {
-	scene.parts[currentpart] = {stage:stg.innerHTML,background:bdy.style.backgroundImage,backgroundsize:bdy.style.backgroundSize};
+	//scene.parts[currentpart] = {stage:stg.innerHTML,background:bdy.style.backgroundImage,backgroundsize:bdy.style.backgroundSize};
+	scene.parts[currentpart] = {stage:encodestage(),background:current_background,backgroundsize:current_backgroundsize,backgroundPosition:current_backgroundPosition};
 }
 
 function loadpart(index)
@@ -119,12 +298,37 @@ function loadpart(index)
 		return;
 	}
 	var part = scene.parts[index];
-	stg.innerHTML = part.stage;
+	current_background = index;
+	current_backgroundsize = part.backgroundsize;
+	current_backgroundPosition = part.backgroundPosition;
 	
+	
+	//stg.innerHTML = part.stage;
+	loadstage(part.stage);
+	var I = null;
+	try
+	{
+		
+	var I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	window.setTimeout(function(){
+	if (part.background > -1)
+	{
+	I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	}
+	bdy.style.backgroundImage = "url("+I+")";
+		bdy.style.backgroundPosition = part.backgroundPosition;
+		bdy.style.backgroundRepeat = "no-repeat";
+		bdy.style.backgroundSize = part.backgroundsize+"px";}, 100);
+	}
+	catch(error)
+	{
+		bdy.style.backgroundImage = "";
+	}
+		/*
 	bdy.style.backgroundImage = part.background;
 	bdy.style.backgroundPosition = "top";
 	bdy.style.backgroundRepeat = "no-repeat";
-	bdy.style.backgroundSize = part.backgroundsize;
+	bdy.style.backgroundSize = part.backgroundsize;*/
 	currentpart = index;
 	refreshSceneData();
 }
@@ -175,22 +379,104 @@ function refreshSceneData()
 		i++;
 	}
 }
+function ChangeBackground(index,position,size)
+{
+	current_background = index;
+	current_backgroundsize = size;
+	current_backgroundPosition = position;
+	var I = null;
+	if (index > -1)
+	{
+	 I = imageSrcFromBackground(index,size / 200);
+	}
+	window.setTimeout(function(){
+	if (index > -1)
+	{
+	I = imageSrcFromBackground(index,size/200);
+	}
+		bdy.style.backgroundPosition = position;
+		bdy.style.backgroundRepeat = "no-repeat";
+		bdy.style.backgroundImage = "url("+I+")";
+		bdy.style.backgroundSize = (size)+"px";
+		pushstate();
+		}, 50
+		);
+		
+}
+function DisplayBackgroundMenu()
+{
+	document.getElementById("Background Menu").style.visibility = "visible";
+	document.getElementById("dimmer").style.visibility = "visible";
+}
+function SetBGOptions()
+{
+	var SC = parseFloat(document.getElementById("BGscale").value);
+	var X = document.getElementById("BGxpos").value;
+	if (X.indexOf("%")<0 && X.indexOf("px")<0)
+	{
+		X = X+"px";
+	}
+	var Y = document.getElementById("BGypos").value;
+	if (Y.indexOf("%")<0 && Y.indexOf("px")<0)
+	{
+		Y = Y+"px";
+	}
+	var pos = X+" "+Y;
+	ChangeBackground(BG_menuSelection,pos,SC * 400);
+		
+}
+function HideBGOptions()
+{
+	document.getElementById("Background Menu").style.visibility = "hidden";
+	document.getElementById("dimmer").style.visibility = "hidden";
+}
+var BG_menuSelection=-1;
+function BGChangeBG(index,scale)
+{
+	var B = document.getElementById("Background Preview");
+	var I=null;
+	BG_menuSelection = index;
+	if (index > -1)
+	{
+	index--;
+	BG_menuSelection--;
+	I = imageSrcFromBackground(index,scale);
+	}
+	window.setTimeout(function(){
+	if (index > 0)
+	{
+		I = imageSrcFromBackground(index,scale);
+	}
+	B.src = I;}, 50);
+}
 function SceneMenuUpdate()
 {
 	var L = document.getElementById("Scene Menu List");
 	var name=L.options[L.selectedIndex].value;
 	var S = scenelist[name];
 	var P = document.getElementById("Scene Menu Parts");
-	P.innerHTML = "Parts: " + S.parts.length;
+	//P.innerHTML = "Parts: " + S.parts.length +"<br/>" + "Total usage:"+getsize("scenes")+" of " + getsize(localStorage.maxstorage);
+	P.innerHTML = "Parts: " + S.parts.length +"<br/>" + "Remaining space:"+formatsize(localStorage.maxstorage-getsize());
 	var D = document.getElementById("Scene Menu Preview");
 	var part = S.parts[0];
 	//D.innerHTML = part.stage;
 	
-	D.style.backgroundImage = part.background;
+	var I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	window.setTimeout(function(){
+	if (part.background > -1)
+	{
+	I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	}
+	D.style.backgroundImage = "url("+I+")";
+		D.style.backgroundPosition = "top";
+		D.style.backgroundRepeat = "no-repeat";
+		D.style.backgroundSize = part.backgroundsize+"px";}, 50);
+		
+	/*D.style.backgroundImage = part.background;
 	D.style.backgroundPosition = "top";
 	D.style.backgroundRepeat = "no-repeat";
 	//D.style.backgroundSize = part.backgroundsize;
-	D.style.backgroundSize = part.backgroundsize;
+	D.style.backgroundSize = part.backgroundsize;*/
 }
 function SceneMenuDelete()
 {
@@ -228,6 +514,15 @@ function HideCharacterOptions()
 	document.getElementById('dimmer').style.visibility = "hidden";
 	document.getElementById("Character Options").style.visibility = "hidden";
 }
+function SaveCharacterOptions()
+{
+	dna = editdna(dna,2,document.getElementById("charoptionsscale").value);
+	dna = editdna(dna,1,document.getElementById("charoptionsname").value);
+	
+	dnalist[dnalist.length] = dna;
+	localStorage.dnas = JSON.stringify(dnalist);
+}
+
 function SetCharacterOptions()
 {
 	dna = editdna(dna,2,document.getElementById("charoptionsscale").value);
@@ -311,6 +606,18 @@ function DisplaySceneInfo()
 function ImportImage()
 {
 	var temp = prompt("enter a url of image to import","");
+	if (temp[1] == ':' && temp[2] == '/' && temp[3] != '/')
+	{
+		//if (offlinemode)
+		{
+			temp = "file://"+temp;
+		}
+	}
+	if (!offlinemode && temp.indexOf("file://")==0)
+	{
+		alert("You cannot import files saved onto your computer when using this program online.\nTry uploading the file to a site that allows hotlinking and import it from there.\n\nor download create.html to your computer.")
+		return;
+	}
 		if (temp!="")
 		{
 			var img = document.createElement("img"); 
@@ -325,7 +632,7 @@ function ImportImage()
 		count = count+1;
 		stg.appendChild(img);
 		initobject(img);
-		stg.removeChild(document.getElementById('dme'));
+		//stg.removeChild(document.getElementById('dme'));
 		}
 }
 function ImportDna()
@@ -408,7 +715,8 @@ function LoadObject()
 	var img = document.createElement("img"); 
 		img.src = I;
     
-		img.alt = d+":"+elt.options[elt.selectedIndex].text;
+		//img.alt = d+":"+elt.options[elt.selectedIndex].text;
+		img.alt = ""+d;
 		img.className = "ObjectProp";
 	
 		imgs[count]=new Image;
@@ -423,7 +731,7 @@ function LoadObject()
 	var img = document.createElement("img"); 
 		img.src = I;
     
-		img.alt = d+":"+elt.options[elt.selectedIndex].text;
+		img.alt = d;
 		img.className = "ObjectProp";
 	
 		imgs[count]=new Image;
@@ -436,12 +744,15 @@ function LoadObject()
 	document.activeElement.blur();
 	//alert("loaded:" + d);
 }
-function LoadBackground()
+/*function LoadBackground()
 {
 	var elt = document.getElementById("backgroundchoice");
 	var d = parseInt(elt.options[elt.selectedIndex].value)-1;
+	
 	var I;
 	var H = Math.floor(window.innerHeight*1.25);
+	current_background = d;
+	current_backgroundsize = H;
 	if (d==-1)
 	{
 		I = null;
@@ -479,41 +790,131 @@ function LoadBackground()
 		}
 		//make sure to call document.activeElement.blur(); after using a text sensitive control to prevent accidental interaction after its use.
 		document.activeElement.blur();
-}
+		pushstate();
+}*/
 function rnd(I)
 {
 	return Math.floor(Math.random()*I);
 }
+function DNAMenuImport()
+{
+	if (currentDNA>-1)
+	{
+		var d = dnalist[currentDNA];
+		AddCharacter(d);
+	}
+}
+function DeleteDNA()
+{
+	if (currentDNA>-1)
+	{
+	var d = dnalist[currentDNA];
+	if (confirm("Delete the DNA:"+d+"?"))
+	{
+		dnalist.splice(currentDNA,1);
+		localStorage.dnas = JSON.stringify(dnalist);
+		DisplayDNAMenu();
+	}
+	}
+}
+function DNAChangeDNA(i)
+{
+	//var d = i;
+	var d = dnalist[i];
+	currentDNA = i;
+	//alert("DNA "+d);
+	//var img = document.getElementById("DNA Preview");
+	//img.src = imageSrcFromDNA(d,null,false,false);
+	var I = imageSrcFromDNA(d,null,false,false);
+	var m = document.getElementById("DNA Menu");
+	m.style.backgroundImage = "url("+I+")";
+	m.style.backgroundSize = 250+"px"
+	m.style.backgroundPosition = "80% 100%";
+	m.style.backgroundRepeat = "no-repeat";
+	
+	document.getElementById("DNA Strand").innerHTML = "<center>"+d+"</center>"
+}
+function HideDNAMenu()
+{
+	document.getElementById("DNA Menu").style.visibility = "hidden";
+	document.getElementById("dimmer").style.visibility = "hidden";
+}
+//calling this instead of adding it directly makes the indexes have the correct references stored
+function adddnaclick(e,i)
+{
+	e.addEventListener("click", function(){DNAChangeDNA(i);});
+}
+function DisplayDNAMenu()
+{
+	var m =document.getElementById("DNA Menu");
+	m.style.visibility = "visible";
+	document.getElementById("dimmer").style.visibility = "visible";
+	m.style.backgroundImage = null;
+	currentDNA = -1;
+	var list = document.getElementById("DNA List");
+	while (list.firstChild) {
+		list.removeChild(list.firstChild);
+	}
+	var i = 0;
+	while (i < dnalist.length)
+	{
+		var p = document.createElement("a");
+		var d = dnalist[i];
+		
+		p.innerHTML = getdnavalue(d,1)+"<br/>";
+		//var t = i;
+		//p.addEventListener("click", function(){DNAChangeDNA(t);});
+		adddnaclick(p,i);
+		list.appendChild(p);
+		i++;
+	}
+	document.getElementById("DNA Strand").innerHTML = "<center>[DNA strand]</center>";
+}
+function AddNewDNA()
+{
+	var d = prompt("Input a DNA strand");
+	if (d.split(":").length>12)
+	{
+		dnalist[dnalist.length] = d;
+		localStorage.dnas = JSON.stringify(dnalist);
+		DisplayDNAMenu();
+	}
+	else
+	{
+		alert("Invalid dna");
+	}
+}
+function RandomizeAll()
+{
+	var i = 0;
+	var C = stg.childNodes;
+	while (i < C.length)
+	{
+		if (C[i].className == "Character")
+		{
+			var d = randomDNA();
+			d = editdna(d,2,parseInt(getdnavalue(d,2)) * 2);
+			C[i].alt = d;
+			C[i].src = imageSrcFromDNA(d,null,false,false);
+		}
+		i++;
+	}
+}
+function randomDNA()
+{
+	return "Null:Char"+count+":100:"+rnd(351)+":"+rnd(281)+":"+rnd(363)+":"+rnd(277)+":"+rnd(127)+":"+rnd(133)+":"+rnd(85)+":"+rnd(157)+":"+rnd(156)+":"+rnd(136)+":"+rnd(16777215).toString(16);
+}
 function newcharacter()
 {
-	var d = "Null:Char"+count+":100:"+rnd(351)+":"+rnd(281)+":"+rnd(363)+":"+rnd(277)+":"+rnd(127)+":"+rnd(133)+":"+rnd(85)+":"+rnd(157)+":"+rnd(156)+":"+rnd(136)+":"+rnd(16777215).toString(16);
-	AddCharacter(d);
-	/*var I = imageSrcFromDNA(d,null,false,false);
-	var img = document.createElement("img"); 
-		img.src = I;
-    
-		imgs[count]=new Image;
-		imgs[count].src = I;
-	
-		stg.appendChild(img);
-	count = count+1;*/
+	AddCharacter(randomDNA());
 }
 function LoadPreset()
 {
 	var elt = document.getElementById("presetchoice");
 	var d = "NULL:"+elt.options[elt.selectedIndex].value;
 	AddCharacter(d,true);
-	/*var I = imageSrcFromDNA(d,null,false,false);
-	var img = document.createElement("img"); 
-		img.src = I;
-    
-		imgs[count]=new Image;
-		imgs[count].src = I;
-	
-		stg.appendChild(img);
-	count = count+1;*/
-	//alert("loaded:" + d);
 }
+
 //determines if the element is a valid object owned by the stage.
 //make sure to check this before manipulating an object otherwise the user will be able to mess up menus and other things.
 function isstageobject(obj)
@@ -570,7 +971,7 @@ document.onkeydown = function(evt) {
 	if ((keyCode >= 33 && keyCode <= 40) || keyCode == 32) {
         ret = false;
     }
-	if (document.activeElement.contentEditable && document.activeElement == lobj)
+	if ((document.activeElement.contentEditable && document.activeElement == lobj) || document.activeElement.tagName == "INPUT")
 	{
 		//alert(""+document.activeElement);
 		//ret = true;
@@ -588,20 +989,6 @@ document.onkeydown = function(evt) {
 	}
 	return ret;
 };
-/*document.addEventListener("keydown", dockeydown);
-
-function dockeydown(e) {
-var keyCode = e.keyCode;
-  var ar=new Array(33,34,35,36,37,38,39,40);
-	var ret = false;
-	if (ar.indexOf(e.keyCode)>-1)
-	{
-	ret = true;
-	}
-	//alert("blarg"+ret+keyCode);
-	return ret;
-	
-}*/
 
 function keydown(e)
 {
@@ -615,10 +1002,6 @@ function keydown(e)
 	var T = document.getElementById("stgmenu");
 	if (e.keyCode == 32)
 	{
-		//alert("pressed space!");
-		//document.getElementById("stgmenu_nav").style.visibility = !document.getElementById("stgmenu_nav").style.visibility;
-		//document.getElementById("stgmenu_nav").style.visibility = "hidden";
-		
 		if (T.style.visibility != "hidden")
 		{
 			T.style.visibility = "hidden";
@@ -670,11 +1053,13 @@ function keydown(e)
 		{
 			stg.removeChild(lobj.parentNode);
 			count--;
+			pushstate();
 		}
 		else
 		{
 			stg.removeChild(lobj);
 			count--;
+			pushstate();
 		}
 	}
 	if (e.shiftKey==1)
@@ -716,6 +1101,7 @@ function keydown(e)
 	if (e.keyCode == 65)
 	{
 		ImportImage();
+		pushstate();
 	}
 	//B key
 	if (e.keyCode == 66)
@@ -726,11 +1112,13 @@ function keydown(e)
 			{
 				lobj.src = imageSrcFromDNA(lobj.alt,null,false,true);
 				lobj.backsprite=true
+				pushstate();
 			}
 			else
 			{
 				lobj.src = imageSrcFromDNA(lobj.alt,null,false,false);
 				lobj.backsprite=false;
+				pushstate();
 			}
 		}
 		else
@@ -744,15 +1132,15 @@ function keydown(e)
 	if (e.keyCode == 67 && lobj.tagName=="DIV")
 	{
 		var temp = prompt("enter a color",""+lobj.style.color);
-		
 		lobj.style.color = temp;
+		pushstate();
 	}
 	//V key
 	if (e.keyCode == 86 && lobj.tagName=="DIV")
 	{
 		var temp = prompt("enter a font name",""+lobj.style.fontFamily);
-		
 		lobj.style.fontFamily = temp;
+		pushstate();
 	}
 	//F key
 	if (e.keyCode == 70)
@@ -770,6 +1158,7 @@ function keydown(e)
 		lobj.style.WebkitTransform = "rotate("+lobj.rot+"deg) scaleX("+(lobj.scale*lobj.direction)+") scaleY("+lobj.scale+")";
 		lobj.style.transform = lobj.style.WebkitTransform;
 		lobj.style.MozTransform = lobj.style.WebkitTransform;
+		pushstate();
 	}
 	//T key
 	if (e.keyCode == 84)
@@ -819,6 +1208,7 @@ function initobject(obj)
 	obj.direction = 1;
 	obj.id = "stgObj:"+Math.random();
 	obj.zIndex = -1000+count;
+	pushstate();
 }
 function mousedown(e)
 {
@@ -854,10 +1244,6 @@ if (typeof tobj.scale === "undefined")
 }
 ox = parseInt(tobj.style.left,10) - x;
 oy = parseInt(tobj.style.top,10) - y;
-//alert("left:"+ tobj.style.left + " offset:" + ox);
-//ox = 30;
-//oy = 5;
-//blb = frg;
 }
 
 if (e.ctrlKey==1)
@@ -884,8 +1270,6 @@ if (e.ctrlKey==1 && e.shiftKey==1)
 	oy = y;
 }
 
-//e.target.style.left = x-(e.target.width / 2 );
-//e.target.style.top = y-(e.target.height / 2);
 return e.target.tagName!='IMG';
 //return false;
 }
@@ -897,7 +1281,6 @@ if (!isstageobject(e.target))
 	}
 x=e.clientX;
 y=e.clientY;
-//tobj = document.getElementById('dme');
 if (mode==2)
 {
 	//tobj.style.transform = "rotate(" + (x-ox) + "deg)";
@@ -913,23 +1296,15 @@ if (mode==3)
 }
 if (mode==4)
 {
-	//tobj.scale = OV+(((x-ox) / 100));
 	var nx = 1+((x-ox) / 100);
 	var ny = 1+((y-oy) / 100);
 	tobj.style.WebkitTransform = "rotate("+tobj.rot+"deg) scaleX("+(nx*tobj.direction)+") scaleY("+ny+")";
 	tobj.style.transform = tobj.style.WebkitTransform;
 	tobj.style.MozTransform = tobj.style.WebkitTransform;
-	//tobj.width = tobj.naturalWidth * nx;
-	//tobj.height = tobj.naturalHeight * ny;
-	//tobj.style.scaleX = nx;
-	//tobj.style.scaleY = ny;
 }
 if (mode==1)
 {
-//clientWidth
 tobj.style.position="absolute";
-//tobj.style.left = x-(tobj.clientWidth / 2 );
-//tobj.style.top = y-(tobj.clientHeight / 2);
 tobj.style.left = x + ox;
 tobj.style.top = y + oy;
 }
@@ -978,6 +1353,44 @@ function compiledna(dna)
 	}
 	return ret;
 }
+
+function pushstate()
+{
+	var state = {scene:scene,currentpart:currentpart,BGsize:current_backgroundsize,current:encodestage(),BGImage:current_background,BGpos:current_backgroundPosition};
+	state = JSON.stringify(state);
+	var id = "state:"+window.history.length;
+	var str = ""+state;
+	var size = state.length;
+	//sessionStorage[id] = state;
+	history.pushState(state,"Create.html","");
+}
+window.onpopstate = function(event) {
+	//var state = JSON.parse(sessionStorage[event.state]);
+	var state = JSON.parse(event.state);
+	if (state.scene != undefined)
+	{
+		scene = state.scene;
+		currentpart = -1;
+		loadpart(state.currentpart);
+		//bdy.style.backgroundImage = state.BGImage;
+		
+		var I = imageSrcFromBackground(state.BGImage,state.BGsize / 200);
+	window.setTimeout(function(){
+	if (state.BGImage > -1)
+	{
+	I = imageSrcFromBackground(state.BGImage,state.BGsize / 200);
+	}
+	bdy.style.backgroundImage = "url("+I+")";
+		bdy.style.backgroundPosition = state.BGpos;
+		bdy.style.backgroundRepeat = "no-repeat";
+		bdy.style.backgroundSize = state.BGsize+"px";}, 50);
+		
+		//bdy.style = state.bodystyle;
+		loadstage(state.current);
+		//stg.innerHTML = state.current;
+	}
+  //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+};
 function mouseup(e)
 {
 	if (mode==3)
@@ -1015,6 +1428,10 @@ function mouseup(e)
 			tobj.alt = D;*/
 		}
 	}
+	if (mode != 0 && lobj != null && isstageobject(lobj))
+	{
+		pushstate();
+	}
 	mode=0;
 	tobj=-1;
 }
@@ -1029,7 +1446,8 @@ S.style.left = x-(S.width / 2 );
 S.style.top = y-(S.height / 2);
 }
 
-if(window.FileReader) { 
+//html drag and drop feature
+/*if(window.FileReader) { 
  var body;
  addEventHandler(window, 'load', function() {
     body   = document.getElementById('body');
@@ -1110,9 +1528,37 @@ Function.prototype.bindToEventHandler = function bindToEventHandler() {
   });
 } else { 
   document.getElementById('status').innerHTML = 'Your browser does not support the HTML5 FileReader.';
-}
+}*/
 //scenelist = [];
 //scenelist = {};
+if (localStorage.maxstorage == undefined)
+{
+	localStorage.clear();
+	var i = 0;
+	var s = "0000000000000000000000000";
+	s = s + s + s + s + s;
+	s = s+s;
+	s = s+s;
+	s = s+s;
+	s = s+s;
+	s = s+s;
+	var ok = true;
+	try
+	{
+	while (ok)
+	{
+		localStorage["memtest:"+i] =s;
+		i++;
+	}
+	}
+	catch(error)
+	{
+	}
+	localStorage.clear();
+	localStorage.maxstorage = i * 1000;
+	alert("maxstorage:"+localStorage.maxstorage);
+	//scenelist = {};
+}
 if (localStorage.scenes == undefined)
 {
 	//localStorage.scenes = new Array();
@@ -1122,7 +1568,22 @@ else
 {
 	scenelist = JSON.parse(localStorage.scenes);
 }
+if (localStorage.dnas == undefined)
+{
+	dnalist = [];
+}
+else
+{
+	dnalist = JSON.parse(localStorage.dnas);
+}
+document.getElementById("BGscale").value = "" +((window.innerHeight*1.25) / 400);
+if (window.location.href.indexOf("file://")==0)
+{
+	offlinemode = true;
+}
 //scenelist = {};
-//scenelist = [];
+//scenelist = []
+//for(var x in localStorage)console.log(x+"="+((localStorage[x].length * 2)/1024/1024).toFixed(2)+" MB");;
+
 refreshSceneList();
 }
