@@ -20,7 +20,7 @@ Create.html pre-alpha 0.04
 						<li>
 							<p>Options</p>
 							<ul>
-								<li><p onclick="alert('Not implemented');">Preferences</p></li>
+								<li><p onclick="alert('Not implemented');"><strike>Preferences</strike></p></li>
 								<li><p onclick="startcollab();">Collab</p></li>
 							</ul>
 						</li>
@@ -45,7 +45,7 @@ Create.html pre-alpha 0.04
 							</ul>
 						</li>
 						<li>
-							<p>Global Locks</p>
+							<p><strike>Global Locks</strike></p>
 							<ul>
 								<li><p>Mouth<input type="checkbox" id="lock_mouth"/></p></li>
 								<li><p>Eyes<input type="checkbox" id="lock_eyes"/></p></li>
@@ -66,8 +66,8 @@ Create.html pre-alpha 0.04
 							<ul>
 								<li><p onclick="ClearStage();">Clear</p></li>
 								<li><p onclick="RandomizeAll();">Randomize All</p></li>
-								<li><p>Scramble!</p></li>
-								<li><p>Shrink</p></li>
+								<li><p><strike>Scramble!</strike></p></li>
+								<li><p><strike>Shrink</strike></p></li>
 							</ul>
 						</li>
 						<li>
@@ -200,7 +200,7 @@ Create.html pre-alpha 0.04
 	<br/>
 	<div style="width:155px;float: left;cursor: pointer;">
 	<br/>
-	<a>Randomize</a><br/>
+	<a onclick="dna=randomDNA();UpdateCharacterOptions();">Randomize</a><br/>
 	<a>Lock All</a><br/>
 	<a>Unlock All</a><br/>
 	<a>Horizontal Flip</a><br/>

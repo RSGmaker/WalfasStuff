@@ -1149,8 +1149,7 @@ function mo(e)
 var dna="";
 function doubleclick(e)
 {
-
-	if (isstageobject(lobj))
+	if (isstageobject(lobj) && getstageobject(e.target) == lobj)
 	{
 		if (lobj.tagName=="DIV")
 		{
