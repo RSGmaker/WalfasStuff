@@ -17,7 +17,8 @@ var colors = [];
 var repo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf2/"
 
 var loader = null;
-if  (ZipLoader)
+var ZipLoader;
+if  (ZipLoader != null && ZipLoader != undefined)
 {
 	var T = document.title;
 	document.title = "Loading assets...";
