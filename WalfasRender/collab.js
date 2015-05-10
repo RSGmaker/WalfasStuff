@@ -1,7 +1,27 @@
 
 	var onlineusers = 0;
 	var rid = "DEV";
-	var channel = new DataChannel("CreateHtml_"+rid);
+	var collabactive = false;
+	var channel;
+	function startcollab()
+	{
+		if (!collabactive)
+		{
+			collabactive = true;
+		}
+		else
+		{
+			alert("You are in room:"+rid);
+			return;
+		}
+		rid = prompt("Enter a room name for your collab\r(Warning:this feature is experimental and may have odd behavior in some cases)");
+		if (rid == "")
+		{
+			collabactive = false;
+			alert("Collab connection was canceled.");
+			return;
+		}
+	channel = new DataChannel("CreateHtml_"+rid);
 	channel.onopen = function(userid) {
 		onlineusers = onlineusers + 1;
 		//prevent new users from blanking out others stages.
@@ -54,6 +74,7 @@
 			me.id = channel.userid;
 		}
     };
+	}
 	
 	function processcommand(data,user,latency){
 		if (user == 0 || ""+user == "undefined")
@@ -106,10 +127,17 @@
 			ChangeBackground(data.id,data.pos,data.size);
 		}
 	}
+	function send(msg)
+	{
+		if (collabactive)
+		{
+			channel.send(msg);
+		}
+	}
 	function collabpush(state)
 	{
 		var data = {command:"SetState",state};
-		channel.send(JSON.stringify(data));
+		send(JSON.stringify(data));
 	}
 	function collabchange(obj)
 	{
@@ -118,14 +146,14 @@
 			if (obj.style != undefined && obj.style != null && obj.style != "")
 			{
 				var data = {command:"SetObject",id:obj.id,alt:obj.alt,style:obj.getAttribute("style"),className:obj.className,html:obj.innerHTML,tagName:obj.tagName};
-				channel.send(JSON.stringify(data));
+				send(JSON.stringify(data));
 			}
 		}
 	}
 	function collabBG(index,position,size)
 	{
 		var data = {command:"SetBG",id:index,pos:position,size:size};
-		channel.send(JSON.stringify(data));
+		send(JSON.stringify(data));
 	}
 			/*channel.onopen = oc.onopen;
 			channel.onmessage = oc.onmessage

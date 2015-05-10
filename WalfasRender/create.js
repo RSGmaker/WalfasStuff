@@ -30,6 +30,27 @@ var current_backgroundPosition = "50% 0px";
 var offlinemode = false;
 var currentDNA = -1;
 var laststate="";
+var Sounds = {};
+function PlaySound(url){
+		var S = GetSound(url);
+		S.play();
+		return S;
+	}
+	function GetSound(url){
+		if (typeof Sounds[url] != 'undefined')
+		{
+			return Sounds[url];
+		}
+		else
+		{
+			var S;
+			S = new Audio();
+			S.src = url;
+			S.volume=0.35;
+			Sounds[url] = S;
+			return S;
+		}
+	}
 function addEventHandler(obj, evt, handler) {
     if(obj.addEventListener) {
         // W3C method
@@ -323,6 +344,7 @@ function saveScene()
 	}*/
 	localStorage.scenes = JSON.stringify(scenelist);
 	refreshSceneList();
+	PlaySound("MenuSelect.mp3");
 }
 
 function savepart()
@@ -410,12 +432,20 @@ function refreshSceneData()
 	var i = 1;
 	//this is out of the loop to force a part 1 to always be visible.
 	var part = document.createElement("li");
-	part.innerHTML = '<p onclick="loadpart('+0+');">Part 1</p>';
+	//part.innerHTML = '<p onclick="loadpart('+0+');">Part 1</p>';
+	part.innerHTML = '<div><a onclick="loadpart('+0+');" style="float:left;cursor: pointer;">Part 1</a><div style="float:right"><img src="down.png" height="32"></img><img src="trashcan.png" height="32"></img></div></div>';
 	parts.appendChild(part);
 	while (i < scene.parts.length)
 	{
 		part = document.createElement("li");
-		part.innerHTML = '<p onclick="loadpart('+i+');">Part '+(i+1)+'</p>';
+		if (i < scene.parts.length-1)
+		{
+			part.innerHTML = '<div><a onclick="loadpart('+i+');" style="float:left;cursor: pointer;">Part '+(i+1)+'</a><div style="float:right"><img src="up.png" height="32"></img><img src="down.png" height="32"></img><img src="trashcan.png" height="32"></img></div></div>';
+		}
+		else
+		{
+			part.innerHTML = '<div><a onclick="loadpart('+i+');" style="float:left;cursor: pointer;">Part '+(i+1)+'</a><div style="float:right"><img src="up.png" height="32"></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="trashcan.png" height="32"></img></div></div>';
+		}
 		parts.appendChild(part);
 		i++;
 	}
@@ -695,24 +725,28 @@ function AddTextBubble(type)
 	NT.setAttribute('contenteditable','false');
 	NT.style.backgroundSize = "100% 100%";
 	//NT.style.margin = "60px";
+	NT.style.textAlign="center";
+	if (type != 4)
+	{
+		NT.style.padding = "20px" 
+		//NT.style.paddingBottom = "40px";
+	}
 	
 	if (type == 1)
 	{
 		NT.style.backgroundImage = "url('speech.png')"
+		NT.style.paddingBottom = "25px";
 	}
 	if (type == 2)
 	{
 		NT.style.backgroundImage = "url('thought.png')"
+		NT.style.paddingBottom = "25px";
 	}
 	if (type == 3)
 	{
 		NT.style.backgroundImage = "url('box.png')"
 	}
-	if (type != 4)
-	{
-		NT.style.padding = "30px" 
-		NT.style.paddingBottom = "40px";
-	}
+	
 	if (type == 5)
 	{
 		NT.style.backgroundImage = "url('action.png')"
@@ -993,7 +1027,7 @@ function LoadPreset()
 //make sure to check this before manipulating an object otherwise the user will be able to mess up menus and other things.
 function isstageobject(obj)
 {
-	if (obj != null && obj.parentNode == stg || obj.parentNode.parentNode == stg)
+	if (obj != null && obj.parentNode == stg /*|| obj.parentNode.parentNode == stg*/)
 	{
 		return true;
 	}
@@ -1024,7 +1058,7 @@ function doubleclick(e)
 		{
 			lobj.setAttribute("contentEditable","true");
 			//let the user know the text box can now be editted
-			lobj.style.border = "solid #000000";
+			lobj.style.border = "dashed #000000";
 		}
 		}
 		if (lobj.className == "Character")
@@ -1298,12 +1332,13 @@ function keydown(e)
 	//T key
 	if (e.keyCode == 84)
 	{
-		var NT = document.createElement("DIV");
+		AddTextBubble(4);
+		/*var NT = document.createElement("DIV");
 		NT.innerHTML="Double-click to edit Me!";
 		NT.setAttribute("contentEditable","false");
 		NT.backgroundImage = "url(speech.png)";
 		stg.appendChild(NT);
-		initobject(NT);
+		initobject(NT);*/
 	}
 	//+ key
 	if (e.keyCode == 107)
@@ -1344,14 +1379,22 @@ function initobject(obj)
 	obj.direction = 1;
 	obj.id = "stgObj:"+Math.random();
 	obj.zIndex = -1000+count;
+	PlaySound("Bubble.mp3");
 	pushstate();
 }
 function mousedown(e)
 {
 if (!isstageobject(e.target))
 	{
-		lobj=null;
-		return;
+		if (isstageobject(e.target.parentNode))
+		{
+			e.target = e.target.parentNode;
+		}
+		else
+		{
+			lobj=null;
+			return;
+		}
 	}
 x=e.clientX;
 y=e.clientY;
