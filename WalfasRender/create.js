@@ -279,6 +279,61 @@ function sceneClear()
 	ClearStage();
 	bdy.style.backgroundImage = null;
 }
+function sceneshiftdown(ind)
+{
+	if (ind < scene.parts.length-1)
+	{
+		var T = scene.parts[ind];
+		scene.parts[ind] = scene.parts[ind+1];
+		scene.parts[ind+1] = T;
+		if (currentpart == ind || currentpart == ind+1)
+		{
+			var i = currentpart;
+			currentpart = -1;
+			loadpart(i);
+		}
+	}
+}
+function sceneshiftup(ind)
+{
+	if (ind > 0)
+	{
+		var T = scene.parts[ind-1];
+		scene.parts[ind-1] = scene.parts[ind];
+		scene.parts[ind] = T;
+		if (currentpart == ind || currentpart == ind-1)
+		{
+			var i = currentpart;
+			currentpart = -1;
+			loadpart(i);
+		}
+	}
+}
+function scenedelete(ind)
+{
+	if (scene.parts.length<2)
+	{
+		return;
+	}
+	scene.parts.splice(ind, 1);
+	if (currentpart >= ind)
+	{
+		loadpart(currentpart-1);
+	}
+	refreshSceneData();
+	/*if (ind > 0)
+	{
+		var T = scene.parts[ind-1];
+		scene.parts[ind-1] = scene.parts[ind];
+		scene.parts[ind] = T;
+		if (currentpart == ind || currentpart == ind-1)
+		{
+			var i = currentpart;
+			currentpart = -1;
+			loadpart(i);
+		}
+	}*/
+}
 function loadscene(scenename)
 {
 	scene=scenelist[scenename];
@@ -360,7 +415,7 @@ function loadpart(index)
 		return;
 	}
 	var part = scene.parts[index];
-	current_background = index;
+	current_background = part.background;
 	current_backgroundsize = part.backgroundsize;
 	current_backgroundPosition = part.backgroundPosition;
 	
@@ -433,18 +488,19 @@ function refreshSceneData()
 	//this is out of the loop to force a part 1 to always be visible.
 	var part = document.createElement("li");
 	//part.innerHTML = '<p onclick="loadpart('+0+');">Part 1</p>';
-	part.innerHTML = '<div><a onclick="loadpart('+0+');" style="float:left;cursor: pointer;">Part 1</a><div style="float:right"><img src="down.png" height="32"></img><img src="trashcan.png" height="32"></img></div></div>';
+	part.innerHTML = '<div><a onclick="loadpart('+0+');" style="float:left;cursor: pointer;">Part 1</a><div style="float:right"><img src="down.png" height="32" onclick="sceneshiftdown(0)"></img><img src="trashcan.png" height="32" onclick="scenedelete('+0+')"></img></div></div>';
 	parts.appendChild(part);
 	while (i < scene.parts.length)
 	{
 		part = document.createElement("li");
 		if (i < scene.parts.length-1)
 		{
-			part.innerHTML = '<div><a onclick="loadpart('+i+');" style="float:left;cursor: pointer;">Part '+(i+1)+'</a><div style="float:right"><img src="up.png" height="32"></img><img src="down.png" height="32"></img><img src="trashcan.png" height="32"></img></div></div>';
+			part.innerHTML = '<div><a onclick="loadpart('+i+');" style="float:left;cursor: pointer;">Part '+(i+1)+'</a><div style="float:right"><img src="up.png" height="32" onclick="sceneshiftup('+i+')"></img><img src="down.png" height="32" onclick="sceneshiftdown('+i+')"></img><img src="trashcan.png" height="32" onclick="scenedelete('+i+')"></img></div></div>';
+			//part.innerHTML = '<div><a onclick="loadpart('+i+');" style="float:left;cursor: pointer;">Part '+(i+1)+'</a><div style="float:right"><img src="up.png" height="32" onclick="sceneshiftup('+i+')></img><img src="down.png" height="32" onclick="sceneshiftdown('+i+')"></img><img src="trashcan.png" height="32" onclick="scenedelete('+i+')"></img></div></div>';
 		}
 		else
 		{
-			part.innerHTML = '<div><a onclick="loadpart('+i+');" style="float:left;cursor: pointer;">Part '+(i+1)+'</a><div style="float:right"><img src="up.png" height="32"></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="trashcan.png" height="32"></img></div></div>';
+			part.innerHTML = '<div><a onclick="loadpart('+i+');" style="float:left;cursor: pointer;">Part '+(i+1)+'</a><div style="float:right"><img src="up.png" height="32" onclick="sceneshiftup('+i+')"></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="trashcan.png" height="32" onclick="scenedelete('+i+')"></img></div></div>';
 		}
 		parts.appendChild(part);
 		i++;
@@ -527,8 +583,11 @@ function SceneMenuUpdate()
 	var S = scenelist[name];
 	var P = document.getElementById("Scene Menu Parts");
 	//P.innerHTML = "Parts: " + S.parts.length +"<br/>" + "Total usage:"+getsize("scenes")+" of " + getsize(localStorage.maxstorage);
-	P.innerHTML = "Parts: " + S.parts.length +"<br/>" + "Remaining space:"+formatsize(localStorage.maxstorage-getsize());
 	var D = document.getElementById("Scene Menu Preview");
+	if (S != null && S != undefined)
+	{
+	P.innerHTML = "Parts: " + S.parts.length +"<br/>" + "Remaining space:"+formatsize(localStorage.maxstorage-getsize());
+	
 	var part = S.parts[0];
 	//D.innerHTML = part.stage;
 	
@@ -542,6 +601,12 @@ function SceneMenuUpdate()
 		D.style.backgroundPosition = "top";
 		D.style.backgroundRepeat = "no-repeat";
 		D.style.backgroundSize = part.backgroundsize+"px";}, 50);
+	}
+	else
+	{
+		P.innerHTML = "Parts:?";
+		D.style.backgroundImage = null;
+	}
 		
 	/*D.style.backgroundImage = part.background;
 	D.style.backgroundPosition = "top";
@@ -555,8 +620,27 @@ function SceneMenuDelete()
 	var name=L.options[L.selectedIndex].value;
 	if (confirm("Delete the scene:"+name+"?"))
 	{
-		delete scenelist[name];
+		var dname = name;
+		var list = Object.keys(scenelist);
+		var i = 0;
+		while (i < list.length)
+		{
+			if (scenelist[list[i]].name == name)
+			{
+				dname = list[i];
+			}
+			i++;
+		}
+		delete scenelist[dname];
+		if (scenelist.length<1)
+		{
+			delete localStorage.scenes;
+		}
 		localStorage.scenes = JSON.stringify(scenelist);
+		if (scenelist.length<1)
+		{
+			delete localStorage.scenes;
+		}
 		//update scene menu
 		DisplaySceneMenu();
 	}
@@ -666,6 +750,10 @@ function HideSceneInfo()
 {
 	document.getElementById('dimmer').style.visibility = "hidden";
 	document.getElementById('Scene Info').style.visibility = "hidden";
+	if (scene.name != document.getElementById("scenename").value)
+	{
+		scene = JSON.parse(JSON.stringify(scene));
+	}
 	scene.name = document.getElementById("scenename").value;
 	refreshSceneData();
 }
