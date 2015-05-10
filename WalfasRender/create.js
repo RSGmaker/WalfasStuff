@@ -499,7 +499,6 @@ function refreshSceneData()
 		if (i < scene.parts.length-1)
 		{
 			part.innerHTML = '<div><a onclick="loadpart('+i+');" style="float:left;cursor: pointer;">Part '+(i+1)+'</a><div style="float:right"><img src="up.png" height="32" onclick="sceneshiftup('+i+')"></img><img src="down.png" height="32" onclick="sceneshiftdown('+i+')"></img><img src="trashcan.png" height="32" onclick="scenedelete('+i+')"></img></div></div>';
-			//part.innerHTML = '<div><a onclick="loadpart('+i+');" style="float:left;cursor: pointer;">Part '+(i+1)+'</a><div style="float:right"><img src="up.png" height="32" onclick="sceneshiftup('+i+')></img><img src="down.png" height="32" onclick="sceneshiftdown('+i+')"></img><img src="trashcan.png" height="32" onclick="scenedelete('+i+')"></img></div></div>';
 		}
 		else
 		{
@@ -795,7 +794,6 @@ function ImportImage()
 		count = count+1;
 		stg.appendChild(img);
 		initobject(img);
-		//stg.removeChild(document.getElementById('dme'));
 		}
 }
 function ImportDna()
@@ -815,12 +813,10 @@ function AddTextBubble(type)
 	NT.innerHTML='Double-click to edit Me!';
 	NT.setAttribute('contenteditable','false');
 	NT.style.backgroundSize = "100% 100%";
-	//NT.style.margin = "60px";
 	NT.style.textAlign="center";
 	if (type != 4)
 	{
 		NT.style.padding = "20px" 
-		//NT.style.paddingBottom = "40px";
 	}
 	
 	if (type == 1)
@@ -1203,12 +1199,11 @@ document.onkeydown = function(evt) {
 	if ((document.activeElement.contentEditable && document.activeElement == lobj) || document.activeElement.tagName == "INPUT")
 	{
 		//alert(""+document.activeElement);
-		//ret = true;
 		return true;
 	}
 	if (!(keyCode >= 16 && keyCode <= 18))
 	{
-	//alert(""+keyCode);
+		//alert(""+keyCode);
 	}
 	//make sure the main controls still fire so the zindex commands will still work.
 	keydown(evt);
@@ -1227,8 +1222,9 @@ function keydown(e)
 	{
 	ret = false;
 	}
-	//space
+	
 	var T = document.getElementById("stgmenu");
+	//space key
 	if (e.keyCode == 32)
 	{
 		if (T.style.visibility != "hidden")
@@ -1242,6 +1238,17 @@ function keydown(e)
 		
 		document.getElementById("scenemenu").style.visibility = T.style.visibility;
 	}
+	//insert key
+	if (e.keyCode == 45)
+	{
+		newcharacter();
+	}
+	//Q key
+	if (e.keyCode == 81)
+	{
+		newpart();
+	}
+	
 	//theater mode
 	if (T.style.visibility == "hidden")
 	{
@@ -1295,7 +1302,8 @@ function keydown(e)
 		{
 		if (e.shiftKey && !e.ctrlKey)
 		{
-			lobj.scale = lobj.scale * (1 + (X*0.1));
+			lobj.scale += (X * 0.01);
+			//lobj.scale = lobj.scale * (1 + (X*0.05));
 			lobj.style.WebkitTransform = "rotate("+lobj.rot+"deg) scaleX("+(lobj.scale*lobj.direction)+") scaleY("+lobj.scale+")";
 			lobj.style.transform = lobj.style.WebkitTransform;
 			lobj.style.MozTransform = lobj.style.WebkitTransform;
@@ -1314,6 +1322,42 @@ function keydown(e)
 		}
 		}
 		//lobj.style.left = 
+	}
+	//[ key
+	if (e.keyCode == 219)
+	{
+		var o = lobj.previousSibling;
+		if (isstageobject(o))
+		{
+			lobj = o;
+		}
+		/*var ind = stg.childNodes.indexOf(lobj);
+		if (ind > 0)
+		{
+			lobj = stg.childNodes[ind-1];
+		}*/
+	}
+	//] key
+	if (e.keyCode == 221)
+	{
+		var o = lobj.nextSibling;
+		if (isstageobject(o))
+		{
+			lobj = o;
+		}
+		/*
+		var ind = stg.childNodes.indexOf(lobj);
+		if (ind < stg.childNodes.length-1)
+		{
+			lobj = stg.childNodes[ind+1];
+		}*/
+	}
+	//R key
+	if (e.keyCode == 82)
+	{
+		lobj.alt = randomDNA();
+		resetobjectimage(lobj);
+		//newpart();
 	}
 	if (lobj.tagName=="DIV")
 	{
