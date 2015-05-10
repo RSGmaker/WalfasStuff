@@ -223,6 +223,7 @@ Create.html pre-alpha 0.04
 	<br/>
 	<br/>
 	<br/>
+	<br/>
 	<h2>
 	&nbsp;&nbsp;&nbsp;Scale:<input type="text" id="charoptionsscale" value="100" width="200px"/>X:<input type="text" id="charoptionsX"value="0" width="200px"/><br/>
 	Rotation:<input type="text" id="charoptionsRotation" value="0" width="200px"/>Y:<input type="text" id="charoptionsY" value="0" width="200px"/><br/>
@@ -242,9 +243,8 @@ Create.html pre-alpha 0.04
 	<div id="Background List" style="width:220px;height:390px;float: left;cursor: pointer;overflow:auto;">
 	</div>
 	<center>Location</center>
-	&nbsp;X:<input type="text" id="BGxpos" value="50%"/>Y:<input type="text" id="BGypos" value="0"/><br/>
-	<br/>
-	<center>Scale: <input type="text" id="BGscale" value="1" /></center><br/>
+	&nbsp;X:<input type="text" id="BGxpos" value="50%"/><br/>&nbsp;Y:<input type="text" id="BGypos" value="0"/>
+	<center>Scale: <input type="text" id="BGscale" value="1" /></center>
 	<img id="Background Preview" style="width:320px;float: right;"></img>
 	<div id="Background List" style="position:absolute; bottom:10;right:45; pointer;overflow:auto;">
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="HideBGOptions();" >&nbsp;&nbsp;Close&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -263,12 +263,12 @@ Create.html pre-alpha 0.04
 	<div id="DNA List" style="width:120px;height:200px;float: left;cursor: pointer;overflow:auto;border-style: solid;">
 	</div>
 	</div>
-	<div style="float:right;">
+	<div style="float:top;">
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="DeleteDNA();" >&nbsp;&nbsp;Delete&nbsp;&nbsp;</a>
 	<img id="DNA Preview" style="width:140px;"></img>
 	</div>
 	<div style="position:absolute; bottom:16;right:15;">
-	<div id="DNA Strand" style="border-style: solid;width:15em;overflow: hidden;" onclick="SetBGOptions();" ><center>[DNA strand]</center></div>
+	<div id="DNA Strand" style="border-style: solid;width:15em;height:1em;overflow: hidden;" onclick="SetBGOptions();" ><center>[DNA strand]</center></div>
 	
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="HideDNAMenu();" >&nbsp;&nbsp;Close&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="DNAMenuImport();" >&nbsp;&nbsp;Import&nbsp;&nbsp;</a>
