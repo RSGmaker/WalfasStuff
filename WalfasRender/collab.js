@@ -4,6 +4,11 @@
 	var channel = new DataChannel("CreateHtml_"+rid);
 	channel.onopen = function(userid) {
 		onlineusers = onlineusers + 1;
+		//prevent new users from blanking out others stages.
+		if (stg.innerHTML != "")
+		{
+			collabpush(getstate());
+		}
 		/*init();
 		if (me.role != "none")
 		{
@@ -19,7 +24,6 @@
 	}
 	channel.onmessage = function(message, userid,latency) {
 		//init();
-				 
 		/*var command = message;
 		var data;
 		if (message.indexOf("{\\}")){
@@ -58,12 +62,69 @@
 		}
 		if (data.command == "SetState")
 		{
-			setstate(JSON.parse(atob(data.state)));
+			setstate(JSON.parse(data.state));
+		}
+		if (data.command == "SetObject")
+		{
+			obj = document.getElementById(data.id);
+			if (obj == undefined || obj == null)
+			{
+				var img = document.createElement(data.tagName); 
+				//img.src = I;
+				var obj = img;
+		
+				//img.alt = "";
+				img.className = data.className;
+		
+	
+				stg.appendChild(img);
+				initobject(img);
+				obj.style = data.style;
+				img.id = data.id;
+				
+				
+			obj.direction = 1;
+			if (obj.scale<0)
+			{
+				obj.direction = -1;
+			}
+			
+			}
+			obj.setAttribute("style",data.style);
+			obj.scale = PFslice2(data.style,"scaleX(",")");
+			obj.rot = PFslice2(data.style,"rotate(",")");
+			obj.innerHTML = data.html;
+			
+			if (obj.alt != data.alt && data.alt != undefined)
+			{
+				obj.alt = data.alt;
+				resetobjectimage(obj);
+			}
+		}
+		if (data.command == "SetBG")
+		{
+			ChangeBackground(data.id,data.pos,data.size);
 		}
 	}
 	function collabpush(state)
 	{
-		var data = {command:"SetState",state:btoa(state)};
+		var data = {command:"SetState",state};
+		channel.send(JSON.stringify(data));
+	}
+	function collabchange(obj)
+	{
+		if (obj != null && obj != undefined)
+		{
+			if (obj.style != undefined && obj.style != null && obj.style != "")
+			{
+				var data = {command:"SetObject",id:obj.id,alt:obj.alt,style:obj.getAttribute("style"),className:obj.className,html:obj.innerHTML,tagName:obj.tagName};
+				channel.send(JSON.stringify(data));
+			}
+		}
+	}
+	function collabBG(index,position,size)
+	{
+		var data = {command:"SetBG",id:index,pos:position,size:size};
 		channel.send(JSON.stringify(data));
 	}
 			/*channel.onopen = oc.onopen;

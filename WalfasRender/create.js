@@ -167,26 +167,48 @@ function encodestage()
 }
 function loadstage(S)
 {
-	/*while (stg.firstChild) {
-		stg.removeChild(stg.firstChild);
-	}
-	if (S=="")
-	{
-		return;
-	}
-	S = atob(S);
-	var C = JSON.parse(S);
+	/*parser=new DOMParser();
+	xml=parser.parseFromString(S,"text/xml");
+	//var C = stg.childNodes;
 	var i = 0;
 	
-	while (i < C.length)
+	i = 0;
+	//detect removed elements.
+	while (i < stg.childNodes)
 	{
-		if (C[i].tagName == "IMG")
+		var C = xml.getElementById(stg.childNodes[i].id)
+		if (C == undefined || C == null)
 		{
-			C[i].setAttribute("src",imageSrcFromDNA(C[i].getAttribute("alt"),null,false,false));
+			stg.removeChild(stg.childNodes[i]);
+			i--;
 		}
-		stg.appendChild(C[i]);
+		i++;
+	}
+	i = 0;
+	while (i < xml.childNodes.length)
+	{
+		var T = xml.childNodes[i];
+		if (T.attributes != null && T.attributes.length>0)
+		{
+		var C = document.getElementById(T.id);
+		if (C == undefined || C == null)
+		{
+			C = document.createElement(T.tagName);
+			stg.appendChild(C);
+		}
+		{
+			var j = 0;
+			while (j < T.attributes.length)
+			{
+				C.setAttribute(T.attributes[j].name,T.attributes[j].value);
+				j++;
+			}
+		}
+		}
 		i++;
 	}*/
+	
+				
 	stg.innerHTML = S;
 	window.setTimeout(function(){
 
@@ -194,7 +216,8 @@ function loadstage(S)
 	var i = 0;
 	while (i < C.length)
 	{
-		if (C[i].tagName == "IMG")
+		resetobjectimage(C[i]);
+		/*if (C[i].tagName == "IMG")
 		{
 			//if (C[i].getAttribute("className" == "Character"))
 			var CN = C[i].className;
@@ -210,9 +233,25 @@ function loadstage(S)
 			{
 				C[i].setAttribute("src",C[i].getAttribute("alt"));
 			}
-		}
+		}*/
 		i++;
 	}}, 50);
+}
+function resetobjectimage(obj)
+{
+	var CN = obj.className;
+			if (CN == "Character")
+			{
+				obj.setAttribute("src",imageSrcFromDNA(obj.getAttribute("alt")));
+			}
+			else if (CN == "ObjectProp")
+			{
+				obj.setAttribute("src",imageSrcFromObject(parseInt(obj.getAttribute("alt")),1.0,false));
+			}
+			else if (CN == "ImportedAsset")
+			{
+				obj.setAttribute("src",obj.getAttribute("alt"));
+			}
 }
 function sceneClear()
 {
@@ -332,6 +371,7 @@ function loadpart(index)
 	bdy.style.backgroundSize = part.backgroundsize;*/
 	currentpart = index;
 	refreshSceneData();
+	pushstate();
 }
 //set scene menu data and list of parts.
 function refreshSceneList()
@@ -388,12 +428,12 @@ function ChangeBackground(index,position,size)
 	var I = null;
 	if (index > -1)
 	{
-	 I = imageSrcFromBackground(index,size / 200);
+	 I = imageSrcFromBackground(index,size / 300);
 	}
 	window.setTimeout(function(){
 	if (index > -1)
 	{
-	I = imageSrcFromBackground(index,size/200);
+	I = imageSrcFromBackground(index,size/300);
 	}
 		bdy.style.backgroundPosition = position;
 		bdy.style.backgroundRepeat = "no-repeat";
@@ -538,6 +578,7 @@ function SetCharacterOptions()
 	edittarget.style.WebkitTransform = "rotate("+edittarget.rot+"deg) scaleX("+(edittarget.scale*edittarget.direction)+") scaleY("+edittarget.scale+")";
 	edittarget.style.transform = edittarget.style.WebkitTransform;
 	edittarget.style.MozTransform = edittarget.style.WebkitTransform;
+	pushstate();
 }
 function DisplayCharacterOptions()
 {
@@ -646,6 +687,38 @@ function ClearStage()
 	while (stg.firstChild) {
 		stg.removeChild(stg.firstChild);
 	}
+}
+function AddTextBubble(type)
+{
+	var NT = document.createElement('DIV');
+	NT.innerHTML='Double-click to edit Me!';
+	NT.setAttribute('contenteditable','false');
+	NT.style.backgroundSize = "100% 100%";
+	//NT.style.margin = "60px";
+	
+	if (type == 1)
+	{
+		NT.style.backgroundImage = "url('speech.png')"
+	}
+	if (type == 2)
+	{
+		NT.style.backgroundImage = "url('thought.png')"
+	}
+	if (type == 3)
+	{
+		NT.style.backgroundImage = "url('box.png')"
+	}
+	if (type != 4)
+	{
+		NT.style.padding = "30px" 
+		NT.style.paddingBottom = "40px";
+	}
+	if (type == 5)
+	{
+		NT.style.backgroundImage = "url('action.png')"
+	}
+	stg.appendChild(NT);initobject(NT);
+	
 }
 function AddCharacter(dna,dble)
 {
@@ -962,6 +1035,18 @@ function doubleclick(e)
 		}
 	}
 }
+//a counter used to reduce typed message update spamming.
+var typecount=0;
+document.onkeyup = function(evt) {
+	if (lobj != null && lobj != undefined)
+	{
+		if (!lobj.contentEditable || typecount & 2>0)
+		{
+			pushstate();
+		}
+		typecount++;
+	}
+}
 document.onkeydown = function(evt) {
 	var ret = false;
 	try
@@ -1216,6 +1301,7 @@ function keydown(e)
 		var NT = document.createElement("DIV");
 		NT.innerHTML="Double-click to edit Me!";
 		NT.setAttribute("contentEditable","false");
+		NT.backgroundImage = "url(speech.png)";
 		stg.appendChild(NT);
 		initobject(NT);
 	}
@@ -1420,8 +1506,34 @@ function pushstate()
 	//sessionStorage[id] = state;
 	if (state != laststate)
 	{
+		//add undo state
 		history.pushState(state,"Create.html","");
-		collabpush(state);
+		
+		//collab features
+		if (collabpush)
+		{
+		if (laststate != "")
+		{
+			var LS = JSON.parse(laststate);
+			if (LS.BGImage != current_background || LS.BGpos != current_backgroundPosition || LS.BGsize != current_backgroundsize)
+			{
+				//update background data
+				collabBG(current_background,current_backgroundPosition,current_backgroundsize);
+			}
+			else if (LS.scene.name != scene.name || LS.currentpart != currentpart)
+			{
+				//update background and the entire scene & stage
+				collabpush(state);
+			}
+			else
+			{
+				//update selected object
+				collabchange(lobj);
+			}
+		}
+		
+		}
+		laststate = state;
 	}
 }
 function setstate(state)
