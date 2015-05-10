@@ -292,6 +292,7 @@ function sceneshiftdown(ind)
 			currentpart = -1;
 			loadpart(i);
 		}
+		PlaySound("Whoosh.mp3");
 	}
 }
 function sceneshiftup(ind)
@@ -307,6 +308,7 @@ function sceneshiftup(ind)
 			currentpart = -1;
 			loadpart(i);
 		}
+		PlaySound("Whoosh.mp3");
 	}
 }
 function scenedelete(ind)
@@ -321,6 +323,7 @@ function scenedelete(ind)
 		loadpart(currentpart-1);
 	}
 	refreshSceneData();
+	PlaySound("Death.mp3");
 	/*if (ind > 0)
 	{
 		var T = scene.parts[ind-1];
@@ -1110,7 +1113,25 @@ function LoadPreset()
 	var d = "NULL:"+elt.options[elt.selectedIndex].value;
 	AddCharacter(d,true);
 }
-
+//returns null if this element isn't part of the stage in any way
+//if it is part of the stage it returns the topmost parent element.
+function getstageobject(obj)
+{
+	var T = obj;
+	while (true)
+	{
+		if (T == null || T == undefined)
+		{
+			return null;
+		}
+		if (isstageobject(T))
+		{
+			return T;
+		}
+		T = T.parentNode;
+	}
+	return null;
+}
 //determines if the element is a valid object owned by the stage.
 //make sure to check this before manipulating an object otherwise the user will be able to mess up menus and other things.
 function isstageobject(obj)
@@ -1472,7 +1493,13 @@ function initobject(obj)
 }
 function mousedown(e)
 {
-if (!isstageobject(e.target))
+	var ET = getstageobject(e.target);
+	//e.target = 
+	if (ET == null)
+	{
+		return;
+	}
+/*if (!isstageobject(e.target))
 	{
 		if (isstageobject(e.target.parentNode))
 		{
@@ -1483,19 +1510,19 @@ if (!isstageobject(e.target))
 			lobj=null;
 			return;
 		}
-	}
+	}*/
 x=e.clientX;
 y=e.clientY;
 mode = 1;
 //alert(""+e.target.tagName)
 ox = 0;
 oy = 0;
-if (typeof e.target === "undefined" || e.target == stg || e.target == bdy)
+if (typeof ET === "undefined" || ET == stg || ET == bdy)
 {
 }
 else
 {
-tobj = e.target;
+tobj = ET;
 lobj = tobj;
 if (typeof tobj.scale === "undefined")
 {
@@ -1537,7 +1564,7 @@ if (e.ctrlKey==1 && e.shiftKey==1)
 	oy = y;
 }
 
-return e.target.tagName!='IMG';
+return ET.tagName!='IMG';
 //return false;
 }
 function mousemove(e)
