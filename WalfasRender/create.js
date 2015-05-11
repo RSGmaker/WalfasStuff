@@ -20,6 +20,7 @@ var toload = 0;
 var imgs = new Array();
 var scenelist;
 var dnalist;
+var hotkeys;
 var bdy = document.getElementById('body');
 document.body.style.backgroundColor = "white";
 var stg = document.getElementById('stage');
@@ -31,6 +32,38 @@ var offlinemode = false;
 var currentDNA = -1;
 var laststate="";
 var Sounds = {};
+//should be implemented part of preferences menu instead, once that gets made.
+function seteyehotkeys()
+{
+	var i = 0;
+	while (i < 10)
+	{
+		var s = prompt("Choose an eye prop to use when you press "+i,""+hotkeys.eye[i]);
+		var t = parseInt(s);
+		if (!isNaN(t))
+		{
+			hotkeys.eye[i] = t;
+		}
+		i++;
+	}
+	localStorage.hotkeys = JSON.stringify(hotkeys);
+}
+//should be implemented part of preferences menu instead, once that gets made.
+function setmouthhotkeys()
+{
+	var i = 0;
+	while (i < 10)
+	{
+		var s = prompt("Choose an mouth prop to use when you press numpad"+i,""+hotkeys.mouth[i]);
+		var t = parseInt(s);
+		if (!isNaN(t))
+		{
+			hotkeys.mouth[i] = t;
+		}
+		i++;
+	}
+	localStorage.hotkeys = JSON.stringify(hotkeys);
+}
 function PlaySound(url){
 		var S = GetSound(url);
 		S.play();
@@ -1248,6 +1281,35 @@ function keydown(e)
 		newpart();
 	}
 	
+	//T key
+	if (e.keyCode == 84)
+	{
+		//AddTextBubble(4);
+		
+		//using alt instead of control because control-t in browsers can mean to open a new tab.
+		if (!e.shiftKey && !e.altKey)
+		{
+			AddTextBubble(1);
+		}
+		else if (e.shiftKey && !e.altKey)
+		{
+			AddTextBubble(2);
+		}
+		else if (!e.shiftKey && e.altKey)
+		{
+			AddTextBubble(3);
+		}
+		else if (e.shiftKey && e.altKey)
+		{
+			AddTextBubble(5);
+		}
+		/*else if (e.altKey)
+		{
+			AddTextBubble(4);
+		}*/
+		
+	}
+	
 	//theater mode
 	if (T.style.visibility == "hidden")
 	{
@@ -1271,6 +1333,41 @@ function keydown(e)
 	if (!isstageobject(lobj))
 	{
 		return ret;
+	}
+	if (lobj.className == "Character")
+	{
+		//R key
+		if (e.keyCode == 82)
+		{
+			lobj.alt = randomDNA();
+			resetobjectimage(lobj);
+		}
+		var hotkey=-1;
+		var type = 0;
+		//number keys
+		if (e.keyCode >= 48 && e.keyCode <= 57)
+		{
+			hotkey = e.keyCode-48;
+			type = 1;
+		}
+		//numpad number keys
+		if (e.keyCode >= 96 && e.keyCode <= 105)
+		{
+			hotkey = e.keyCode-96;
+			type = 2;
+		}
+		//set character's eyes
+		if (type == 1)
+		{
+			lobj.alt = editdna(lobj.alt,8,hotkeys.eye[hotkey]);
+			resetobjectimage(lobj);
+		}
+		//set character's mouth
+		if (type == 2)
+		{
+			lobj.alt = editdna(lobj.alt,9,hotkeys.mouth[hotkey]);
+			resetobjectimage(lobj);
+		}
 	}
 	if (T.style.visibility != "hidden")
 	{
@@ -1351,13 +1448,7 @@ function keydown(e)
 			lobj = stg.childNodes[ind+1];
 		}*/
 	}
-	//R key
-	if (e.keyCode == 82)
-	{
-		lobj.alt = randomDNA();
-		resetobjectimage(lobj);
-		//newpart();
-	}
+	
 	if (lobj.tagName=="DIV")
 	{
 		if (lobj.getAttribute("contentEditable")=="true")
@@ -1466,7 +1557,21 @@ function keydown(e)
 	//F key
 	if (e.keyCode == 70)
 	{
-		//if (typeof lobj.dir === "undefined")
+		/*if (lobj.tagName == "DIV")
+		{
+			if (lobj.style.backgroundSize == "100% 100%")
+			{
+				lobj.style.backgroundSize = "-100% 100%"
+				lobj.style.backgroundPosition = "100% 0";
+			}
+			else
+			{
+				lobj.style.backgroundSize = "100% 100%";
+				lobj.style.backgroundPosition = "0 0";
+			}
+		}
+		else*/
+		{
 		if (lobj.direction == 1)
 		{
 			lobj.direction = -1;
@@ -1479,19 +1584,10 @@ function keydown(e)
 		lobj.style.WebkitTransform = "rotate("+lobj.rot+"deg) scaleX("+(lobj.scale*lobj.direction)+") scaleY("+lobj.scale+")";
 		lobj.style.transform = lobj.style.WebkitTransform;
 		lobj.style.MozTransform = lobj.style.WebkitTransform;
+		}
 		pushstate();
 	}
-	//T key
-	if (e.keyCode == 84)
-	{
-		AddTextBubble(4);
-		/*var NT = document.createElement("DIV");
-		NT.innerHTML="Double-click to edit Me!";
-		NT.setAttribute("contentEditable","false");
-		NT.backgroundImage = "url(speech.png)";
-		stg.appendChild(NT);
-		initobject(NT);*/
-	}
+	
 	//+ key
 	if (e.keyCode == 107)
 	{
@@ -1950,6 +2046,14 @@ if (localStorage.dnas == undefined)
 else
 {
 	dnalist = JSON.parse(localStorage.dnas);
+}
+if (localStorage.hotkeys == undefined)
+{
+	hotkeys = {eye:[0,1,2,3,4,5,6,7,8,9],mouth:[0,1,2,3,4,5,6,7,8,9]};
+}
+else
+{
+	hotkeys = JSON.parse(localStorage.hotkeys);
 }
 document.getElementById("BGscale").value = "" +((window.innerHeight*1.25) / 400);
 if (window.location.href.indexOf("file://")==0)
