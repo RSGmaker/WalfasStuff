@@ -597,6 +597,10 @@ function BGChangeBG(index,scale)
 {
 	var B = document.getElementById("Background Preview");
 	var I=null;
+	if (index == -1)
+	{
+		index = Math.floor(Math.random() * 218);
+	}
 	BG_menuSelection = index;
 	if (index > -1)
 	{
