@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>
-Create.html pre-alpha 0.03
+Create.html pre-alpha 0.04
 </title>
 <link rel="stylesheet" type="text/css" href="create.css">
 </head>
@@ -20,7 +20,10 @@ Create.html pre-alpha 0.03
 						<li>
 							<p>Options</p>
 							<ul>
-								<li><p>(you can load custom dnas by clicking on the clone capsule.)</p></li>
+								<li><p onclick="alert('Not implemented');"><strike>Preferences</strike></p></li>
+								<li><p onclick="seteyehotkeys();">Change eye hotkeys</p></li>
+								<li><p onclick="setmouthhotkeys();">Change mouth hotkeys</p></li>
+								<li><p onclick="startcollab();">Collab</p></li>
 							</ul>
 						</li>
 						<li>
@@ -33,18 +36,18 @@ Create.html pre-alpha 0.03
 								</li>
 								<li><p>Bubble</p>
 								<ul>
-								<li><p>Speech</p></li>
-								<li><p>Thought</p></li>
-								<li><p>Box</p></li>
-								<li><p onclick="var NT = document.createElement('DIV');NT.innerHTML='Double-click to edit Me!';NT.setAttribute('contenteditable','false');stg.appendChild(NT);initobject(NT);">Floating</p></li>
-								<li><p>Action</p></li>
+								<li><p onclick="AddTextBubble(1);">Speech</p></li>
+								<li><p onclick="AddTextBubble(2);">Thought</p></li>
+								<li><p onclick="AddTextBubble(3);">Box</p></li>
+								<li><p onclick="AddTextBubble(4);">Floating</p></li>
+								<li><p onclick="AddTextBubble(5);">Action</p></li>
 							</ul>
 								</li>
 								<li><p onclick="ImportImage();">Image</p></li>
 							</ul>
 						</li>
 						<li>
-							<p>Global Locks</p>
+							<p><strike>Global Locks</strike></p>
 							<ul>
 								<li><p>Mouth<input type="checkbox" id="lock_mouth"/></p></li>
 								<li><p>Eyes<input type="checkbox" id="lock_eyes"/></p></li>
@@ -65,8 +68,8 @@ Create.html pre-alpha 0.03
 							<ul>
 								<li><p onclick="ClearStage();">Clear</p></li>
 								<li><p onclick="RandomizeAll();">Randomize All</p></li>
-								<li><p>Scramble!</p></li>
-								<li><p>Shrink</p></li>
+								<li><p><strike>Scramble!</strike></p></li>
+								<li><p><strike>Shrink</strike></p></li>
 							</ul>
 						</li>
 						<li>
@@ -78,11 +81,11 @@ Create.html pre-alpha 0.03
 						<li>
 							<p>Toys</p>
 							<ul>
-								<li><p>Mysterious gap</p></li>
+								<li><p><strike>Mysterious gap</strike></p></li>
 								<li onmousedown="ImportDna();"><p>Clone capsule</p></li>
-								<li><p>Boxing chen</p></li>
-								<li><p>Gravity well</p></li>
-								<li><p>Grouchy reimu</p></li>
+								<li><p><strike>Boxing chen</strike></p></li>
+								<li><p><strike>Gravity well</strike></p></li>
+								<li><p><strike>Grouchy reimu</strike></p></li>
 							</ul>
 						</li>
 						<li>
@@ -199,7 +202,7 @@ Create.html pre-alpha 0.03
 	<br/>
 	<div style="width:155px;float: left;cursor: pointer;">
 	<br/>
-	<a>Randomize</a><br/>
+	<a onclick="dna=randomDNA();UpdateCharacterOptions();">Randomize</a><br/>
 	<a>Lock All</a><br/>
 	<a>Unlock All</a><br/>
 	<a>Horizontal Flip</a><br/>
@@ -211,6 +214,7 @@ Create.html pre-alpha 0.03
 	<div style="float: left;">
 	
 	</div>
+	<br/>
 	<br/>
 	<br/>
 	<br/>
@@ -241,9 +245,8 @@ Create.html pre-alpha 0.03
 	<div id="Background List" style="width:220px;height:390px;float: left;cursor: pointer;overflow:auto;">
 	</div>
 	<center>Location</center>
-	&nbsp;X:<input type="text" id="BGxpos" value="50%"/>Y:<input type="text" id="BGypos" value="0"/><br/>
-	<br/>
-	<center>Scale: <input type="text" id="BGscale" value="1" /></center><br/>
+	&nbsp;X:<input type="text" id="BGxpos" value="50%"/><br/>&nbsp;Y:<input type="text" id="BGypos" value="0"/>
+	<center>Scale: <input type="text" id="BGscale" value="1" /></center>
 	<img id="Background Preview" style="width:320px;float: right;"></img>
 	<div id="Background List" style="position:absolute; bottom:10;right:45; pointer;overflow:auto;">
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="HideBGOptions();" >&nbsp;&nbsp;Close&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -262,12 +265,12 @@ Create.html pre-alpha 0.03
 	<div id="DNA List" style="width:120px;height:200px;float: left;cursor: pointer;overflow:auto;border-style: solid;">
 	</div>
 	</div>
-	<div style="float:right;">
+	<div style="float:top;">
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="DeleteDNA();" >&nbsp;&nbsp;Delete&nbsp;&nbsp;</a>
 	<img id="DNA Preview" style="width:140px;"></img>
 	</div>
 	<div style="position:absolute; bottom:16;right:15;">
-	<div id="DNA Strand" style="border-style: solid;width:15em;overflow: hidden;" onclick="SetBGOptions();" ><center>[DNA strand]</center></div>
+	<div id="DNA Strand" style="border-style: solid;width:15em;height:1em;overflow: hidden;" onclick="SetBGOptions();" ><center>[DNA strand]</center></div>
 	
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="HideDNAMenu();" >&nbsp;&nbsp;Close&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<a style="border-style: solid;cursor: pointer;" width="100px" onclick="DNAMenuImport();" >&nbsp;&nbsp;Import&nbsp;&nbsp;</a>
@@ -282,4 +285,6 @@ Create.html pre-alpha 0.03
 <script src="drawwalfas.js"></script>
 <script src="create.js"></script>
 <script src="create_data.js"></script>
+<script src="DataChannel.js"> </script>
+<script src="collab.js"></script>
 </html>

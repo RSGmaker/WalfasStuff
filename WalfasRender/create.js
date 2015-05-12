@@ -20,6 +20,7 @@ var toload = 0;
 var imgs = new Array();
 var scenelist;
 var dnalist;
+var hotkeys;
 var bdy = document.getElementById('body');
 document.body.style.backgroundColor = "white";
 var stg = document.getElementById('stage');
@@ -29,6 +30,60 @@ var current_backgroundsize = 0;
 var current_backgroundPosition = "50% 0px";
 var offlinemode = false;
 var currentDNA = -1;
+var laststate="";
+var Sounds = {};
+//should be implemented part of preferences menu instead, once that gets made.
+function seteyehotkeys()
+{
+	var i = 0;
+	while (i < 10)
+	{
+		var s = prompt("Choose an eye prop to use when you press "+i,""+hotkeys.eye[i]);
+		var t = parseInt(s);
+		if (!isNaN(t))
+		{
+			hotkeys.eye[i] = t;
+		}
+		i++;
+	}
+	localStorage.hotkeys = JSON.stringify(hotkeys);
+}
+//should be implemented part of preferences menu instead, once that gets made.
+function setmouthhotkeys()
+{
+	var i = 0;
+	while (i < 10)
+	{
+		var s = prompt("Choose an mouth prop to use when you press numpad"+i,""+hotkeys.mouth[i]);
+		var t = parseInt(s);
+		if (!isNaN(t))
+		{
+			hotkeys.mouth[i] = t;
+		}
+		i++;
+	}
+	localStorage.hotkeys = JSON.stringify(hotkeys);
+}
+function PlaySound(url){
+		var S = GetSound(url);
+		S.play();
+		return S;
+	}
+	function GetSound(url){
+		if (typeof Sounds[url] != 'undefined')
+		{
+			return Sounds[url];
+		}
+		else
+		{
+			var S;
+			S = new Audio();
+			S.src = url;
+			S.volume=0.35;
+			Sounds[url] = S;
+			return S;
+		}
+	}
 function addEventHandler(obj, evt, handler) {
     if(obj.addEventListener) {
         // W3C method
@@ -166,26 +221,48 @@ function encodestage()
 }
 function loadstage(S)
 {
-	/*while (stg.firstChild) {
-		stg.removeChild(stg.firstChild);
-	}
-	if (S=="")
-	{
-		return;
-	}
-	S = atob(S);
-	var C = JSON.parse(S);
+	/*parser=new DOMParser();
+	xml=parser.parseFromString(S,"text/xml");
+	//var C = stg.childNodes;
 	var i = 0;
 	
-	while (i < C.length)
+	i = 0;
+	//detect removed elements.
+	while (i < stg.childNodes)
 	{
-		if (C[i].tagName == "IMG")
+		var C = xml.getElementById(stg.childNodes[i].id)
+		if (C == undefined || C == null)
 		{
-			C[i].setAttribute("src",imageSrcFromDNA(C[i].getAttribute("alt"),null,false,false));
+			stg.removeChild(stg.childNodes[i]);
+			i--;
 		}
-		stg.appendChild(C[i]);
+		i++;
+	}
+	i = 0;
+	while (i < xml.childNodes.length)
+	{
+		var T = xml.childNodes[i];
+		if (T.attributes != null && T.attributes.length>0)
+		{
+		var C = document.getElementById(T.id);
+		if (C == undefined || C == null)
+		{
+			C = document.createElement(T.tagName);
+			stg.appendChild(C);
+		}
+		{
+			var j = 0;
+			while (j < T.attributes.length)
+			{
+				C.setAttribute(T.attributes[j].name,T.attributes[j].value);
+				j++;
+			}
+		}
+		}
 		i++;
 	}*/
+	
+				
 	stg.innerHTML = S;
 	window.setTimeout(function(){
 
@@ -193,7 +270,8 @@ function loadstage(S)
 	var i = 0;
 	while (i < C.length)
 	{
-		if (C[i].tagName == "IMG")
+		resetobjectimage(C[i]);
+		/*if (C[i].tagName == "IMG")
 		{
 			//if (C[i].getAttribute("className" == "Character"))
 			var CN = C[i].className;
@@ -209,14 +287,88 @@ function loadstage(S)
 			{
 				C[i].setAttribute("src",C[i].getAttribute("alt"));
 			}
-		}
+		}*/
 		i++;
 	}}, 50);
+}
+function resetobjectimage(obj)
+{
+	var CN = obj.className;
+			if (CN == "Character")
+			{
+				obj.setAttribute("src",imageSrcFromDNA(obj.getAttribute("alt")));
+			}
+			else if (CN == "ObjectProp")
+			{
+				obj.setAttribute("src",imageSrcFromObject(parseInt(obj.getAttribute("alt")),1.0,false));
+			}
+			else if (CN == "ImportedAsset")
+			{
+				obj.setAttribute("src",obj.getAttribute("alt"));
+			}
 }
 function sceneClear()
 {
 	ClearStage();
 	bdy.style.backgroundImage = null;
+}
+function sceneshiftdown(ind)
+{
+	if (ind < scene.parts.length-1)
+	{
+		var T = scene.parts[ind];
+		scene.parts[ind] = scene.parts[ind+1];
+		scene.parts[ind+1] = T;
+		if (currentpart == ind || currentpart == ind+1)
+		{
+			var i = currentpart;
+			currentpart = -1;
+			loadpart(i);
+		}
+		PlaySound("Whoosh.mp3");
+	}
+}
+function sceneshiftup(ind)
+{
+	if (ind > 0)
+	{
+		var T = scene.parts[ind-1];
+		scene.parts[ind-1] = scene.parts[ind];
+		scene.parts[ind] = T;
+		if (currentpart == ind || currentpart == ind-1)
+		{
+			var i = currentpart;
+			currentpart = -1;
+			loadpart(i);
+		}
+		PlaySound("Whoosh.mp3");
+	}
+}
+function scenedelete(ind)
+{
+	if (scene.parts.length<2)
+	{
+		return;
+	}
+	scene.parts.splice(ind, 1);
+	if (currentpart >= ind)
+	{
+		loadpart(currentpart-1);
+	}
+	refreshSceneData();
+	PlaySound("Death.mp3");
+	/*if (ind > 0)
+	{
+		var T = scene.parts[ind-1];
+		scene.parts[ind-1] = scene.parts[ind];
+		scene.parts[ind] = T;
+		if (currentpart == ind || currentpart == ind-1)
+		{
+			var i = currentpart;
+			currentpart = -1;
+			loadpart(i);
+		}
+	}*/
 }
 function loadscene(scenename)
 {
@@ -283,6 +435,7 @@ function saveScene()
 	}*/
 	localStorage.scenes = JSON.stringify(scenelist);
 	refreshSceneList();
+	PlaySound("MenuSelect.mp3");
 }
 
 function savepart()
@@ -298,7 +451,7 @@ function loadpart(index)
 		return;
 	}
 	var part = scene.parts[index];
-	current_background = index;
+	current_background = part.background;
 	current_backgroundsize = part.backgroundsize;
 	current_backgroundPosition = part.backgroundPosition;
 	
@@ -331,6 +484,7 @@ function loadpart(index)
 	bdy.style.backgroundSize = part.backgroundsize;*/
 	currentpart = index;
 	refreshSceneData();
+	pushstate();
 }
 //set scene menu data and list of parts.
 function refreshSceneList()
@@ -369,12 +523,20 @@ function refreshSceneData()
 	var i = 1;
 	//this is out of the loop to force a part 1 to always be visible.
 	var part = document.createElement("li");
-	part.innerHTML = '<p onclick="loadpart('+0+');">Part 1</p>';
+	//part.innerHTML = '<p onclick="loadpart('+0+');">Part 1</p>';
+	part.innerHTML = '<div><a onclick="loadpart('+0+');" style="float:left;cursor: pointer;">Part 1</a><div style="float:right"><img src="down.png" height="32" onclick="sceneshiftdown(0)"></img><img src="trashcan.png" height="32" onclick="scenedelete('+0+')"></img></div></div>';
 	parts.appendChild(part);
 	while (i < scene.parts.length)
 	{
 		part = document.createElement("li");
-		part.innerHTML = '<p onclick="loadpart('+i+');">Part '+(i+1)+'</p>';
+		if (i < scene.parts.length-1)
+		{
+			part.innerHTML = '<div><a onclick="loadpart('+i+');" style="float:left;cursor: pointer;">Part '+(i+1)+'</a><div style="float:right"><img src="up.png" height="32" onclick="sceneshiftup('+i+')"></img><img src="down.png" height="32" onclick="sceneshiftdown('+i+')"></img><img src="trashcan.png" height="32" onclick="scenedelete('+i+')"></img></div></div>';
+		}
+		else
+		{
+			part.innerHTML = '<div><a onclick="loadpart('+i+');" style="float:left;cursor: pointer;">Part '+(i+1)+'</a><div style="float:right"><img src="up.png" height="32" onclick="sceneshiftup('+i+')"></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="trashcan.png" height="32" onclick="scenedelete('+i+')"></img></div></div>';
+		}
 		parts.appendChild(part);
 		i++;
 	}
@@ -387,12 +549,12 @@ function ChangeBackground(index,position,size)
 	var I = null;
 	if (index > -1)
 	{
-	 I = imageSrcFromBackground(index,size / 200);
+	 I = imageSrcFromBackground(index,size / 300);
 	}
 	window.setTimeout(function(){
 	if (index > -1)
 	{
-	I = imageSrcFromBackground(index,size/200);
+	I = imageSrcFromBackground(index,size/300);
 	}
 		bdy.style.backgroundPosition = position;
 		bdy.style.backgroundRepeat = "no-repeat";
@@ -435,6 +597,10 @@ function BGChangeBG(index,scale)
 {
 	var B = document.getElementById("Background Preview");
 	var I=null;
+	if (index == -1)
+	{
+		index = Math.floor(Math.random() * 218);
+	}
 	BG_menuSelection = index;
 	if (index > -1)
 	{
@@ -456,8 +622,11 @@ function SceneMenuUpdate()
 	var S = scenelist[name];
 	var P = document.getElementById("Scene Menu Parts");
 	//P.innerHTML = "Parts: " + S.parts.length +"<br/>" + "Total usage:"+getsize("scenes")+" of " + getsize(localStorage.maxstorage);
-	P.innerHTML = "Parts: " + S.parts.length +"<br/>" + "Remaining space:"+formatsize(localStorage.maxstorage-getsize());
 	var D = document.getElementById("Scene Menu Preview");
+	if (S != null && S != undefined)
+	{
+	P.innerHTML = "Parts: " + S.parts.length +"<br/>" + "Remaining space:"+formatsize(localStorage.maxstorage-getsize());
+	
 	var part = S.parts[0];
 	//D.innerHTML = part.stage;
 	
@@ -471,6 +640,12 @@ function SceneMenuUpdate()
 		D.style.backgroundPosition = "top";
 		D.style.backgroundRepeat = "no-repeat";
 		D.style.backgroundSize = part.backgroundsize+"px";}, 50);
+	}
+	else
+	{
+		P.innerHTML = "Parts:?";
+		D.style.backgroundImage = null;
+	}
 		
 	/*D.style.backgroundImage = part.background;
 	D.style.backgroundPosition = "top";
@@ -484,8 +659,27 @@ function SceneMenuDelete()
 	var name=L.options[L.selectedIndex].value;
 	if (confirm("Delete the scene:"+name+"?"))
 	{
-		delete scenelist[name];
+		var dname = name;
+		var list = Object.keys(scenelist);
+		var i = 0;
+		while (i < list.length)
+		{
+			if (scenelist[list[i]].name == name)
+			{
+				dname = list[i];
+			}
+			i++;
+		}
+		delete scenelist[dname];
+		if (scenelist.length<1)
+		{
+			delete localStorage.scenes;
+		}
 		localStorage.scenes = JSON.stringify(scenelist);
+		if (scenelist.length<1)
+		{
+			delete localStorage.scenes;
+		}
 		//update scene menu
 		DisplaySceneMenu();
 	}
@@ -537,6 +731,7 @@ function SetCharacterOptions()
 	edittarget.style.WebkitTransform = "rotate("+edittarget.rot+"deg) scaleX("+(edittarget.scale*edittarget.direction)+") scaleY("+edittarget.scale+")";
 	edittarget.style.transform = edittarget.style.WebkitTransform;
 	edittarget.style.MozTransform = edittarget.style.WebkitTransform;
+	pushstate();
 }
 function DisplayCharacterOptions()
 {
@@ -594,6 +789,10 @@ function HideSceneInfo()
 {
 	document.getElementById('dimmer').style.visibility = "hidden";
 	document.getElementById('Scene Info').style.visibility = "hidden";
+	if (scene.name != document.getElementById("scenename").value)
+	{
+		scene = JSON.parse(JSON.stringify(scene));
+	}
 	scene.name = document.getElementById("scenename").value;
 	refreshSceneData();
 }
@@ -632,7 +831,6 @@ function ImportImage()
 		count = count+1;
 		stg.appendChild(img);
 		initobject(img);
-		//stg.removeChild(document.getElementById('dme'));
 		}
 }
 function ImportDna()
@@ -645,6 +843,40 @@ function ClearStage()
 	while (stg.firstChild) {
 		stg.removeChild(stg.firstChild);
 	}
+}
+function AddTextBubble(type)
+{
+	var NT = document.createElement('DIV');
+	NT.innerHTML='Double-click to edit Me!';
+	NT.setAttribute('contenteditable','false');
+	NT.style.backgroundSize = "100% 100%";
+	NT.style.textAlign="center";
+	if (type != 4)
+	{
+		NT.style.padding = "20px" 
+	}
+	
+	if (type == 1)
+	{
+		NT.style.backgroundImage = "url('speech.png')"
+		NT.style.paddingBottom = "25px";
+	}
+	if (type == 2)
+	{
+		NT.style.backgroundImage = "url('thought.png')"
+		NT.style.paddingBottom = "25px";
+	}
+	if (type == 3)
+	{
+		NT.style.backgroundImage = "url('box.png')"
+	}
+	
+	if (type == 5)
+	{
+		NT.style.backgroundImage = "url('action.png')"
+	}
+	stg.appendChild(NT);initobject(NT);
+	
 }
 function AddCharacter(dna,dble)
 {
@@ -914,12 +1146,30 @@ function LoadPreset()
 	var d = "NULL:"+elt.options[elt.selectedIndex].value;
 	AddCharacter(d,true);
 }
-
+//returns null if this element isn't part of the stage in any way
+//if it is part of the stage it returns the topmost parent element.
+function getstageobject(obj)
+{
+	var T = obj;
+	while (true)
+	{
+		if (T == null || T == undefined)
+		{
+			return null;
+		}
+		if (isstageobject(T))
+		{
+			return T;
+		}
+		T = T.parentNode;
+	}
+	return null;
+}
 //determines if the element is a valid object owned by the stage.
 //make sure to check this before manipulating an object otherwise the user will be able to mess up menus and other things.
 function isstageobject(obj)
 {
-	if (obj != null && obj.parentNode == stg || obj.parentNode.parentNode == stg)
+	if (obj != null && obj.parentNode == stg /*|| obj.parentNode.parentNode == stg*/)
 	{
 		return true;
 	}
@@ -936,8 +1186,7 @@ function mo(e)
 var dna="";
 function doubleclick(e)
 {
-
-	if (isstageobject(lobj))
+	if (isstageobject(lobj) && getstageobject(e.target) == lobj)
 	{
 		if (lobj.tagName=="DIV")
 		{
@@ -950,7 +1199,7 @@ function doubleclick(e)
 		{
 			lobj.setAttribute("contentEditable","true");
 			//let the user know the text box can now be editted
-			lobj.style.border = "solid #000000";
+			lobj.style.border = "dashed #000000";
 		}
 		}
 		if (lobj.className == "Character")
@@ -959,6 +1208,18 @@ function doubleclick(e)
 			dna = lobj.alt;
 			DisplayCharacterOptions();
 		}
+	}
+}
+//a counter used to reduce typed message update spamming.
+var typecount=0;
+document.onkeyup = function(evt) {
+	if (lobj != null && lobj != undefined)
+	{
+		if (!lobj.contentEditable || typecount & 2>0)
+		{
+			pushstate();
+		}
+		typecount++;
 	}
 }
 document.onkeydown = function(evt) {
@@ -974,12 +1235,11 @@ document.onkeydown = function(evt) {
 	if ((document.activeElement.contentEditable && document.activeElement == lobj) || document.activeElement.tagName == "INPUT")
 	{
 		//alert(""+document.activeElement);
-		//ret = true;
 		return true;
 	}
 	if (!(keyCode >= 16 && keyCode <= 18))
 	{
-	//alert(""+keyCode);
+		//alert(""+keyCode);
 	}
 	//make sure the main controls still fire so the zindex commands will still work.
 	keydown(evt);
@@ -998,8 +1258,9 @@ function keydown(e)
 	{
 	ret = false;
 	}
-	//space
+	
 	var T = document.getElementById("stgmenu");
+	//space key
 	if (e.keyCode == 32)
 	{
 		if (T.style.visibility != "hidden")
@@ -1013,6 +1274,46 @@ function keydown(e)
 		
 		document.getElementById("scenemenu").style.visibility = T.style.visibility;
 	}
+	//insert key
+	if (e.keyCode == 45)
+	{
+		newcharacter();
+	}
+	//Q key
+	if (e.keyCode == 81)
+	{
+		newpart();
+	}
+	
+	//T key
+	if (e.keyCode == 84)
+	{
+		//AddTextBubble(4);
+		
+		//using alt instead of control because control-t in browsers can mean to open a new tab.
+		if (!e.shiftKey && !e.altKey)
+		{
+			AddTextBubble(1);
+		}
+		else if (e.shiftKey && !e.altKey)
+		{
+			AddTextBubble(2);
+		}
+		else if (!e.shiftKey && e.altKey)
+		{
+			AddTextBubble(3);
+		}
+		else if (e.shiftKey && e.altKey)
+		{
+			AddTextBubble(5);
+		}
+		/*else if (e.altKey)
+		{
+			AddTextBubble(4);
+		}*/
+		
+	}
+	
 	//theater mode
 	if (T.style.visibility == "hidden")
 	{
@@ -1036,6 +1337,41 @@ function keydown(e)
 	if (!isstageobject(lobj))
 	{
 		return ret;
+	}
+	if (lobj.className == "Character")
+	{
+		//R key
+		if (e.keyCode == 82)
+		{
+			lobj.alt = randomDNA();
+			resetobjectimage(lobj);
+		}
+		var hotkey=-1;
+		var type = 0;
+		//number keys
+		if (e.keyCode >= 48 && e.keyCode <= 57)
+		{
+			hotkey = e.keyCode-48;
+			type = 1;
+		}
+		//numpad number keys
+		if (e.keyCode >= 96 && e.keyCode <= 105)
+		{
+			hotkey = e.keyCode-96;
+			type = 2;
+		}
+		//set character's eyes
+		if (type == 1)
+		{
+			lobj.alt = editdna(lobj.alt,8,hotkeys.eye[hotkey]);
+			resetobjectimage(lobj);
+		}
+		//set character's mouth
+		if (type == 2)
+		{
+			lobj.alt = editdna(lobj.alt,9,hotkeys.mouth[hotkey]);
+			resetobjectimage(lobj);
+		}
 	}
 	if (T.style.visibility != "hidden")
 	{
@@ -1066,7 +1402,8 @@ function keydown(e)
 		{
 		if (e.shiftKey && !e.ctrlKey)
 		{
-			lobj.scale = lobj.scale * (1 + (X*0.1));
+			lobj.scale += (X * 0.01);
+			//lobj.scale = lobj.scale * (1 + (X*0.05));
 			lobj.style.WebkitTransform = "rotate("+lobj.rot+"deg) scaleX("+(lobj.scale*lobj.direction)+") scaleY("+lobj.scale+")";
 			lobj.style.transform = lobj.style.WebkitTransform;
 			lobj.style.MozTransform = lobj.style.WebkitTransform;
@@ -1086,6 +1423,36 @@ function keydown(e)
 		}
 		//lobj.style.left = 
 	}
+	//[ key
+	if (e.keyCode == 219)
+	{
+		var o = lobj.previousSibling;
+		if (isstageobject(o))
+		{
+			lobj = o;
+		}
+		/*var ind = stg.childNodes.indexOf(lobj);
+		if (ind > 0)
+		{
+			lobj = stg.childNodes[ind-1];
+		}*/
+	}
+	//] key
+	if (e.keyCode == 221)
+	{
+		var o = lobj.nextSibling;
+		if (isstageobject(o))
+		{
+			lobj = o;
+		}
+		/*
+		var ind = stg.childNodes.indexOf(lobj);
+		if (ind < stg.childNodes.length-1)
+		{
+			lobj = stg.childNodes[ind+1];
+		}*/
+	}
+	
 	if (lobj.tagName=="DIV")
 	{
 		if (lobj.getAttribute("contentEditable")=="true")
@@ -1194,7 +1561,21 @@ function keydown(e)
 	//F key
 	if (e.keyCode == 70)
 	{
-		//if (typeof lobj.dir === "undefined")
+		/*if (lobj.tagName == "DIV")
+		{
+			if (lobj.style.backgroundSize == "100% 100%")
+			{
+				lobj.style.backgroundSize = "-100% 100%"
+				lobj.style.backgroundPosition = "100% 0";
+			}
+			else
+			{
+				lobj.style.backgroundSize = "100% 100%";
+				lobj.style.backgroundPosition = "0 0";
+			}
+		}
+		else*/
+		{
 		if (lobj.direction == 1)
 		{
 			lobj.direction = -1;
@@ -1207,17 +1588,10 @@ function keydown(e)
 		lobj.style.WebkitTransform = "rotate("+lobj.rot+"deg) scaleX("+(lobj.scale*lobj.direction)+") scaleY("+lobj.scale+")";
 		lobj.style.transform = lobj.style.WebkitTransform;
 		lobj.style.MozTransform = lobj.style.WebkitTransform;
+		}
 		pushstate();
 	}
-	//T key
-	if (e.keyCode == 84)
-	{
-		var NT = document.createElement("DIV");
-		NT.innerHTML="Double-click to edit Me!";
-		NT.setAttribute("contentEditable","false");
-		stg.appendChild(NT);
-		initobject(NT);
-	}
+	
 	//+ key
 	if (e.keyCode == 107)
 	{
@@ -1257,27 +1631,41 @@ function initobject(obj)
 	obj.direction = 1;
 	obj.id = "stgObj:"+Math.random();
 	obj.zIndex = -1000+count;
+	PlaySound("Bubble.mp3");
 	pushstate();
 }
 function mousedown(e)
 {
-if (!isstageobject(e.target))
+	var ET = getstageobject(e.target);
+	//e.target = 
+	if (ET == null)
 	{
-		lobj=null;
 		return;
 	}
+/*if (!isstageobject(e.target))
+	{
+		if (isstageobject(e.target.parentNode))
+		{
+			e.target = e.target.parentNode;
+		}
+		else
+		{
+			lobj=null;
+			return;
+		}
+	}*/
 x=e.clientX;
 y=e.clientY;
 mode = 1;
 //alert(""+e.target.tagName)
 ox = 0;
 oy = 0;
-if (typeof e.target === "undefined" || e.target == stg || e.target == bdy)
+if (typeof ET === "undefined" || ET == stg || ET == bdy)
 {
 }
 else
 {
-tobj = e.target;
+tobj = ET;
 lobj = tobj;
 if (typeof tobj.scale === "undefined")
 {
@@ -1319,7 +1707,7 @@ if (e.ctrlKey==1 && e.shiftKey==1)
 	oy = y;
 }
 
-return e.target.tagName!='IMG';
+return ET.tagName!='IMG';
 //return false;
 }
 function mousemove(e)
@@ -1402,20 +1790,55 @@ function compiledna(dna)
 	}
 	return ret;
 }
-
-function pushstate()
+function getstate()
 {
 	var state = {scene:scene,currentpart:currentpart,BGsize:current_backgroundsize,current:encodestage(),BGImage:current_background,BGpos:current_backgroundPosition};
 	state = JSON.stringify(state);
-	var id = "state:"+window.history.length;
-	var str = ""+state;
-	var size = state.length;
-	//sessionStorage[id] = state;
-	history.pushState(state,"Create.html","");
+	return state;
 }
-window.onpopstate = function(event) {
-	//var state = JSON.parse(sessionStorage[event.state]);
-	var state = JSON.parse(event.state);
+function pushstate()
+{
+	/*var state = {scene:scene,currentpart:currentpart,BGsize:current_backgroundsize,current:encodestage(),BGImage:current_background,BGpos:current_backgroundPosition};
+	state = JSON.stringify(state);*/
+	var state = getstate();
+	/*var id = "state:"+window.history.length;
+	var str = ""+state;
+	var size = state.length;*/
+	//sessionStorage[id] = state;
+	if (state != laststate)
+	{
+		//add undo state
+		history.pushState(state,"Create.html","");
+		
+		//collab features
+		if (collabpush)
+		{
+		if (laststate != "")
+		{
+			var LS = JSON.parse(laststate);
+			if (LS.BGImage != current_background || LS.BGpos != current_backgroundPosition || LS.BGsize != current_backgroundsize)
+			{
+				//update background data
+				collabBG(current_background,current_backgroundPosition,current_backgroundsize);
+			}
+			else if (LS.scene.name != scene.name || LS.currentpart != currentpart)
+			{
+				//update background and the entire scene & stage
+				collabpush(state);
+			}
+			else
+			{
+				//update selected object
+				collabchange(lobj);
+			}
+		}
+		
+		}
+		laststate = state;
+	}
+}
+function setstate(state)
+{
 	if (state.scene != undefined)
 	{
 		scene = state.scene;
@@ -1438,7 +1861,10 @@ window.onpopstate = function(event) {
 		loadstage(state.current);
 		//stg.innerHTML = state.current;
 	}
-  //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+}
+window.onpopstate = function(event) {
+	var state = JSON.parse(event.state);
+	setstate(state);
 };
 function mouseup(e)
 {
@@ -1625,11 +2051,20 @@ else
 {
 	dnalist = JSON.parse(localStorage.dnas);
 }
+if (localStorage.hotkeys == undefined)
+{
+	hotkeys = {eye:[0,1,2,3,4,5,6,7,8,9],mouth:[0,1,2,3,4,5,6,7,8,9]};
+}
+else
+{
+	hotkeys = JSON.parse(localStorage.hotkeys);
+}
 document.getElementById("BGscale").value = "" +((window.innerHeight*1.25) / 400);
 if (window.location.href.indexOf("file://")==0)
 {
 	offlinemode = true;
 }
+
 //scenelist = {};
 //scenelist = []
 //for(var x in localStorage)console.log(x+"="+((localStorage[x].length * 2)/1024/1024).toFixed(2)+" MB");;
