@@ -298,6 +298,12 @@ function resetobjectimage(obj)
 			{
 				obj.setAttribute("src",imageSrcFromDNA(obj.getAttribute("alt")));
 			}
+			else if (CN == "ADVCharacter")
+			{
+				var D = JSON.parse(obj.getAttribute("alt"));
+				D.scale = 200;
+				obj.setAttribute("src",imageSrcFromADVDNA(D));
+			}
 			else if (CN == "ObjectProp")
 			{
 				obj.setAttribute("src",imageSrcFromObject(parseInt(obj.getAttribute("alt")),1.0,false));
@@ -880,12 +886,24 @@ function AddTextBubble(type)
 }
 function AddCharacter(dna,dble)
 {
-	if (dble==true)
-	{
-	//double the scale so scaling looks less bad.
-	dna = editdna(dna,2,parseFloat(getdnavalue(dna,2)) * 2);
-	}
-	var I = imageSrcFromDNA(dna,null,false,false);
+	var adv = false;
+	var I = null;
+	if (dna[0] == "{")
+		{
+			var D = JSON.parse(dna);
+				D.scale = 200;
+			I = imageSrcFromADVDNA(D,null,false,false);
+			adv = true;
+		}
+		else
+		{
+			if (dble==true)
+			{
+				//double the scale so scaling looks less bad.
+				dna = editdna(dna,2,parseFloat(getdnavalue(dna,2)) * 2);
+			}
+			I = imageSrcFromDNA(dna,null,false,false);
+		}
 	if (false)
 	{
 	window.setTimeout(function(){I = imageSrcFromDNA(dna,null,false,false);
@@ -916,6 +934,11 @@ function AddCharacter(dna,dble)
 		
 		img.alt = dna;
 		img.className = "Character";
+		if (adv)
+		{
+			img.className = "ADVCharacter";
+		}
+		
 		
 		
 		imgs[count]=new Image;
@@ -1207,6 +1230,16 @@ function doubleclick(e)
 			edittarget = lobj;
 			dna = lobj.alt;
 			DisplayCharacterOptions();
+		}
+		if (lobj.className == "ADVCharacter")
+		{
+			//edittarget = lobj;
+			//dna = lobj.alt;
+			var D = prompt("edit advanced dna",lobj.alt);
+			//lobj.alt = D;
+			lobj.setAttribute("alt",D);
+			resetobjectimage(lobj);
+			//DisplayCharacterOptions();
 		}
 	}
 }

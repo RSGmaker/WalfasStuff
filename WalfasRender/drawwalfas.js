@@ -15,7 +15,7 @@ var randomcols = false;
 var colors = [];
 //the repository of the create.swf vector files(in svg format).
 var repo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf2/"
-
+var HairColor = null;
 var loader = null;
 var ZipLoader;
 if  (ZipLoader != null && ZipLoader != undefined)
@@ -67,6 +67,7 @@ var Openfile = function(req,type) {
 		E.y = 0;
 		E.type=type;
 		E.content = "svg";
+		E.scale = 0.85;
 		DWentities[DWentities.length] = E;
 		return E;
 	}
@@ -145,7 +146,8 @@ function PartLoad(feature,obj,side)
 	var ot = obj.type;
 	if (ot == undefined)
 	{
-		if (typeof obj.src == "number")
+		//if (typeof obj.src == "number")
+		if (!isNaN(obj.src))
 		{
 			ot = "normal";
 		}
@@ -156,7 +158,14 @@ function PartLoad(feature,obj,side)
 	}
 	if (ot == "normal")
 	{
-		ret = LoadPart(feature,obj.src,side);
+		var ind = parseInt(""+obj.src);
+		var tmp = ["Wings","Accessories","body","Arms","Hats"]
+		if (tmp.indexOf(feature)>-1)
+		{
+			ind--;
+		}
+		//ret = LoadPart(feature,obj.src,side);
+		ret = LoadPart(feature,ind,side);
 		if (ret != null)
 		{
 			ret.content = "svg";
@@ -187,7 +196,11 @@ function PartLoad(feature,obj,side)
 		//ret.src = new Image;
         //ret.src.src = URL.createObjectURL(req.response);
 		//ret.src.src = 'data:image/png;base64,' +req.responseText;
-		if (req.status === 200 || req.status === 304)
+		if (typeof req.responseText == "string" && req.responseText.indexOf("<?xml") == 0)
+		{
+			ret.svg = req.responseText;
+		}
+		/*if (req.status === 200 || req.status === 304)
 		{
 			ret.svg = req.responseText;
 			
@@ -200,7 +213,7 @@ function PartLoad(feature,obj,side)
 			var blob = new Blob([req.response], {type: 'image/png'});
 			ret.src.src = URL.createObjectURL(blob);*/
 				
-		}
+		//}*/
 		if (ret != 0)
 		{
 			DWentities[DWentities.length] = ret;
@@ -212,6 +225,18 @@ function PartLoad(feature,obj,side)
 			ret.type = feature;
 			//ret.content = "img";
 			ret.content = "svg";
+			ret.scale = 0.85;
+			
+			var i = 0;
+			while (i<colors.length)
+			{
+				var nc = colors[i];
+				if (nc.active && ((nc.filter == "All" || type == "All") || (feature.toLowerCase().indexOf( nc.filter.toLowerCase())>-1)))
+				{
+					ret.svg = ret.svg.replace(nc.src,nc.dst);
+				}
+				i = i+1;
+			}
 		}
 		}
 		catch(err)
@@ -220,6 +245,7 @@ function PartLoad(feature,obj,side)
 			ret = {};
 			ret.src = new Image;
 			ret.src.src = url;
+			ret.scale = 0.85;
 		}
 		}
 	}
@@ -236,7 +262,7 @@ function PartLoad(feature,obj,side)
 	if (ret != null/* && (ot == "normal" || ot == "basic")*/)
 	{
 		//general offset value, changing this will change where it centers.
-		ret.content = "svg";
+		//ret.content = "svg";
 	var xo = -100;
 	var yo = -220;
 	
@@ -271,7 +297,7 @@ function PartLoad(feature,obj,side)
 		//outlinehead.y = -10000;
 	}
 	
-	if (feature == "Hat")
+	if (feature == "Hats")
 	{
 		ret.x = 100+xo;
 		ret.y = 310+yo-4;
@@ -303,20 +329,25 @@ function PartLoad(feature,obj,side)
 		var T = ret.svg.substr(ret.svg.indexOf("#"),7);
 		if (T != "#000000")
 		{
-			//may break hair outline...
-			//D[13] won't exist in this context so a new haircolor variable is needed
-			//ret.svg = ret.svg.replace(T,"#"+D[13])
+			if (HairColor != null)
+			{
+				ret.svg = ret.svg.replace(T,"#"+HairColor)
+			}
 		}
 	}
 	if (feature == "Accessories")
 	{
 		ret.x = 47+xo;
 		ret.y = 63+yo+5;
+		ret.y += 7;
+		ret.x -= 2;
+		ret.scale = 1;
 	}
 	if (feature == "Items")
 	{
 		ret.x = 68+xo+NX;
 		ret.y = 180+yo+NY;
+		ret.scale = 1;
 	}
 	//back
 		if (feature == "Wings")
@@ -353,6 +384,7 @@ function LoadADVDNA(dna,sc,oc,isbacksprite){
 	var Back = null;
 	var Back2 = null;
 	var hasstubble = false;
+	HairColor = dna.HairColor;
 	//var hasstubble = (D[11] == 110);
 	if (isbacksprite!=true)
 	{
@@ -406,7 +438,7 @@ function LoadADVDNA(dna,sc,oc,isbacksprite){
 	var Hat;
 	if (isbacksprite!=true)
 	{
-		Hat	= PartsLoad("Hats",dna.Hat);
+		Hat	= PartsLoad("Hats",dna.Hats);
 	}
 	var Arms = null;
 	var Arms2 = null;
@@ -438,7 +470,7 @@ function LoadADVDNA(dna,sc,oc,isbacksprite){
 		//H2 is a duplicate that helps hide parts to try to make the backsprite cleaner
 		
 		//H2 = Openfile(repo+"Basichead/0.svg","basichead"); 
-		Hat	= PartsLoad("Hats",dna.Hat);
+		Hat	= PartsLoad("Hats",dna.Hats);
 	}
 
 	if (isbacksprite==true)
@@ -1812,7 +1844,7 @@ var drawxml = function(context,xml,x,y){
 			}
 			else
 			{
-				context.lineJoin = "miter";
+				//context.lineJoin = "miter";
 			}
 			lj = S.getAttribute("linecap");
 			if (lj)
@@ -1821,16 +1853,16 @@ var drawxml = function(context,xml,x,y){
 			}
 			else
 			{
-				context.lineCap = "miter";
+				//context.lineCap = "miter";
 			}
 			lj = S.getAttribute("stroke-width");
 			if (lj)
 			{
-				context.lineWidth = parseInt(lj);
+				context.lineWidth = lj;
 			}
 			else
 			{
-				context.lineWidth = 1;
+				//context.lineWidth = 1;
 			}
 			
 			var path = new Path2D(D);
@@ -1844,6 +1876,7 @@ var drawxml = function(context,xml,x,y){
 				while (II<STYLE.length)
 				{
 					var SS = STYLE[II].split(":");
+					SS[1] = SS[1].replace("px","")
 					if (SS[0]=="id")
 					{
 					}
@@ -1854,6 +1887,10 @@ var drawxml = function(context,xml,x,y){
 					else if (SS[0]=="stroke")
 					{
 						scolor = SS[1];
+					}
+					else if (SS[0] == "stroke-width")
+					{
+						context.lineWidth = SS[1];
 					}
 					else if (isNaN(SS[1]))
 					{
@@ -2490,19 +2527,26 @@ function imageSrcFromADVDNA(dna,scale,cropped,isbacksprite){
 	
  
 	// move to the middle of where we want to draw our image
+	var TX = 0;
+	var TY = 0;
 	if (customrenderer)
 	{
-		G.translate(250*scale, 260*scale);
+		//G.translate(250*scale, 260*scale);
+		TX = 250 * scale;
+		TY = 260 * scale;
 	}
 	else
 	{
-		G.translate(125*scale, 125*scale);
+		//G.translate(125*scale, 125*scale);
+		TX = 125 * scale;
+		TY = 125 * scale;
 	}
+	
  
 	// rotate around that point, converting our 
 	// angle from degrees to radians 
-	G.scale(0.85*scale,0.85*scale);
-	
+	//G.scale(0.85*scale,0.85*scale);
+	//G.setTransform(1,0,0,1,250,260);
 	var i = 0;
 	while (i < DWentities.length)
 	{
@@ -2511,6 +2555,7 @@ function imageSrcFromADVDNA(dna,scale,cropped,isbacksprite){
 		{
 			if (customrenderer)
 			{
+				G.setTransform(E.scale*scale,0,0,E.scale*scale,TX,TY);
 			if (E.content == "svg" && typeof E.svg != 'undefined')
 			{
 			if (typeof E.xml == 'undefined')
@@ -2634,9 +2679,59 @@ function imageFromDNA(dna,scale,cropped,isbacksprite){
 	ret.src = imageSrcFromDNA(dna,scale,cropped,isbacksprite);
 	return ret;
 }
+function converttoadvancedDNA(dna)
+{
+	//Version#:Name:Scale:Hat:Hair:Body:Arm:Shoes:Eyes:Mouth:Item:Accessory:Back:HairColor
+	//var D = {};
+	var t = dna.split(":");
+	colors = [];
+	if (t.length>=15)
+		{
+			//process recolor information in dna
+			var TT = t[14].split("/");
+			i = 0;
+			while (i< TT.length)
+			{
+				
+				var TTT = TT[i].split(">");
+				var nc = {};
+				//source color
+				nc.src = "#"+TTT[0];
+				//destination color
+				nc.dst = "#"+TTT[1];
+				//filter(which props this color change applies to)
+				nc.filter = TTT[2];
+				nc.active = true;
+				colors[i] = nc;
+				i = i+1;
+			}
+			
+		}
+	
+	var D = {scale:parseFloat(t[2]),
+	Body:[{src:t[5]}],
+	Eyes:[{src:t[8]}],
+	Head:[{src:0}],
+	Arms:[{src:t[6]}],
+	Accessory:[{src:t[11]}],
+	Hair:[{src:t[4]}],
+	Hats:[{src:t[3]}],
+	Items:[{src:t[10]}],
+	Shoes:[{src:t[7]}],
+	Back:[{src:t[12]}],
+	HairColor:t[13],
+	colors:colors};
+	//
+	
+	//
+	
+	return D;
+}
 //render walfas dna and get the render as a dataurl
 function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
-	var CR = customrenderer;
+	
+	return imageSrcFromADVDNA(converttoadvancedDNA(dna),scale,cropped,isbacksprite);
+	/*var CR = customrenderer;
 	customrenderer = true;
 	allowtransforms = false;
 	LoadDNA(dna,null,null,isbacksprite);
@@ -2673,7 +2768,7 @@ function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
 		var E = DWentities[i];
 		if (E != null && typeof E.svg != 'undefined')
 		{
-			if (customrenderer/* && E.type != "Items"*/)
+			if (customrenderer)
 			{
 			if (typeof E.xml == 'undefined')
 			{
@@ -2720,7 +2815,7 @@ function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
 			while (tx < canvas.width)
 			{
 				//detect if pixel has any opacity
-				if (data[tindex]>0/* || data[tindex+1]>0 || data[tindex+2]>0 || data[tindex+3]>0*/)
+				if (data[tindex]>0)
 				{
 					//adjust range to fit the pixel
 					if (mnx != null)
@@ -2778,6 +2873,6 @@ function imageSrcFromDNA(dna,scale,cropped,isbacksprite){
 		}
 		ret = cropped.toDataURL();
 	}
-	return ret;
+	return ret;*/
 }
 }
