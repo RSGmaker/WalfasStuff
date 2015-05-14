@@ -546,6 +546,7 @@ var Openfile = function(req,type) {
 		E.svg = svg;
 		E.x = 0;
 		E.y = 0;
+		E.scale = 0.85;
 		entities[entities.length] = E;
 		return E;
 	}
@@ -926,19 +927,22 @@ function LoadDNA(dna)
 	{
 		Accessory.x = 47+xo;
 		Accessory.y = 63+yo+5;
+		Accessory.scale = 1;
 		//Accessory.y = 200;
 	}
 	if (Item != null)
 	{
 		//3.39:Aya:100:31:30:31:31:31:0:0:47:36:15:332B1A
 		//3.39:Reimu (2 Blue):100:112:112:113:111:2:0:0:0:0:0:283960
-		Item.x = 68+xo+NX;
-		Item.y = 180+yo+NY;
+		Item.x = 68+xo+NX-2;
+		Item.y = 180+yo+NY-1;
+		Item.scale=1;
 	}
 	if (Item2 != null)
 	{
 		Item2.x = 68+xo+NX;
 		Item2.y = 180+yo+NY;
+		Item2.scale=1;
 	}
 	if (Back != null)
 	{
@@ -1622,8 +1626,10 @@ var update = function(){
 	while (i < entities.length)
 	{
 		var E = entities[i];
+		
 		if (E != null && typeof E.svg != 'undefined' && E.svg != null)
 		{
+			ctx.setTransform(E.scale*scl,0,0,E.scale*scl,250*scl,300*scl);
 			//ctx.translate(E.x,E.y)
 			ctx.translate(E.x,E.y);
 			//try {
