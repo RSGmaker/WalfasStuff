@@ -32,6 +32,7 @@ var offlinemode = false;
 var currentDNA = -1;
 var laststate="";
 var Sounds = {};
+var walfas = new drawwalfas();
 //should be implemented part of preferences menu instead, once that gets made.
 function seteyehotkeys()
 {
@@ -296,17 +297,17 @@ function resetobjectimage(obj)
 	var CN = obj.className;
 			if (CN == "Character")
 			{
-				obj.setAttribute("src",imageSrcFromDNA(obj.getAttribute("alt")));
+				obj.setAttribute("src",walfas.imageSrcFromDNA(obj.getAttribute("alt")));
 			}
 			else if (CN == "ADVCharacter")
 			{
 				var D = JSON.parse(obj.getAttribute("alt"));
 				D.scale = 200;
-				obj.setAttribute("src",imageSrcFromADVDNA(D));
+				obj.setAttribute("src",walfas.imageSrcFromADVDNA(D));
 			}
 			else if (CN == "ObjectProp")
 			{
-				obj.setAttribute("src",imageSrcFromObject(parseInt(obj.getAttribute("alt")),1.0,false));
+				obj.setAttribute("src",walfas.imageSrcFromObject(parseInt(obj.getAttribute("alt")),1.0,false));
 			}
 			else if (CN == "ImportedAsset")
 			{
@@ -468,11 +469,11 @@ function loadpart(index)
 	try
 	{
 		
-	var I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	var I = walfas.imageSrcFromBackground(part.background,part.backgroundsize / 200);
 	window.setTimeout(function(){
 	if (part.background > -1)
 	{
-	I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	I = walfas.imageSrcFromBackground(part.background,part.backgroundsize / 200);
 	}
 	bdy.style.backgroundImage = "url("+I+")";
 		bdy.style.backgroundPosition = part.backgroundPosition;
@@ -555,12 +556,12 @@ function ChangeBackground(index,position,size)
 	var I = null;
 	if (index > -1)
 	{
-	 I = imageSrcFromBackground(index,size / 300);
+	 I = walfas.imageSrcFromBackground(index,size / 300);
 	}
 	window.setTimeout(function(){
 	if (index > -1)
 	{
-	I = imageSrcFromBackground(index,size/300);
+	I = walfas.imageSrcFromBackground(index,size/300);
 	}
 		bdy.style.backgroundPosition = position;
 		bdy.style.backgroundRepeat = "no-repeat";
@@ -612,12 +613,12 @@ function BGChangeBG(index,scale)
 	{
 	index--;
 	BG_menuSelection--;
-	I = imageSrcFromBackground(index,scale);
+	I = walfas.imageSrcFromBackground(index,scale);
 	}
 	window.setTimeout(function(){
 	if (index > 0)
 	{
-		I = imageSrcFromBackground(index,scale);
+		I = walfas.imageSrcFromBackground(index,scale);
 	}
 	B.src = I;}, 50);
 }
@@ -636,11 +637,11 @@ function SceneMenuUpdate()
 	var part = S.parts[0];
 	//D.innerHTML = part.stage;
 	
-	var I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	var I = walfas.imageSrcFromBackground(part.background,part.backgroundsize / 200);
 	window.setTimeout(function(){
 	if (part.background > -1)
 	{
-	I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	I = walfas.imageSrcFromBackground(part.background,part.backgroundsize / 200);
 	}
 	D.style.backgroundImage = "url("+I+")";
 		D.style.backgroundPosition = "top";
@@ -702,7 +703,7 @@ function ColorChange()
 function UpdateCharacterOptions()
 {
 	var CO = document.getElementById("Character Options");
-	CO.style.backgroundImage = "url("+imageSrcFromDNA(dna,null,false,false)+")";
+	CO.style.backgroundImage = "url("+walfas.imageSrcFromDNA(dna,null,false,false)+")";
 }
 function SceneMenuLoad()
 {
@@ -732,7 +733,7 @@ function SetCharacterOptions()
 	edittarget.style.left = document.getElementById("charoptionsX").value+"px";
 	edittarget.style.top = document.getElementById("charoptionsY").value+"px";
 	
-	edittarget.src = imageSrcFromDNA(edittarget.alt,null,false,false);
+	edittarget.src = walfas.imageSrcFromDNA(edittarget.alt,null,false,false);
 	
 	edittarget.style.WebkitTransform = "rotate("+edittarget.rot+"deg) scaleX("+(edittarget.scale*edittarget.direction)+") scaleY("+edittarget.scale+")";
 	edittarget.style.transform = edittarget.style.WebkitTransform;
@@ -891,8 +892,11 @@ function AddCharacter(dna,dble)
 	if (dna[0] == "{")
 		{
 			var D = JSON.parse(dna);
+			if (dble==true)
+			{
 				D.scale = 200;
-			I = imageSrcFromADVDNA(D,null,false,false);
+			}
+			I = walfas.imageSrcFromADVDNA(D,null,false,false);
 			adv = true;
 		}
 		else
@@ -902,11 +906,11 @@ function AddCharacter(dna,dble)
 				//double the scale so scaling looks less bad.
 				dna = editdna(dna,2,parseFloat(getdnavalue(dna,2)) * 2);
 			}
-			I = imageSrcFromDNA(dna,null,false,false);
+			I = walfas.imageSrcFromDNA(dna,null,false,false);
 		}
 	if (false)
 	{
-	window.setTimeout(function(){I = imageSrcFromDNA(dna,null,false,false);
+	window.setTimeout(function(){I = walfas.imageSrcFromDNA(dna,null,false,false);
 	var img = document.createElement("img"); 
 		img.src = I;
 		
@@ -963,10 +967,10 @@ function LoadObject()
 {
 	var elt = document.getElementById("objectchoice");
 	var d = parseInt(elt.options[elt.selectedIndex].value)-1;
-	var I = imageSrcFromObject(d,1.0,false);
+	var I = walfas.imageSrcFromObject(d,1.0,false);
 	if (false)
 	{
-	window.setTimeout(function(){I = imageSrcFromObject(d,1.0,false);
+	window.setTimeout(function(){I = walfas.imageSrcFromObject(d,1.0,false);
 	var img = document.createElement("img"); 
 		img.src = I;
     
@@ -1080,7 +1084,7 @@ function DNAChangeDNA(i)
 	//alert("DNA "+d);
 	//var img = document.getElementById("DNA Preview");
 	//img.src = imageSrcFromDNA(d,null,false,false);
-	var I = imageSrcFromDNA(d,null,false,false);
+	var I = walfas.imageSrcFromDNA(d,null,false,false);
 	var m = document.getElementById("DNA Menu");
 	m.style.backgroundImage = "url("+I+")";
 	m.style.backgroundSize = 250+"px"
@@ -1150,7 +1154,7 @@ function RandomizeAll()
 			var d = randomDNA();
 			d = editdna(d,2,parseInt(getdnavalue(d,2)) * 2);
 			C[i].alt = d;
-			C[i].src = imageSrcFromDNA(d,null,false,false);
+			C[i].src = walfas.imageSrcFromDNA(d,null,false,false);
 		}
 		i++;
 	}
@@ -1559,13 +1563,13 @@ function keydown(e)
 		{
 			if (lobj.backsprite!=true)
 			{
-				lobj.src = imageSrcFromDNA(lobj.alt,null,false,true);
+				lobj.src = walfas.imageSrcFromDNA(lobj.alt,null,false,true);
 				lobj.backsprite=true
 				pushstate();
 			}
 			else
 			{
-				lobj.src = imageSrcFromDNA(lobj.alt,null,false,false);
+				lobj.src = walfas.imageSrcFromDNA(lobj.alt,null,false,false);
 				lobj.backsprite=false;
 				pushstate();
 			}
@@ -1879,11 +1883,11 @@ function setstate(state)
 		loadpart(state.currentpart);
 		//bdy.style.backgroundImage = state.BGImage;
 		
-		var I = imageSrcFromBackground(state.BGImage,state.BGsize / 200);
+		var I = walfas.imageSrcFromBackground(state.BGImage,state.BGsize / 200);
 	window.setTimeout(function(){
 	if (state.BGImage > -1)
 	{
-	I = imageSrcFromBackground(state.BGImage,state.BGsize / 200);
+	I = walfas.imageSrcFromBackground(state.BGImage,state.BGsize / 200);
 	}
 	bdy.style.backgroundImage = "url("+I+")";
 		bdy.style.backgroundPosition = state.BGpos;
