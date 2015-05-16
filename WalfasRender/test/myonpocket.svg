@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="342.0px"
+   width="237.9px"
+   id="svg10897"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="myonpocket.svg">
+  <metadata
+     id="metadata10934">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1012"
+     id="namedview10932"
+     showgrid="false"
+     inkscape:zoom="2.7602339"
+     inkscape:cx="180.52949"
+     inkscape:cy="245.24857"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg10897" />
+  <g
+     transform="matrix(1, 0, 0, 1, 118.05, 273.9)"
+     id="g10899">
+    <use
+       height="150.35"
+       transform="matrix(1.0, 0.0, 0.0, 1.0, -57.1, -138.6)"
+       width="109.4"
+       xlink:href="#shape0"
+       id="use10901" />
+  </g>
+  <g
+     id="shape0"
+     transform="matrix(1, 0, 0, 1, 57.1, 138.6)">
+    <path
+       d="m 15.05,-93.65 -11.35,1.2 -0.25,-2.4 10.85,-1.15 0.75,2.35"
+       id="path10910"
+       inkscape:connector-curvature="0"
+       style="fill:#ffffff;fill-rule:evenodd;stroke:none"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="M15.05 -93.65 L3.7 -92.45 3.45 -94.85 14.3 -96.0"
+       fill="none"
+       stroke="#000000"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="1.5"
+       id="path10916" />
+    <path
+       d="M-4.65 -108.55 L-5.15 -108.0 -4.8 -108.6 -4.65 -108.55"
+       fill="#fefefe"
+       fill-rule="evenodd"
+       stroke="none"
+       id="path10922" />
+    <path
+       d="M13.9 -89.6 L15.3 -88.2 16.7 -85.8 16.95 -84.4 16.75 -82.75 Q16.65 -82.15 16.85 -81.55 17.65 -79.6 19.1 -78.05 19.35 -77.2 18.9 -76.4 17.7 -74.45 15.9 -73.3 15.75 -74.2 16.25 -74.95 L16.55 -75.55 Q16.9 -77.0 15.75 -77.65 L14.5 -78.3 Q13.9 -78.6 13.7 -79.1 13.05 -80.55 12.7 -82.25 11.0 -81.3 8.65 -81.4 7.1 -81.3 6.05 -82.45 4.95 -83.65 5.25 -85.45 L5.8 -87.2 Q6.45 -88.5 7.7 -89.35 8.55 -89.95 9.6 -90.35 11.95 -91.25 13.9 -89.6"
+       fill="#ffffff"
+       fill-rule="evenodd"
+       stroke="none"
+       id="path10928" />
+    <path
+       d="M13.9 -89.6 Q11.95 -91.25 9.6 -90.35 8.55 -89.95 7.7 -89.35 6.45 -88.5 5.8 -87.2 L5.25 -85.45 Q4.95 -83.65 6.05 -82.45 7.1 -81.3 8.65 -81.4 11.0 -81.3 12.7 -82.25 13.05 -80.55 13.7 -79.1 13.9 -78.6 14.5 -78.3 L15.75 -77.65 Q16.9 -77.0 16.55 -75.55 L16.25 -74.95 Q15.75 -74.2 15.9 -73.3 17.7 -74.45 18.9 -76.4 19.35 -77.2 19.1 -78.05 17.65 -79.6 16.85 -81.55 16.65 -82.15 16.75 -82.75 L16.95 -84.4 16.7 -85.8 15.3 -88.2 13.9 -89.6"
+       fill="none"
+       stroke="#000000"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="1.5"
+       id="path10930" />
+  </g>
+  <defs
+     id="defs10903" />
+</svg>

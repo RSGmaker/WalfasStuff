@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="342.0px"
+   width="237.9px"
+   id="svg7274"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="nazrincrystal.svg">
+  <metadata
+     id="metadata7305">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1012"
+     id="namedview7303"
+     showgrid="false"
+     inkscape:zoom="4"
+     inkscape:cx="-44.055253"
+     inkscape:cy="291.27712"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg7274" />
+  <g
+     transform="matrix(1, 0, 0, 1, 118.05, 273.9)"
+     id="g7276">
+    <use
+       height="151.95"
+       transform="matrix(1.0, 0.0, 0.0, 1.0, -61.4, -140.2)"
+       width="113.0"
+       xlink:href="#shape0"
+       id="use7278" />
+  </g>
+  <g
+     id="shape0"
+     transform="matrix(1, 0, 0, 1, 61.4, 140.2)">
+    <path
+       d="M-4.1 -83.75 L-3.95 -84.05 -3.9 -83.55 5.3 -70.0 -1.25 -55.9 -1.2 -55.8 -10.7 -68.45 -4.15 -83.8 -4.1 -83.75 M-3.45 -78.25 L-7.1 -69.25 -1.9 -61.1 1.7 -70.1 -3.45 -78.25"
+       fill="#000000"
+       fill-rule="evenodd"
+       stroke="none"
+       id="path7299" />
+    <path
+       d="M-3.45 -78.25 L1.7 -70.1 -1.9 -61.1 -7.1 -69.25 -3.45 -78.25"
+       fill="#c4f2f7"
+       fill-rule="evenodd"
+       stroke="none"
+       id="path7301" />
+  </g>
+  <defs
+     id="defs7280" />
+</svg>
