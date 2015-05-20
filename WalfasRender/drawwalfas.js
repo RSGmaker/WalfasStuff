@@ -1,6 +1,8 @@
 {
 	walfasloader = null;
-//if  (Ziploader != null && Ziploader != undefined)
+//if  (ZipLoader != null && ZipLoader != undefined)
+	//var walfasrepo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf2/"
+var walfasrepo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/ea008702777f6353e40c0916e0c355855504da3f/WalfasRender/createswf2/"
 {
 	var T = document.title;
 	document.title = "Loading assets...";
@@ -8,12 +10,12 @@
 	{
 		try
 		{
-			walfasloader = new Ziploader("createswf2.zip");
-			this.repo="";
+			walfasloader = new ZipLoader("createswf2.zip");
+			walfasrepo="";
 		}
 		catch(err2)
 		{
-			walfasloader = new Ziploader(this.repo+"createswf2.zip");
+			walfasloader = new ZipLoader(walfasrepo+"createswf2.zip");
 		}
 		
 	
@@ -40,11 +42,11 @@ this.customrenderer = false;
 this.randomcols = false;
 //list of colorchanges
 this.colors = [];
-//the this.repository of the create.swf vector files(in svg format).
-this.repo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf2/"
+//the walfasrepository of the create.swf vector files(in svg format).
+this.OHairColor = null;
 this.HairColor = null;
 
-//var Ziploader;
+//var ZipLoader;
 this.allowtransforms = false;
 
 this.Openfile = function(req,type) {
@@ -88,7 +90,7 @@ this.Loadfile = function(url,type){
 	{
 		if (walfasloader != null)
 		{
-			var U = this.repo + "createswf2.zip://createswf2/" + url.substring(this.repo.length);
+			var U = walfasrepo + "createswf2.zip://createswf2/" + url.substring(walfasrepo.length);
 			try
 			{
 				var ret = walfasloader.load(U);
@@ -167,7 +169,7 @@ this.PartLoad = function(feature,obj)
 	if (ot == "normal")
 	{
 		var ind = parseInt(""+obj.src);
-		var tmp = ["Wings","Accessories","body","Arms","Hats","Items","Mouth"]
+		var tmp = ["Wings","Accessories","body","Arms","Hats","Items","Mouth","Shoes"]
 		if (tmp.indexOf(feature)>-1)
 		{
 			ind--;
@@ -335,13 +337,40 @@ this.PartLoad = function(feature,obj)
 	if (feature == "Hair" || feature == "Hair2")
 	{
 		ret.x = 100+xo;
-		ret.y = 310+yo-3;
-		var T = ret.svg.substr(ret.svg.indexOf("#"),7);
-		if (T != "#000000")
+		ret.y = 310+yo-3;//fill="#
+		//var T = ret.svg.substr(ret.svg.indexOf("#"),7);
+		//var T = "#"+slice2(ret.svg,'fill="#','"');
+		//if (T != "#000000")
+		var T = this.OHairColor;
+		this.OHairColor = null;
+		if (feature == "Hair")
+		{
+			T = slice2(ret.svg,'fill="','"');
+		}
+		//if (T != "#000000" && (T != null && T[0]=="#"))
+		if (T != "#000000" && (T == null || T.toLowerCase()!="black"))
 		{
 			if (this.HairColor != null)
 			{
+				if (feature == "Hair")
+				{
+					this.OHairColor = T;
+				}
 				ret.svg = ret.svg.replace(T,"#"+this.HairColor)
+			}
+		}
+		else if (feature == "Hair")
+		{
+			//if the first search for the haircolor failed, then make 1 more attempt.
+			T = ret.svg.substr(ret.svg.indexOf('fill="')+5);
+			T = slice2(T,'fill="','"');
+			if (T != "#000000" && (T == null || T.toLowerCase()!="black"))
+			{
+				if (this.HairColor != null)
+				{
+					this.OHairColor = T;
+					ret.svg = ret.svg.replace(T,"#"+this.HairColor)
+				}
 			}
 		}
 	}
@@ -407,14 +436,14 @@ this.LoadADVDNA = function(dna,sc,oc,isbacksprite){
 		Shoes = this.PartsLoad("Shoes",dna.Shoes);
 	}
 	var outlinehead;
-	//this.outlinehead = this.Openfile(this.repo+"Basichead/1.svg","blarg");
+	//this.outlinehead = this.Openfile(walfasrepo+"Basichead/1.svg","blarg");
 	
 	//basichead is the head prop that goes under the hair
 	var basichead;
 	var Accessory;
 	if (isbacksprite!=true)
 	{
-		/*basichead = this.Openfile(this.repo+"Basichead/0.svg","blarg");
+		/*basichead = this.Openfile(walfasrepo+"Basichead/0.svg","blarg");
 		var xo = -100;
 	var yo = -220;
 		basichead.x = 38+xo+1;
@@ -472,15 +501,15 @@ this.LoadADVDNA = function(dna,sc,oc,isbacksprite){
 	var H2;
 	if (isbacksprite==true)
 	{
-		this.outlinehead = this.Openfile(this.repo+"Basichead/1.svg","basichead");
+		this.outlinehead = this.Openfile(walfasrepo+"Basichead/1.svg","basichead");
 		
 		Hair = this.PartsLoad("Hair",dna.Hair);
 		Hair2 = this.PartsLoad("Hair2",dna.Hair);
-		//basichead = this.Openfile(this.repo+"Basichead/0.svg","basichead");
+		//basichead = this.Openfile(walfasrepo+"Basichead/0.svg","basichead");
 		basichead = this.PartsLoad("Basichead",dna.Head);
 		//H2 is a duplicate that helps hide parts to try to make the backsprite cleaner
 		
-		//H2 = this.Openfile(this.repo+"Basichead/0.svg","basichead"); 
+		//H2 = this.Openfile(walfasrepo+"Basichead/0.svg","basichead"); 
 		Hat	= this.PartsLoad("Hats",dna.Hats);
 	}
 
@@ -785,14 +814,14 @@ this.LoadDNA = function(dna,sc,oc,isbacksprite){
 		Shoes = this.LoadPart("Shoes",this.dec(D[7]));
 	}
 	var outlinehead;
-	//this.outlinehead = this.Openfile(this.repo+"Basichead/1.svg","blarg");
+	//this.outlinehead = this.Openfile(walfasrepo+"Basichead/1.svg","blarg");
 	
 	//basichead is the head prop that goes under the hair
 	var basichead;
 	var Accessory;
 	if (isbacksprite!=true)
 	{
-		basichead = this.Openfile(this.repo+"Basichead/0.svg","blarg");
+		basichead = this.Openfile(walfasrepo+"Basichead/0.svg","blarg");
 	}
 	
 	
@@ -860,13 +889,13 @@ this.LoadDNA = function(dna,sc,oc,isbacksprite){
 	var H2;
 	if (isbacksprite==true)
 	{
-		this.outlinehead = this.Openfile(this.repo+"Basichead/1.svg","blarg");
+		this.outlinehead = this.Openfile(walfasrepo+"Basichead/1.svg","blarg");
 		Hair2 = this.LoadPart("Hair2",D[4]);
 		Hair = this.LoadPart("Hair",D[4]);
 		
-		basichead = this.Openfile(this.repo+"Basichead/0.svg","blarg");
+		basichead = this.Openfile(walfasrepo+"Basichead/0.svg","blarg");
 		//H2 is a duplicate that helps hide parts to try to make the backsprite cleaner
-		H2 = this.Openfile(this.repo+"Basichead/0.svg","blarg"); 
+		H2 = this.Openfile(walfasrepo+"Basichead/0.svg","blarg"); 
 		Hat	= this.LoadPart("Hats",this.dec(D[3]));
 		
 		
@@ -1179,9 +1208,12 @@ this.LoadPart = function(feature,index,side)
 {
 	if (index >-1)
 	{
-		var U = this.repo+feature+"/"+index+".svg";
+		var U = walfasrepo+feature+"/"+index+".svg";
 		var ret = this.Openfile(U,feature);
+		if (ret != null)
+		{
 		ret.svg = this.sideSplit(ret.svg,feature,side);
+		}
 	return ret;
 	}
 	return null;
@@ -2326,7 +2358,7 @@ this.imageFromObject = function(objindex,scale,cropped){
 //render walfas dna and get the render as a dataurl
 this.imageSrcFromObject = function(objindex,scale,cropped){
 	//this.LoadDNA(dna);
-	//return this.repo+"Objects"+"/"+objindex+".svg";
+	//return walfasrepo+"Objects"+"/"+objindex+".svg";
 	var CR = this.customrenderer;
 	this.customrenderer = true;
 	allowtransforms = false;
