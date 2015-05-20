@@ -502,15 +502,36 @@ this.LoadADVDNA = function(dna,sc,oc,isbacksprite){
 	if (isbacksprite==true)
 	{
 		this.outlinehead = this.Openfile(walfasrepo+"Basichead/1.svg","basichead");
+		if (this.outlinehead != null)
+		{
+			var xo = -100;
+			var yo = -220;
+			this.outlinehead.x = 100+xo;
+			this.outlinehead.y = 305+yo+5+3;
+			//this.outline head isnt that useful it looks like, so lets just move it off screen....
+			//this.outlinehead.y = -10000;
+		}
+		//this.outlinehead = this.PartsLoad("Basichead",[{src:1}]);
 		
 		Hair = this.PartsLoad("Hair",dna.Hair);
 		Hair2 = this.PartsLoad("Hair2",dna.Hair);
 		//basichead = this.Openfile(walfasrepo+"Basichead/0.svg","basichead");
 		basichead = this.PartsLoad("Basichead",dna.Head);
 		//H2 is a duplicate that helps hide parts to try to make the backsprite cleaner
-		
-		//H2 = this.Openfile(walfasrepo+"Basichead/0.svg","basichead"); 
+		//basichead[0].scale = 1;
+		H2 = this.PartsLoad("Basichead",dna.Head);
+		//H2[0].scale = 1;
 		Hat	= this.PartsLoad("Hats",dna.Hats);
+		
+		//if (isbacksprite==true)
+		{
+			basichead[0].y +=1;
+			H2[0].x = basichead[0].x+6;
+			H2[0].y = basichead[0].y;
+			basichead[0].svg = basichead[0].svg.replace("#fff1dd","#"+dna.HairColor);
+			
+			H2[0].svg = H2[0].svg.replace("#fff1dd","#"+dna.HairColor);
+		}
 	}
 
 	if (isbacksprite==true)
