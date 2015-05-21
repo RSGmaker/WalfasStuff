@@ -1,5 +1,36 @@
 {
 	walfasloader = null;
+	// gets a value in between 2 strings
+function slice2(str,start,end){
+	var SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		return null;
+	}
+	SI = SI + start.length;
+	return str.slice(SI,str.indexOf(end,SI+1));
+}
+// gets a value in between 2 strings and converts it to an integer
+function Pslice2(str,start,end){
+	var SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		return null;
+	}
+	SI = SI + start.length;
+	return parseInt(str.slice(SI,str.indexOf(end,SI+1)));
+}
+// gets a value in between 2 strings and converts it to a float
+function PFslice2(str,start,end){
+	var SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		return null;
+	}
+	SI = SI + start.length;
+	return parseFloat(str.slice(SI,str.indexOf(end,SI+1)));
+}
+
 //if  (ZipLoader != null && ZipLoader != undefined)
 	//var walfasrepo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf2/"
 var walfasrepo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/ea008702777f6353e40c0916e0c355855504da3f/WalfasRender/createswf2/"
@@ -1238,36 +1269,6 @@ this.LoadPart = function(feature,index,side)
 	return ret;
 	}
 	return null;
-}
-// gets a value in between 2 strings
-function slice2(str,start,end){
-	var SI = str.indexOf(start);
-	if (SI == -1)
-	{
-		return null;
-	}
-	SI = SI + start.length;
-	return str.slice(SI,str.indexOf(end,SI+1));
-}
-// gets a value in between 2 strings and converts it to an integer
-function Pslice2(str,start,end){
-	var SI = str.indexOf(start);
-	if (SI == -1)
-	{
-		return null;
-	}
-	SI = SI + start.length;
-	return parseInt(str.slice(SI,str.indexOf(end,SI+1)));
-}
-// gets a value in between 2 strings and converts it to a float
-function PFslice2(str,start,end){
-	var SI = str.indexOf(start);
-	if (SI == -1)
-	{
-		return null;
-	}
-	SI = SI + start.length;
-	return parseFloat(str.slice(SI,str.indexOf(end,SI+1)));
 }
 function fillarray(array,element)
 {
