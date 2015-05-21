@@ -1738,13 +1738,42 @@ if (typeof tobj.scale === "undefined")
 {
 	//initobject(tobj);
 	//these variables are made up so i have to remake them up when they're missing(basicly they just don't save)
-	tobj.scale = PFslice2(tobj.style.transform,"scaleX(",")");
+	var start = "scaleX(";
+	var end = ")";
+	var str = tobj.style.transform;
+	var SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		//return null;
+	}
+	else
+	{
+		SI = SI + start.length;
+		tobj.scale =  parseFloat(str.slice(SI,str.indexOf(end,SI+1)));
+	}
+	
+	//tobj.scale = PFslice2(tobj.style.transform,"scaleX(",")");
 	tobj.direction = 1;
 	if (tobj.scale<0)
 	{
 		tobj.direction = -1;
 	}
-	tobj.rot = PFslice2(tobj.style.transform,"rotate(",")");
+	
+	start = "rotate("";
+	end = ")";
+	str = tobj.style.transform;
+	SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		//return null;
+	}
+	else
+	{
+		SI = SI + start.length;
+		tobj.rot =  parseFloat(str.slice(SI,str.indexOf(end,SI+1)));
+	}
+	
+	//tobj.rot = PFslice2(tobj.style.transform,"rotate(",")");
 }
 ox = parseInt(tobj.style.left,10) - x;
 oy = parseInt(tobj.style.top,10) - y;
