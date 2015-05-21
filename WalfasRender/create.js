@@ -1759,7 +1759,7 @@ if (typeof tobj.scale === "undefined")
 		tobj.direction = -1;
 	}
 	
-	start = "rotate("";
+	start = "rotate(";
 	end = ")";
 	str = tobj.style.transform;
 	SI = str.indexOf(start);
