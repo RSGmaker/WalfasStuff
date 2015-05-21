@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="342.0px"
+   width="237.9px"
+   id="svg11464"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="yuuka.svg">
+  <metadata
+     id="metadata11505">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1012"
+     id="namedview11503"
+     showgrid="false"
+     inkscape:zoom="5.5204678"
+     inkscape:cx="81.098418"
+     inkscape:cy="262.98523"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg11464" />
+  <g
+     transform="matrix(1, 0, 0, 1, 118.05, 273.9)"
+     id="g11466">
+    <use
+       height="150.35"
+       transform="matrix(1.0, 0.0, 0.0, 1.0, -57.05, -138.6)"
+       width="109.35"
+       xlink:href="#shape0"
+       id="use11468" />
+  </g>
+  <g
+     id="shape0"
+     transform="matrix(1, 0, 0, 1, 57.05, 138.6)">
+    <path
+       d="M7.3 -118.7 L1.2 -109.85 Q9.15 -85.9 11.45 -58.6 3.35 -56.95 -4.8 -56.75 L-5.85 -56.7 -5.85 -82.45 -5.85 -56.7 -8.0 -56.7 -9.05 -56.75 Q-17.15 -56.95 -25.25 -58.6 -23.85 -84.2 -18.85 -109.8 L-28.0 -118.95 -26.25 -128.3 Q-19.65 -126.8 -12.75 -126.8 L-9.75 -126.85 -9.2 -126.85 -15.1 -116.35 -13.1 -115.55 -16.85 -88.1 Q-15.35 -85.95 -9.0 -84.9 L-8.0 -84.75 -6.8 -84.6 -6.35 -82.3 -5.85 -82.45 -5.75 -82.45 -4.8 -82.75 Q-1.0 -84.2 1.1 -87.4 L-5.1 -115.5 Q-3.95 -115.85 -2.75 -116.35 L-9.15 -126.85 5.15 -128.1 Q5.2 -126.1 7.3 -118.7 M-15.1 -116.35 L-18.85 -109.8 -15.1 -116.35 M-9.0 -84.9 L-9.05 -56.75 -9.0 -84.9 M-2.75 -116.35 L1.2 -109.85 -2.75 -116.35"
+       fill="#ffffff"
+       fill-rule="evenodd"
+       stroke="none"
+       id="path11481" />
+    <path
+       d="M11.45 -58.6 L11.8 -54.25 Q-6.85 -46.8 -25.5 -54.25 L-25.25 -58.6 Q-17.15 -56.95 -9.05 -56.75 L-8.0 -56.7 -5.85 -56.7 -4.8 -56.75 Q3.35 -56.95 11.45 -58.6"
+       fill="#9a1010"
+       fill-rule="evenodd"
+       stroke="none"
+       id="path11483" />
+    <path
+       d="M-9.2 -126.85 L-9.2 -126.9 -9.15 -126.85 -2.75 -116.35 Q-3.95 -115.85 -5.1 -115.5 -9.35 -114.35 -13.1 -115.55 -9.35 -114.35 -5.1 -115.5 L1.1 -87.4 Q-1.0 -84.2 -4.8 -82.75 L-5.75 -82.45 -5.85 -82.45 -6.35 -82.3 -6.8 -84.6 -8.0 -84.75 -9.0 -84.9 Q-15.35 -85.95 -16.85 -88.1 L-13.1 -115.55 -15.1 -116.35 -9.2 -126.85 M-6.8 -94.25 L-6.8 -84.6 -6.8 -94.25"
+       fill="#f4e02d"
+       fill-rule="evenodd"
+       stroke="none"
+       id="path11485" />
+    <path
+       d="M7.3 -118.7 L1.2 -109.85 Q9.15 -85.9 11.45 -58.6 L11.8 -54.25 12.0 -50.6 27.9 -62.75 M7.3 -118.7 L8.35 -120.2 M-9.15 -126.85 L-9.2 -126.9 -9.2 -126.85 -15.1 -116.35 -13.1 -115.55 Q-9.35 -114.35 -5.1 -115.5 -3.95 -115.85 -2.75 -116.35 L-9.15 -126.85 M-28.0 -118.95 L-18.85 -109.8 -15.1 -116.35 M-28.0 -118.95 L-30.05 -121.05 M-13.1 -115.55 L-16.85 -88.1 Q-15.35 -85.95 -9.0 -84.9 L-8.0 -84.75 M-5.85 -82.45 L-6.35 -82.3 M-5.1 -115.5 L1.1 -87.4 Q-1.0 -84.2 -4.8 -82.75 L-5.75 -82.45 M-5.85 -56.7 L-4.8 -56.75 Q3.35 -56.95 11.45 -58.6 M-25.5 -54.25 L-25.65 -50.1 -43.3 -61.85 M-25.5 -54.25 L-25.25 -58.6 Q-23.85 -84.2 -18.85 -109.8 M-9.05 -56.75 L-8.0 -56.7 -5.85 -56.7 M-25.25 -58.6 Q-17.15 -56.95 -9.05 -56.75 M11.8 -54.25 Q-6.85 -46.8 -25.5 -54.25 M1.2 -109.85 L-2.75 -116.35"
+       fill="none"
+       stroke="#000000"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="4.0"
+       id="path11487" />
+    <path
+       d="M-8.0 -84.75 L-6.8 -84.6 -6.8 -94.25 M-6.35 -82.3 L-6.8 -84.6 M-5.75 -82.45 L-5.85 -82.45 -5.85 -56.7 M-9.05 -56.75 L-9.0 -84.9"
+       fill="none"
+       stroke="#000000"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       stroke-width="2.0"
+       id="path11489" />
+  </g>
+  <defs
+     id="defs11470" />
+</svg>

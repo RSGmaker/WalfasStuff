@@ -32,6 +32,37 @@ var offlinemode = false;
 var currentDNA = -1;
 var laststate="";
 var Sounds = {};
+var walfas = new drawwalfas();
+// gets a value in between 2 strings
+function slice2(str,start,end){
+	var SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		return null;
+	}
+	SI = SI + start.length;
+	return str.slice(SI,str.indexOf(end,SI+1));
+}
+// gets a value in between 2 strings and converts it to an integer
+function Pslice2(str,start,end){
+	var SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		return null;
+	}
+	SI = SI + start.length;
+	return parseInt(str.slice(SI,str.indexOf(end,SI+1)));
+}
+// gets a value in between 2 strings and converts it to a float
+function PFslice2(str,start,end){
+	var SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		return null;
+	}
+	SI = SI + start.length;
+	return parseFloat(str.slice(SI,str.indexOf(end,SI+1)));
+}
 //should be implemented part of preferences menu instead, once that gets made.
 function seteyehotkeys()
 {
@@ -296,11 +327,17 @@ function resetobjectimage(obj)
 	var CN = obj.className;
 			if (CN == "Character")
 			{
-				obj.setAttribute("src",imageSrcFromDNA(obj.getAttribute("alt")));
+				obj.setAttribute("src",walfas.imageSrcFromDNA(obj.getAttribute("alt")));
+			}
+			else if (CN == "ADVCharacter")
+			{
+				var D = JSON.parse(obj.getAttribute("alt"));
+				D.scale = 200;
+				obj.setAttribute("src",walfas.imageSrcFromADVDNA(D));
 			}
 			else if (CN == "ObjectProp")
 			{
-				obj.setAttribute("src",imageSrcFromObject(parseInt(obj.getAttribute("alt")),1.0,false));
+				obj.setAttribute("src",walfas.imageSrcFromObject(parseInt(obj.getAttribute("alt")),1.0,false));
 			}
 			else if (CN == "ImportedAsset")
 			{
@@ -462,11 +499,11 @@ function loadpart(index)
 	try
 	{
 		
-	var I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	var I = walfas.imageSrcFromBackground(part.background,part.backgroundsize / 200);
 	window.setTimeout(function(){
 	if (part.background > -1)
 	{
-	I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	I = walfas.imageSrcFromBackground(part.background,part.backgroundsize / 200);
 	}
 	bdy.style.backgroundImage = "url("+I+")";
 		bdy.style.backgroundPosition = part.backgroundPosition;
@@ -549,12 +586,12 @@ function ChangeBackground(index,position,size)
 	var I = null;
 	if (index > -1)
 	{
-	 I = imageSrcFromBackground(index,size / 300);
+	 I = walfas.imageSrcFromBackground(index,size / 300);
 	}
 	window.setTimeout(function(){
 	if (index > -1)
 	{
-	I = imageSrcFromBackground(index,size/300);
+	I = walfas.imageSrcFromBackground(index,size/300);
 	}
 		bdy.style.backgroundPosition = position;
 		bdy.style.backgroundRepeat = "no-repeat";
@@ -606,12 +643,12 @@ function BGChangeBG(index,scale)
 	{
 	index--;
 	BG_menuSelection--;
-	I = imageSrcFromBackground(index,scale);
+	I = walfas.imageSrcFromBackground(index,scale);
 	}
 	window.setTimeout(function(){
 	if (index > 0)
 	{
-		I = imageSrcFromBackground(index,scale);
+		I = walfas.imageSrcFromBackground(index,scale);
 	}
 	B.src = I;}, 50);
 }
@@ -630,11 +667,11 @@ function SceneMenuUpdate()
 	var part = S.parts[0];
 	//D.innerHTML = part.stage;
 	
-	var I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	var I = walfas.imageSrcFromBackground(part.background,part.backgroundsize / 200);
 	window.setTimeout(function(){
 	if (part.background > -1)
 	{
-	I = imageSrcFromBackground(part.background,part.backgroundsize / 200);
+	I = walfas.imageSrcFromBackground(part.background,part.backgroundsize / 200);
 	}
 	D.style.backgroundImage = "url("+I+")";
 		D.style.backgroundPosition = "top";
@@ -696,7 +733,7 @@ function ColorChange()
 function UpdateCharacterOptions()
 {
 	var CO = document.getElementById("Character Options");
-	CO.style.backgroundImage = "url("+imageSrcFromDNA(dna,null,false,false)+")";
+	CO.style.backgroundImage = "url("+walfas.imageSrcFromDNA(dna,null,false,false)+")";
 }
 function SceneMenuLoad()
 {
@@ -726,7 +763,7 @@ function SetCharacterOptions()
 	edittarget.style.left = document.getElementById("charoptionsX").value+"px";
 	edittarget.style.top = document.getElementById("charoptionsY").value+"px";
 	
-	edittarget.src = imageSrcFromDNA(edittarget.alt,null,false,false);
+	edittarget.src = walfas.imageSrcFromDNA(edittarget.alt,null,false,false);
 	
 	edittarget.style.WebkitTransform = "rotate("+edittarget.rot+"deg) scaleX("+(edittarget.scale*edittarget.direction)+") scaleY("+edittarget.scale+")";
 	edittarget.style.transform = edittarget.style.WebkitTransform;
@@ -880,15 +917,30 @@ function AddTextBubble(type)
 }
 function AddCharacter(dna,dble)
 {
-	if (dble==true)
-	{
-	//double the scale so scaling looks less bad.
-	dna = editdna(dna,2,parseFloat(getdnavalue(dna,2)) * 2);
-	}
-	var I = imageSrcFromDNA(dna,null,false,false);
+	var adv = false;
+	var I = null;
+	if (dna[0] == "{")
+		{
+			var D = JSON.parse(dna);
+			if (dble==true)
+			{
+				D.scale = 200;
+			}
+			I = walfas.imageSrcFromADVDNA(D,null,false,false);
+			adv = true;
+		}
+		else
+		{
+			if (dble==true)
+			{
+				//double the scale so scaling looks less bad.
+				dna = editdna(dna,2,parseFloat(getdnavalue(dna,2)) * 2);
+			}
+			I = walfas.imageSrcFromDNA(dna,null,false,false);
+		}
 	if (false)
 	{
-	window.setTimeout(function(){I = imageSrcFromDNA(dna,null,false,false);
+	window.setTimeout(function(){I = walfas.imageSrcFromDNA(dna,null,false,false);
 	var img = document.createElement("img"); 
 		img.src = I;
 		
@@ -916,6 +968,11 @@ function AddCharacter(dna,dble)
 		
 		img.alt = dna;
 		img.className = "Character";
+		if (adv)
+		{
+			img.className = "ADVCharacter";
+		}
+		
 		
 		
 		imgs[count]=new Image;
@@ -940,10 +997,10 @@ function LoadObject()
 {
 	var elt = document.getElementById("objectchoice");
 	var d = parseInt(elt.options[elt.selectedIndex].value)-1;
-	var I = imageSrcFromObject(d,1.0,false);
+	var I = walfas.imageSrcFromObject(d,1.0,false);
 	if (false)
 	{
-	window.setTimeout(function(){I = imageSrcFromObject(d,1.0,false);
+	window.setTimeout(function(){I = walfas.imageSrcFromObject(d,1.0,false);
 	var img = document.createElement("img"); 
 		img.src = I;
     
@@ -1057,7 +1114,7 @@ function DNAChangeDNA(i)
 	//alert("DNA "+d);
 	//var img = document.getElementById("DNA Preview");
 	//img.src = imageSrcFromDNA(d,null,false,false);
-	var I = imageSrcFromDNA(d,null,false,false);
+	var I = walfas.imageSrcFromDNA(d,null,false,false);
 	var m = document.getElementById("DNA Menu");
 	m.style.backgroundImage = "url("+I+")";
 	m.style.backgroundSize = 250+"px"
@@ -1127,7 +1184,7 @@ function RandomizeAll()
 			var d = randomDNA();
 			d = editdna(d,2,parseInt(getdnavalue(d,2)) * 2);
 			C[i].alt = d;
-			C[i].src = imageSrcFromDNA(d,null,false,false);
+			C[i].src = walfas.imageSrcFromDNA(d,null,false,false);
 		}
 		i++;
 	}
@@ -1207,6 +1264,16 @@ function doubleclick(e)
 			edittarget = lobj;
 			dna = lobj.alt;
 			DisplayCharacterOptions();
+		}
+		if (lobj.className == "ADVCharacter")
+		{
+			//edittarget = lobj;
+			//dna = lobj.alt;
+			var D = prompt("edit advanced dna",lobj.alt);
+			//lobj.alt = D;
+			lobj.setAttribute("alt",D);
+			resetobjectimage(lobj);
+			//DisplayCharacterOptions();
 		}
 	}
 }
@@ -1526,13 +1593,13 @@ function keydown(e)
 		{
 			if (lobj.backsprite!=true)
 			{
-				lobj.src = imageSrcFromDNA(lobj.alt,null,false,true);
+				lobj.src = walfas.imageSrcFromDNA(lobj.alt,null,false,true);
 				lobj.backsprite=true
 				pushstate();
 			}
 			else
 			{
-				lobj.src = imageSrcFromDNA(lobj.alt,null,false,false);
+				lobj.src = walfas.imageSrcFromDNA(lobj.alt,null,false,false);
 				lobj.backsprite=false;
 				pushstate();
 			}
@@ -1671,13 +1738,42 @@ if (typeof tobj.scale === "undefined")
 {
 	//initobject(tobj);
 	//these variables are made up so i have to remake them up when they're missing(basicly they just don't save)
-	tobj.scale = PFslice2(tobj.style.transform,"scaleX(",")");
+	var start = "scaleX(";
+	var end = ")";
+	var str = tobj.style.transform;
+	var SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		//return null;
+	}
+	else
+	{
+		SI = SI + start.length;
+		tobj.scale =  parseFloat(str.slice(SI,str.indexOf(end,SI+1)));
+	}
+	
+	//tobj.scale = PFslice2(tobj.style.transform,"scaleX(",")");
 	tobj.direction = 1;
 	if (tobj.scale<0)
 	{
 		tobj.direction = -1;
 	}
-	tobj.rot = PFslice2(tobj.style.transform,"rotate(",")");
+	
+	start = "rotate(";
+	end = ")";
+	str = tobj.style.transform;
+	SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		//return null;
+	}
+	else
+	{
+		SI = SI + start.length;
+		tobj.rot =  parseFloat(str.slice(SI,str.indexOf(end,SI+1)));
+	}
+	
+	//tobj.rot = PFslice2(tobj.style.transform,"rotate(",")");
 }
 ox = parseInt(tobj.style.left,10) - x;
 oy = parseInt(tobj.style.top,10) - y;
@@ -1846,11 +1942,11 @@ function setstate(state)
 		loadpart(state.currentpart);
 		//bdy.style.backgroundImage = state.BGImage;
 		
-		var I = imageSrcFromBackground(state.BGImage,state.BGsize / 200);
+		var I = walfas.imageSrcFromBackground(state.BGImage,state.BGsize / 200);
 	window.setTimeout(function(){
 	if (state.BGImage > -1)
 	{
-	I = imageSrcFromBackground(state.BGImage,state.BGsize / 200);
+	I = walfas.imageSrcFromBackground(state.BGImage,state.BGsize / 200);
 	}
 	bdy.style.backgroundImage = "url("+I+")";
 		bdy.style.backgroundPosition = state.BGpos;
