@@ -914,7 +914,9 @@ function LoadDNA(dna)
 	{
 		Hair.x = 100+xo;
 		Hair.y = 310+yo-3;
-		Hair.svg = Hair.svg.replace(Hair.svg.substr(Hair.svg.indexOf("#"),7),"#"+D[13])
+		//Hair.svg = Hair.svg.replace(Hair.svg.substr(Hair.svg.indexOf("#"),7),"#"+D[13])
+		Hair.svg = Hair.svg.replace(Hair.svg.substr(Hair.svg.indexOf('fill="')+6,7),"#"+D[13])
+		Hair.svg = Hair.svg.replace(Hair.svg.substr(Hair.svg.indexOf('fill:')+5,7),"#"+D[13])
 	}
 	if (Hair2 != null)
 	{
