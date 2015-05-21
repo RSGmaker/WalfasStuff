@@ -33,6 +33,36 @@ var currentDNA = -1;
 var laststate="";
 var Sounds = {};
 var walfas = new drawwalfas();
+// gets a value in between 2 strings
+function slice2(str,start,end){
+	var SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		return null;
+	}
+	SI = SI + start.length;
+	return str.slice(SI,str.indexOf(end,SI+1));
+}
+// gets a value in between 2 strings and converts it to an integer
+function Pslice2(str,start,end){
+	var SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		return null;
+	}
+	SI = SI + start.length;
+	return parseInt(str.slice(SI,str.indexOf(end,SI+1)));
+}
+// gets a value in between 2 strings and converts it to a float
+function PFslice2(str,start,end){
+	var SI = str.indexOf(start);
+	if (SI == -1)
+	{
+		return null;
+	}
+	SI = SI + start.length;
+	return parseFloat(str.slice(SI,str.indexOf(end,SI+1)));
+}
 //should be implemented part of preferences menu instead, once that gets made.
 function seteyehotkeys()
 {
