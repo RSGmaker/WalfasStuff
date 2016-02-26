@@ -4,6 +4,8 @@
 	var collabactive = false;
 	var channel;
 	var auto_rid = "";
+	var collabready = false;
+	var collabltime = null;
 	function startcollab()
 	{
 		if (!collabactive)
@@ -32,6 +34,7 @@
 	channel = new DataChannel("CreateHtml_"+rid);
 	channel.onopen = function(userid) {
 		onlineusers = onlineusers + 1;
+		collabltime = Date.now();
 		//prevent new users from blanking out others stages.
 		if (stg.innerHTML != "")
 		{
@@ -139,7 +142,17 @@
 	{
 		if (collabactive)
 		{
-			channel.send(msg);
+			if (!collabready)
+			{
+				if ((Date.now() - collabltime) >= 3000)
+				{
+					collabready = true;
+				}
+			}
+			if (collabready)
+			{
+				channel.send(msg);
+			}
 		}
 	}
 	function collabpush(state)
