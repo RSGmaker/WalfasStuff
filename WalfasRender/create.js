@@ -597,7 +597,6 @@ function ChangeBackground(index,position,size)
 		bdy.style.backgroundRepeat = "no-repeat";
 		bdy.style.backgroundImage = "url("+I+")";
 		bdy.style.backgroundSize = (size)+"px";
-		pushstate();
 		}, 50
 		);
 		
@@ -622,7 +621,7 @@ function SetBGOptions()
 	}
 	var pos = X+" "+Y;
 	ChangeBackground(BG_menuSelection,pos,SC * 400);
-		
+	pushstate();
 }
 function HideBGOptions()
 {
