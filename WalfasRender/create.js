@@ -1904,7 +1904,10 @@ function pushstate()
 	if (state != laststate)
 	{
 		//add undo state
-		history.pushState(state,"Create.html","");
+		if (location.origin.toLowerCase() != "file://")
+		{
+			history.pushState(state,"Create.html","");
+		}
 		
 		//collab features
 		if (collabpush)
@@ -2127,7 +2130,7 @@ if (localStorage.maxstorage == undefined)
 	}
 	localStorage.clear();
 	localStorage.maxstorage = i * 1000;
-	alert("maxstorage:"+localStorage.maxstorage);
+	///alert("maxstorage:"+localStorage.maxstorage);
 	//scenelist = {};
 }
 if (localStorage.scenes == undefined)

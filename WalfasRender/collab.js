@@ -3,6 +3,7 @@
 	var rid = "DEV";
 	var collabactive = false;
 	var channel;
+	var auto_rid = "";
 	function startcollab()
 	{
 		if (!collabactive)
@@ -14,7 +15,14 @@
 			alert("You are in room:"+rid);
 			return;
 		}
-		rid = prompt("Enter a room name for your collab\r(Warning:this feature is experimental and may have odd behavior in some cases)");
+		if (auto_rid == "")
+		{
+			rid = prompt("Enter a room name for your collab\r(Warning:this feature is experimental and may have odd behavior in some cases)");
+		}
+		else
+		{
+			rid = auto_rid;
+		}
 		if (rid == "")
 		{
 			collabactive = false;
@@ -154,6 +162,24 @@
 	{
 		var data = {command:"SetBG",id:index,pos:position,size:size};
 		send(JSON.stringify(data));
+	}
+	
+	if (location.search.indexOf("?") > -1){
+		var TD = location.search.split('?')[1].split("&");
+		var ji = 0;
+		while (ji<TD.length)
+		{
+			var TTD = TD[ji].split("=");
+			if (TTD[0]=="rid")
+			{
+			
+				var U = TTD[1];
+				auto_rid = U;
+				startcollab();
+				
+			}
+			ji = ji + 1;
+		}
 	}
 			/*channel.onopen = oc.onopen;
 			channel.onmessage = oc.onmessage
