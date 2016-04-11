@@ -77,8 +77,21 @@ this.colors = [];
 this.OHairColor = null;
 this.HairColor = null;
 
-//var ZipLoader;
+//I keep messing up the transform order on this feature so it's disabled by default.
 this.allowtransforms = false;
+
+//minimalistic render data.
+//the last non-black color drawn.
+this._lcolor = "#000000";
+//if false, anytime the color black is drawn, we replace it with another color.
+this.drawblack = true;
+//reset the last color used each time a new asset is drawn.
+this.Ndrawblackresetdefault = false;
+//select last fill color as default instead of the first.
+this.Ndrawblackresetlast = false;
+//requires drawblack set to false to function, prevents _lcolor from changing once the default gets set, and all colors get replaced not just black.
+this.singlecolormode = false;
+
 
 this.Openfile = function(req,type) {
 	if (typeof req == "string")
@@ -1194,6 +1207,10 @@ this.LoadDNA = function(dna,sc,oc,isbacksprite){
 	}
 	}
 }
+function randomcolor2()
+{
+	return '#'+Math.floor(Math.random()*16777215).toString(16);
+}
 //used as a lazy way to fix indexes.
 this.dec = function(strind)
 {
@@ -1281,6 +1298,49 @@ function fillarray(array,element)
 	}
 }
 
+this.cancelBlack = function(fcolor,scolor){
+	if (scolor != null && scolor!="none")
+	{
+		if (scolor != "#000000" && !this.singlecolormode)
+		{
+			if (scolor.indexOf("#")==0 || scolor.indexOf("url(#")==0)
+			{
+				this._lcolor = scolor;
+			}
+			else
+			{
+				alert("what?!?:"+scolor);
+			}
+		}
+		else if (this._lcolor != null)
+		{
+			scolor = this._lcolor;
+		}
+	}
+	if (fcolor != null && fcolor!="none")
+	{
+		if (fcolor != "#000000" && !this.singlecolormode)
+		{
+			if (fcolor.indexOf("#")==0 || fcolor.indexOf("url(#")==0)
+			{
+				this._lcolor = fcolor;
+			}
+			else
+			{
+				alert("what?!?:"+fcolor);
+			}
+		}
+		else if (this._lcolor != null)
+		{
+			fcolor = this._lcolor;
+		}
+	}
+	var ret = {};
+	ret.scolor = scolor;
+	ret.fcolor = fcolor;
+	return ret;
+}
+
 //the xml version of this.drawsvg which will likely be more compatible
 this.drawxml = function(context,xml,x,y){
 	var i = 0;
@@ -1293,6 +1353,30 @@ this.drawxml = function(context,xml,x,y){
 	var G;
 	grd = null;
 	var svg = [];
+	if (!this.drawblack && this.Ndrawblackresetdefault)
+	{
+		//if we're removing the color black, then we need to look for a default color.
+		var XT = new XMLSerializer();
+		var svgtxt = XT.serializeToString(xml);;
+		var ok = false;
+		while (!ok && svgtxt.indexOf("fill=\"")>=0)
+		{
+			var C = slice2(svgtxt,"fill=\"","\"");
+			if (C!=null && C != "#000000" && C!="none")
+			{
+				this._lcolor = C;
+				if (!this.Ndrawblackresetlast)
+				{
+					ok = true;
+				}
+			}
+			svgtxt = svgtxt.substr(svgtxt.indexOf("fill=\"")+3);
+		}
+		if (this.randomcols)
+		{
+			this._lcolor = randomcolor2();
+		}
+	}
 	//flatten elements into 1 single array so it processes in the same order as the text parser
 	fillarray(svg,xml.getElementsByTagName("svg")[0]);
 	while (i < svg.length)
@@ -1450,11 +1534,17 @@ this.drawxml = function(context,xml,x,y){
 					II = II + 1;
 				}
 			}
+			if (!this.drawblack)
+			{
+				var C = this.cancelBlack(fcolor,scolor);
+				fcolor = C.fcolor;
+				scolor = C.scolor;
+			}
 			
 			if (scolor != null)
 			{
 				context.strokeStyle=scolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.strokeStyle=randomcolor2();
 				}
@@ -1514,6 +1604,12 @@ this.drawxml = function(context,xml,x,y){
 					II = II + 1;
 				}
 			}
+			if (!this.drawblack)
+			{
+				var C = this.cancelBlack(fcolor,scolor);
+				fcolor = C.fcolor;
+				scolor = C.scolor;
+			}
 			
 			if (fcolor != null)
 			{
@@ -1531,7 +1627,7 @@ this.drawxml = function(context,xml,x,y){
 					fcolor = Gradients[slice2(fcolor,"url(#",")")];
 				}
 				context.fillStyle=fcolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.fillStyle=randomcolor2();
 				}
@@ -1561,7 +1657,7 @@ this.drawxml = function(context,xml,x,y){
 			if (scolor != null)
 			{
 				context.strokeStyle=scolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.strokeStyle=randomcolor2();
 				}
@@ -1654,6 +1750,12 @@ this.drawxml = function(context,xml,x,y){
 					II = II + 1;
 				}
 			}
+			if (!this.drawblack)
+			{
+				var C = this.cancelBlack(fcolor,scolor);
+				fcolor = C.fcolor;
+				scolor = C.scolor;
+			}
 			
 			if (fcolor != null)
 			{
@@ -1671,7 +1773,7 @@ this.drawxml = function(context,xml,x,y){
 					fcolor = Gradients[slice2(fcolor,"url(#",")")];
 				}
 				context.fillStyle=fcolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.fillStyle=randomcolor2();
 				}
@@ -1686,7 +1788,7 @@ this.drawxml = function(context,xml,x,y){
 			if (scolor != null)
 			{
 				context.strokeStyle=scolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.strokeStyle=randomcolor2();
 				}
@@ -1748,6 +1850,12 @@ this.drawxml = function(context,xml,x,y){
 					II = II + 1;
 				}
 			}
+			if (!this.drawblack)
+			{
+				var C = this.cancelBlack(fcolor,scolor);
+				fcolor = C.fcolor;
+				scolor = C.scolor;
+			}
 			
 			if (fcolor != null)
 			{
@@ -1765,7 +1873,7 @@ this.drawxml = function(context,xml,x,y){
 					fcolor = Gradients[slice2(fcolor,"url(#",")")];
 				}
 				context.fillStyle=fcolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.fillStyle=randomcolor2();
 				}
@@ -1779,7 +1887,7 @@ this.drawxml = function(context,xml,x,y){
 			if (scolor != null)
 			{
 				context.strokeStyle=scolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.strokeStyle=randomcolor2();
 				}
@@ -1845,6 +1953,12 @@ this.drawxml = function(context,xml,x,y){
 					II = II + 1;
 				}
 			}
+			if (!this.drawblack)
+			{
+				var C = this.cancelBlack(fcolor,scolor);
+				fcolor = C.fcolor;
+				scolor = C.scolor;
+			}
 			
 			if (fcolor != null)
 			{
@@ -1862,7 +1976,7 @@ this.drawxml = function(context,xml,x,y){
 					fcolor = Gradients[slice2(fcolor,"url(#",")")];
 				}
 				context.fillStyle=fcolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.fillStyle=randomcolor2();
 				}
@@ -1875,7 +1989,7 @@ this.drawxml = function(context,xml,x,y){
 			if (scolor != null)
 			{
 				context.strokeStyle=scolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.strokeStyle=randomcolor2();
 				}
@@ -1973,6 +2087,12 @@ this.drawxml = function(context,xml,x,y){
 					II = II + 1;
 				}
 			}
+			if (!this.drawblack)
+			{
+				var C = this.cancelBlack(fcolor,scolor);
+				fcolor = C.fcolor;
+				scolor = C.scolor;
+			}
 
 			context.translate(x,y);
 			if (trans != null)
@@ -1998,7 +2118,7 @@ this.drawxml = function(context,xml,x,y){
 					fcolor = Gradients[slice2(fcolor,"url(#",")")];
 				}
 				context.fillStyle=fcolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.fillStyle=randomcolor2();
 				}
@@ -2012,7 +2132,7 @@ this.drawxml = function(context,xml,x,y){
 			if (scolor != null && (scolor != "none"))
 			{
 				context.strokeStyle=scolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.strokeStyle=randomcolor2();
 				}
@@ -2330,7 +2450,7 @@ this.drawsvg = function(context,svg,x,y){
 					fcolor = Gradients[slice2(fcolor,"url(#",")")];
 				}
 				context.fillStyle=fcolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.fillStyle=randomcolor2();
 				}
@@ -2343,7 +2463,7 @@ this.drawsvg = function(context,svg,x,y){
 			if (scolor != null && (scolor.charAt(0) == "#"))
 			{
 				context.strokeStyle=scolor;
-				if (this.randomcols)
+				if (this.randomcols && this.drawblack)
 				{
 					context.strokeStyle=randomcolor2();
 				}

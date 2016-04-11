@@ -1,0 +1,24 @@
+﻿<html>
+
+<body>
+<script src="drawwalfas.js"></script>
+<script>
+	var walfas = new drawwalfas();
+	walfas.drawblack = false;
+	var dna = prompt("enter DNA","3.39:Meiling:100:1:0:1:1:1:0:0:0:0:0:EB585A");
+	var mode = prompt("Which color mode do you want to use?\n0=Keep last color.\n1=Reset color per asset.\n2=single non-black color per asset.","0");
+	walfas.imageFromDNA(dna,null,false,false);
+	if (mode == "2" || mode=="1")
+	{
+		walfas.Ndrawblackresetdefault=true;
+		if (mode == "2")
+		{
+			walfas.singlecolormode=true;
+		}
+	}
+	//walfas.Ndrawblackresetdefault = confirm("Which color mode do you want to use?\nOK=Reset color per asset.\nCancel=Keep last color")
+	document.body.appendChild(walfas.imageFromDNA(dna,null,false,false));
+</script>
+</body>
+
+</html>

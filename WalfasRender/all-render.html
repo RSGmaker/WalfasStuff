@@ -1,0 +1,64 @@
+﻿<html>
+
+<body>
+<!--<table border="1" style="width:100%">
+<tr id="img"/>
+<tr id="txt"/>
+</table>-->
+<script src="drawwalfas.js"></script>
+<script>
+function appendtext(text)
+{
+	/*var tn = document.createTextNode(text);
+    document.body.appendChild(tn);*/
+	document.body.insertAdjacentHTML( 'beforeend', "<div style='float:left'>"+text+"</div>" );
+}
+function appendtextwithimage(text,image)
+{
+	var T = document.createElement("TABLE");
+	T.border=1;
+	T.style="display: inline-table;"
+	//var row = document.getElementById("img");
+	var row = T.insertRow(-1);
+	row.style="background-color:#EEEEEE";
+	var col = row.insertCell(-1);
+	col.appendChild(image);
+	
+	//row = document.getElementById("txt");
+	row = T.insertRow(-1);
+	col = row.insertCell(-1);
+	col.innerHTML = text;
+	document.body.appendChild(T);
+}
+	var walfas = new drawwalfas();
+	var cropping = true;
+	var dna = prompt("enter DNA","3.39:Meiling:100:1:0:1:1:1:0:0:0:0:0:EB585A");
+	
+	//normal
+	appendtextwithimage("Normal",walfas.imageFromDNA(dna,null,cropping,false));
+	//backsprite
+	appendtextwithimage("Backsprite",walfas.imageFromDNA(dna,null,cropping,true));
+	//random color
+	walfas.randomcols = true;
+	appendtextwithimage("Random color",walfas.imageFromDNA(dna,null,cropping,false));
+	walfas.randomcols = false;
+	//minimalistic
+	walfas.drawblack = false;
+	appendtextwithimage("Minimalistic:Keep color",walfas.imageFromDNA(dna,null,cropping,false));
+	walfas.Ndrawblackresetdefault=true;
+	appendtextwithimage("Minimalistic:Reset color",walfas.imageFromDNA(dna,null,cropping,false));
+	walfas.Ndrawblackresetlast=true;
+	appendtextwithimage("Minimalistic:Reset color(select last)",walfas.imageFromDNA(dna,null,cropping,false));
+	walfas.singlecolormode=true;
+	walfas.Ndrawblackresetlast=false;
+	appendtextwithimage("Minimalistic:Single color",walfas.imageFromDNA(dna,null,cropping,false));
+	walfas.Ndrawblackresetlast=true;
+	appendtextwithimage("Minimalistic:Single color(select last)",walfas.imageFromDNA(dna,null,cropping,false));
+	/*walfas.Ndrawblackresetlast=false;
+	walfas.randomcols = true;
+	appendtextwithimage("Minimalistic:Single random color",walfas.imageFromDNA(dna,null,cropping,false));
+	walfas.randomcols = false;*/
+</script>
+</body>
+
+</html>
