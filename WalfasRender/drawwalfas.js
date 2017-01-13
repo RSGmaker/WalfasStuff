@@ -33,7 +33,7 @@ function PFslice2(str,start,end){
 
 //if  (ZipLoader != null && ZipLoader != undefined)
 	//var walfasrepo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/master/WalfasRender/createswf2/"
-var walfasrepo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/ea008702777f6353e40c0916e0c355855504da3f/WalfasRender/createswf2/"
+var walfasrepo = "https://cdn.rawgit.com/RSGmaker/WalfasStuff/f8e4fa95cb3e2c3f02e7f3f7eb2a6dceeddc1cae/WalfasRender/createswf2/"
 {
 	var T = document.title;
 	document.title = "Loading assets...";
